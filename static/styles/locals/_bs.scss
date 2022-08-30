@@ -1,0 +1,90 @@
+a.nav-link {
+    padding: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    color: var(--dark);
+    &:hover {
+        color: var(--primary-dark);
+    }
+    &:focus {
+        color: var(--primary-dark);
+    }
+    &.active {
+        color: var(--primary-dark);
+        font-weight: 700;
+        text-decoration: underline;
+    }
+}
+
+div.alert {
+    border: 2px solid crimson;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    button.btn-close {
+        padding-top: 13px;
+        padding-bottom: 15px;
+        padding-right: 10px;
+    }
+}
+
+ul.dropdown-menu {
+    padding: 0px;
+}
+
+.bg-lightdark {
+    background-color: rgb(235, 235, 235);
+}
+
+// additional custom class
+.fs-xxl {
+    font-size: 7rem;
+}
+.fs-xl {
+    font-size: 5rem;
+}
+.fs-7 {
+    font-size: .9rem;
+}
+
+.fs-8 {
+    font-size: .8rem;
+}
+
+.badge-sidebar {
+    text-decoration: none;
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    background-color: #2378a3;
+    padding: 2px 10px;
+    border-radius: 3px;
+    &:hover {
+        color: white;
+        background-color: #2a90c4;
+    }
+}
+
+
+//make bootstrap floatform radio button appear inline
+fieldset.bs_radio_field {
+    div.form-radio {
+        div {
+            display: inline;
+            margin-right: 1em;
+        }
+    }
+}
+
+// border with breakpoints
+@media only screen and (min-width: 768px){
+    .borderonly-lg-left {
+        border-left: 1px solid rgb(211, 210, 210);
+        border-top: none;
+    }
+}
+@media only screen and (max-width: 768px){
+    .borderonly-md-top {
+        border-top: 1px solid rgb(211, 210, 210);
+        border-left: none;
+    }
+}

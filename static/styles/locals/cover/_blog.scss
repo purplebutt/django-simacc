@@ -1,0 +1,24 @@
+section.blog {
+    h2,h3,p {
+        color: var(--st-patricks-blue);
+    }
+    h2.underline {
+        position: relative;
+        &::before {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            width: 80%;
+            height: 8px;
+            transform: translateX(10%);
+            background-image: var(--gradient-2);
+            border-radius: 5px;
+        }
+    }
+    div.content {
+        a {
+            color: var(--st-patricks-blue);
+            text-transform: capitalize;
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{% extends 'apps/_shared/acc.html' %}
+
+
+{% block page_tittle %}Company List{% endblock page_tittle %}
+
+{% block acc_content %}
+    <h1>Company List</h1>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Address</th>
+                <th scope="col">Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in objects %}
+                <tr>
+                    <th scope="row">
+                        <a href="{{c.get_absolute_url}}">{{c.pk}}</a>
+                    </th>
+                    <td>{{c.name}}</td>
+                    <td>{{c.address}}</td>
+                    <td>{{c.phone}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock acc_content %}

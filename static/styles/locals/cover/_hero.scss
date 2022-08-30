@@ -1,0 +1,13 @@
+section.hero {
+    background-image: url("/static/images/section/hero/hero-bg.png"),
+                      var(--gradient-1);
+    background-repeat: no-repeat, no-repeat;
+    background-position: center, center;
+    background-size: cover, cover;
+    div.hero-content {
+        margin-block-end: 50px;
+        p {
+            text-align: justify;
+        }
+    }
+}

@@ -1,0 +1,124 @@
+{% load static %}
+{% load humanize %}
+
+<section id="blog" class="blog">
+    <div class="container">
+        <h2 class="underline"> Our Blog & News </h2>
+        <div class="row g-3">
+            {% for b in blogs %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="blog-card">
+                        <a href="{{b.url}}">
+                            <img src="{{b.img}}" width="750" height="350"
+                            loading="lazy" alt="blog1" class="img-cover">
+                        </a>
+                        <div class="content mb-auto">
+                            <a class="fs-3 fw-bold" href="#blog1">{{b.title}}</a>
+                            <p class="fs-5">{{b.content}}</p>
+                        </div>
+                        <info>
+                            <div class="publish-date">
+                                <i class="fa fa-clock fa-fw" aria-hidden="true"></i>
+                                {% now "d M, Y" %}
+                            </div>
+                            <div class="comments">
+                                <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
+                                {{ b.comments|intcomma }}
+                            </div>
+                            <a href="{{b.share}}" title="Share">
+                                <i class="fa fa-share-nodes fa-fw" aria-hidden="true"></i>
+                            </a>
+                            <a href="{{b.report}}" title="Report">
+                                <i class="fa fa-flag fa-fw" aria-hidden="true"></i>
+                            </a>
+                        </info>
+                    </div>
+                </div>
+            {% endfor %}
+            {% comment %} <div class="col-md-6 col-lg-3">
+                <div class="blog-card">
+                    <a href="#">
+                        <img src="{% static 'images/blog-2.jpg' %}" width="750" height="350"
+                        loading="lazy" alt="blog1" class="img-cover">
+                    </a>
+                    <div class="content mb-auto">
+                        <a class="fs-3 fw-bold" href="#blog1">{% lorem 4 w random %}</a>
+                        <p class="fs-5">{% lorem 15 w random %}</p>
+                    </div>
+                    <info>
+                        <div class="publish-date">
+                            <i class="fa fa-clock fa-fw" aria-hidden="true"></i>
+                            {% now "d M, Y" %}
+                        </div>
+                        <div class="comments">
+                            <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
+                            {{ 12300|intcomma }}
+                        </div>
+                        <a href="#share" title="Share">
+                            <i class="fa fa-share-nodes fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="#report" title="Report">
+                            <i class="fa fa-flag fa-fw" aria-hidden="true"></i>
+                        </a>
+                    </info>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="blog-card">
+                    <a href="#">
+                        <img src="{% static 'images/blog-3.jpg' %}" width="750" height="350"
+                        loading="lazy" alt="blog1" class="img-cover">
+                    </a>
+                    <div class="content mb-auto">
+                        <a class="fs-3 fw-bold" href="#blog1">{% lorem 5 w random %}</a>
+                        <p class="fs-5">{% lorem 15 w random %}</p>
+                    </div>
+                    <info>
+                        <div class="publish-date">
+                            <i class="fa fa-clock fa-fw" aria-hidden="true"></i>
+                            {% now "d M, Y" %}
+                        </div>
+                        <div class="comments">
+                            <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
+                            {{ 12300|intcomma }}
+                        </div>
+                        <a href="#share" title="Share">
+                            <i class="fa fa-share-nodes fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="#report" title="Report">
+                            <i class="fa fa-flag fa-fw" aria-hidden="true"></i>
+                        </a>
+                    </info>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="blog-card">
+                    <a href="#">
+                        <img src="{% static 'images/blog-4.jpg' %}" width="750" height="350"
+                        loading="lazy" alt="blog1" class="img-cover">
+                    </a>
+                    <div class="content mb-auto">
+                        <a class="fs-3 fw-bold" href="#blog1">{% lorem 3 w random %}</a>
+                        <p class="fs-5">{% lorem 15 w random %}</p>
+                    </div>
+                    <info>
+                        <div class="publish-date">
+                            <i class="fa fa-clock fa-fw" aria-hidden="true"></i>
+                            {% now "d M, Y" %}
+                        </div>
+                        <div class="comments">
+                            <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
+                            {{ 12300|intcomma }}
+                        </div>
+                        <a href="#share" title="Share">
+                            <i class="fa fa-share-nodes fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="#report" title="Report">
+                            <i class="fa fa-flag fa-fw" aria-hidden="true"></i>
+                        </a>
+                    </info>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,13 @@
+{% extends '_shared/base.html' %}
+
+
+{% block page_title %}{{object.user|title}} profile{% endblock page_title %}
+{% block base_content %}
+    <div class="container">
+        <h3><a href="{{object.get_absolute_url}}">{{object.user|title}}</a></h3>
+        <p>{{object.user.firstname}}</p>
+        <p>{{object.user.lastname}}</p>
+        <p>{{object.address}}</p>
+        <p>{{object.gender}}</p>
+    </div>
+{% endblock base_content %}

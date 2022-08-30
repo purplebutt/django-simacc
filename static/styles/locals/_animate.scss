@@ -1,0 +1,18 @@
+img.img-animate {
+    animation: waveAnim 2s linear infinite alternate;
+}
+
+@keyframes waveAnim {
+    0% { transform: translate(0, 0) rotate(0); }
+    100% { transform: translate(3px, 5px) rotate(2deg); }
+}
+
+@keyframes rotate90deg {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(90deg);}
+}
+
+@keyframes rotate90deg_back {
+    0% {transform: rotate(90deg);}
+    100% {transform: rotate(0deg);}
+}

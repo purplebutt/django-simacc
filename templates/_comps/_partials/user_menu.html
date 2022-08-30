@@ -1,0 +1,47 @@
+{% load static %}
+{% load core_tags %}
+
+<div class="ms-3 d-flex flex-row justify-content-center align-items-center">
+    {% if user.is_authenticated %}
+        <div class="nav-item dropdown">
+            <a id="userMenu" role="button" 
+                data-bs-toggle="dropdown" title="{{user|title}}">{% profile_pic user %}</a>
+            <ul class="dropdown-menu dropdown-menu-end text-center text-lg-start" aria-labelledby="userMenuDropdown">
+                <a class="dropdown-item border" href="{% url 'accounts:myprofile' %}"><i class="fa fa-address-card me-2"></i>My Profile</a>
+                <a class="dropdown-item border" type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#changePasswordModal"
+                    hx-swap="innerHTML"
+                    hx-target="#changePasswordModalContent"
+                    hx-get="{% url 'account_change_password' %}"
+                    >
+                    <i class="fa fa-key me-2"></i>Change Password</a>
+                <a class="dropdown-item border"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#updatePictureModal"
+                    hx-swap="innerHTML"
+                    hx-target="#updatePictureModalContent"
+                    hx-get="{% url 'accounts:update_picture' %}"
+                    ><i class="fa fa-image me-2"></i>Change Picture</a>
+                <a class="dropdown-item border"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#logoutModal"
+                    hx-swap="innerHTML"
+                    hx-target="#logoutModalContent"
+                    hx-get="{% url 'account_logout' %}"><i class="fa fa-right-from-bracket me-2"></i>Logout</a>
+            </ul>
+        </div>
+    {% else %}
+        <div>
+            <a id="btn-signin" class="p-1 btn btn-warning"
+                data-bs-toggle="modal"
+                data-bs-target="#loginModal"
+                hx-swap="innerHTML"
+                hx-target="#loginModalContent"
+                hx-get="{% url 'account_login' %}"
+            >Login</a>
+        </div>
+    {% endif %}
+</div>

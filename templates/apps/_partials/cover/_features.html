@@ -1,0 +1,21 @@
+<section id="features" class="features">
+    <div class="container">
+        <h2 class="underline">Our Features</h2>
+        <div class="row g-4">
+            {% for d in features %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card d-flex flex-row align-items-start">
+                        <div class="icon-container me-4"> <i class="fa {{d.icon}} fa-fw" aria-hidden="true"></i> </div>
+                        <div class="content-container d-flex flex-column justify-content-between">
+                            <h3>{{d.title|upper}}</h3>
+                            <p class="text-muted">{{d.content|capfirst}}</p>
+                            <a href="{{d.url}}"a class="icon-container ms-auto">
+                                <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

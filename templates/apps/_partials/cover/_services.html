@@ -1,0 +1,17 @@
+<section id="services" class="services">
+    <div class="container">
+        <h2 class="underline"> Our Specialisation </h2>
+        <div class="row g-3">
+            {% for d in services %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="service-card">
+                        <div class="icon-container"> <i class="fa {{d.icon}} fa-fw" aria-hidden="true"></i> </div>
+                        <h3>{{d.title|upper}}</h3>
+                        <p class="text-muted fs-5">{{d.content|capfirst}}</p>
+                        <a href="{{d.url}}">Read More..</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

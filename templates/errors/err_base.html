@@ -1,0 +1,18 @@
+
+{% extends '_shared/base.html' %}
+{% load static %}
+{% load core_tags %}
+
+
+{% block base_content %}
+    <div class="vh-100 container py-3 d-flex flex-column justify-content-center align-items-center">
+        <main class="container mt-3">
+            <div class="d-flex flex-column align-items-center justify-content-center" style="height:70vh">
+                <div class="mb-5 text-center"> {% brand 1 60 %} </div>
+                {% block err_base_content %}
+                {% endblock err_base_content %}
+            </div>
+        </main>
+        {% include '_comps/footer.html' %}
+    </div>
+{% endblock base_content %}

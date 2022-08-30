@@ -1,0 +1,48 @@
+{% load core_tags %}
+
+
+<nav class="nav">
+    <small class="container px-2 d-flex justify-content-between">
+        <div class="d-flex">
+            <div class="d-block">
+                <a id="languageDropdown" type="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fa fa-language"></i><span class="d-none d-md-inline">&nbsp;Lang</span>
+                </a>
+                <ul class="nav-item dropdown-menu" style="z-index:1030" aria-labelledby="languageDropdown">
+                    <li><a class="dropdown-item" href="#">English</a></li>
+                    <li><a class="dropdown-item" href="#">Indonesia</a></li>
+                </ul>
+            </div>
+            <div class="d-block">
+                <a id="currencyDropdown" type="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fa fa-dollar"></i><span class="d-none d-md-inline">&nbsp;USD</span>
+                </a>
+                <ul class="nav-item dropdown-menu" style="z-index:1030" aria-labelledby="currencyDropdown">
+                    <li><a class="dropdown-item" href="#">USD</a></li>
+                    <li><a class="dropdown-item" href="#">IDR</a></li>
+                </ul>
+            </div>
+        </div>
+        {% if request.is_admin %}
+            {% if request.session.hide_admin == '1' %}
+                <a href="{% url_query request 'hide_admin=0' %}" type="button" class="nav-link">
+                    <i class="fa fa-eye me-1" aria-hidden="true"></i>Show admin menu
+                </a>
+            {% else %}
+                <a href="{% url_query request 'hide_admin=1' %}" type="button" class="nav-link">
+                    <i class="fa fa-eye-slash me-1" aria-hidden="true"></i>Hide admin menu
+                </a>
+            {% endif %}
+        {% endif %}
+        <div class="d-flex">
+            <a type="button" class="nav-link" href="#">
+                <i class="fa fa-envelope"></i><span class="d-none d-md-inline">&nbsp;Email</span>
+            </a>
+            <a type="button" class="nav-link" href="#">
+                <i class="fa fa-phone"></i><span class="d-none d-md-inline">&nbsp;Call us</span>
+            </a>
+        </div>
+    </small>
+    <noscript style="padding: 1rem; width: 100%; text-align: center; color: #eeffaa; background-color: #446600;"><h5>Our website require javascript to run, but your browser either turn it off
+         or doesn't support it</h5></noscript>
+</nav>

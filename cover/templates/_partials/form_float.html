@@ -1,0 +1,137 @@
+{% load widget_tweaks %}
+{% load widget_type_checker %}
+{% load core_tags %}
+{% load core_filters %}
+
+
+{% if f|is_field_checkbox %}
+    {% if checkbox_left %}
+        <fieldset class="d-flex flex-row align-items-center">
+            {% render_field f class+="form-check-input ms-2 my-0" %}
+            {{f|add_label_class:"my-0 ms-1"}}
+            {{f.errors}}
+        </fieldset>
+    {% else %}
+        <div class="form-floating mt-{{space}} mb-1 text-center {{f|widget_col_width}}">
+            <div class="h-100 d-flex justify-content-center">
+                {{f|add_label_class:"me-2 form-check-label my-auto"}}
+                {% render_field f class+="form-check-input my-auto" %}
+                {{f.errors}}
+            </div>
+        </div>
+    {% endif %}
+{% elif f|is_field_file %} 
+    <div class="form-file mt-{{space}} {{f|widget_col_width}}">
+        {% if show_file_label %} {{f.label_tag}} {% endif %}
+        {% if f.errors %}
+            {% render_field f class+="form-control is-invalid" placeholder="{{f.label_tag}}" %}
+        {% else %}
+            {% render_field f class+="form-control" placeholder="{{f.label_tag}}" %}
+        {% endif %}
+        {{f.errors}}
+    </div>
+{% elif f|is_field_date %} 
+    <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+        {% if f.errors %}
+            {% render_field f class+="form-control is-invalid" type="date" %} {{f.label_tag}}
+        {% else %}
+            {% if f.value %}
+                {% render_field f class+="form-control is-valid" type="date" %} {{f.label_tag}}
+            {% else %}
+                {% render_field f class+="form-control" type="date" %} {{f.label_tag}}
+            {% endif %}
+        {% endif %}
+        {% utc_diff_title "input[type='date']" "ms-3 text-primary fs-7" %}
+        {{f.errors}}
+    </div>
+{% elif f|is_field_datetime %} 
+    <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+        {% if f.errors %}
+            {% render_field f class+="form-control is-invalid" type="datetime-local" %} {{f.label_tag}}
+        {% else %}
+            {% if f.value %}
+                {% render_field f class+="form-control is-valid" type="datetime-local" %} {{f.label_tag}}
+            {% else %}
+                {% render_field f class+="form-control" type="datetime-local" %} {{f.label_tag}}
+            {% endif %}
+        {% endif %}
+        {% utc_diff_title "ms-3 text-primary fs-7" %}
+        {{f.errors}}
+    </div>
+{% elif f|is_field_textarea %} 
+    <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+        {% if f.errors %}
+            {% render_field f class+="form-control is-invalid form-control-sm" style+=textarea_height placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+        {% else %}
+            {% render_field f class+="form-control form-control-sm" style+=textarea_height placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+        {% endif %}
+        {{f.errors}}
+    </div>
+{% elif f|is_field_radio %} 
+    <fieldset class="bs_radio_field">
+        {{f.label_tag}}
+        {% if f.errors %}
+            {% render_field f class+="form-radio ms-1 is-invalid" %}
+        {% else %}
+            {% render_field f class+="form-radio ms-1" %}
+        {% endif %}
+        {{f.errors}}
+    </fieldset>
+{% elif f|is_field_password and show_pswrdbtn %}
+    <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+        {% if f.errors %}
+            {% render_field f class+="form-control is-invalid" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+        {% else %}
+            {% render_field f class+="form-control" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+        {% endif %}
+        <i class="fa fa-eye pswrdShowHideIcon hide" onclick="showHidePasswordIconClick(this)" type="button" title="show/hide password"></i>
+        <i class="fa fa-eye-slash pswrdShowHideIcon hide" onclick="showHidePasswordIconClick(this)" type="button" title="show/hide password"></i>
+        {{f.errors}}
+        <style>
+            svg.pswrdShowHideIcon {
+                position: absolute;
+                right:.5rem;
+                top: 1.5rem;
+            }
+            svg.pswrdShowHideIcon.hide {
+                display: none;
+            }
+        </style>
+    </div>
+{% else %}
+    {% if f.field.as_datalist %}
+        <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+            {% if f.errors %}
+                <input id="id_{{f.name|lower}}" class="form-control is-invalid" placeholder="{{f.name}}" 
+                    type="text" list="{{f.name}}_listdata" name="{{f.name}}" value="{{f.value}}" required="{{f.required}}"> {{f.label_tag}}
+            {% else %}
+                {% if f.value %}
+                    <input id="id_{{f.name|lower}}" class="form-control is-valid" placeholder="{{f.name}}" 
+                        value="{% getval_frstr f.field.as_datalist.model f.value f.field.as_datalist.field %}" type="text" 
+                        list="{{f.name}}_listdata" name="{{f.name}}" required="{{f.required}}"> {{f.label_tag}}
+                {% else %}
+                    <input id="id_{{f.name|lower}}" class="form-control" type="text" placeholder="{{f.name}}"
+                        list="{{f.name}}_listdata" name="{{f.name}}" required="{{f.required}}"> {{f.label_tag}}
+                {% endif %}
+            {% endif %}
+            {{f.errors}}
+            <datalist id="{{f.name}}_listdata" hx-swap="innerHTML" hx-target="datalist#{{f.name}}_listdata" 
+                hx-get="{% url f.field.as_datalist.url f.field.as_datalist.model %}{{f.field.as_datalist.query}}"
+                hx-trigger="load once">
+            </datalist>
+        </div>
+    {% else %}
+        <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+            {% if f.errors %}
+                {% render_field f class+="form-control is-invalid" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+            {% else %}
+                {% if f.value %}
+                    {% render_field f class+="form-control is-valid" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+                {% else %}
+                    {% render_field f class+="form-control" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+                {% endif %}
+            {% endif %}
+            {{f.errors}}
+        </div>
+    {% endif %}
+{% endif %}

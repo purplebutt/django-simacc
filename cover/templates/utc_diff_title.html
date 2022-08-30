@@ -1,0 +1,14 @@
+{% with target as target %}
+    <script type="text/javascript">
+        var utcLocalDiffInfoDiv = document.querySelectorAll("{{target}}");
+        var utcDiff = (new Date()).getTimezoneOffset();
+        utcLocalDiffInfoDiv.forEach(e => {
+            if (utcDiff<0) {
+                e.setAttribute("title", 'Your are ' + Math.abs(utcDiff/60) + ' hour(s) ahead of server time');
+            }
+            else {
+                e.setAttribute("title", 'Your are ' + Math.abs(utcDiff/60) + ' hour(s) behind of server time');
+            }
+        })
+    </script>
+{% endwith %}

@@ -1,0 +1,51 @@
+@font-face {
+    font-family: 'myFont';
+    src: url('/static/webfont/roboto/Roboto-Regular.ttf');
+    //src: url('/static/webfont/Sora/Sora-VariableFont_wght.ttf');
+}
+
+:root {
+    --st-patricks-blue: hsl(236, 57%, 28%);
+    --amaranth-purple: hsl(335, 88%, 38%);
+    --royal-blue-dark: hsl(231, 68%, 21%);
+    --chrome-yellow: hsl(39, 100%, 52%);
+    --space-cadet-1: hsl(230, 41%, 25%);
+    --space-cadet-2: hsl(230, 59%, 16%);
+    --winter-sky-dark: rgb(117, 14, 57);
+    --winter-sky_50: hsla(335, 87%, 53%, 0.5);
+    --purple-navy: hsl(236, 26%, 43%);
+    --ksu-purple: hsl(275, 54%, 33%);
+    --winter-sky: hsl(335, 87%, 53%);
+    --razzmatazz: hsl(335, 87%, 51%);
+    --platinum: hsl(0, 0%, 90%);
+    --black_70: hsla(0, 0%, 0%, 0.7);
+    --rajah: hsl(29, 99%, 67%);
+    --white: hsl(0, 0%, 100%);
+
+    --primary: #d40037ff;
+    --primary-dark: rgb(100, 1, 28);
+    --primary-light: rgb(232, 49, 98);
+    --btnhover: rgb(235, 4, 65);
+    --dark: #2f2121;
+    --light: #d0cccc;
+    --body-bg: rgb(246, 246, 246);
+    --body-text: rgb(128, 93, 93);
+
+    // gradient
+    --gradient-0: linear-gradient(90deg,var(--winter-sky-dark) 0,var(--ksu-purple) 51%,var(--winter-sky-dark));
+    --gradient-1: linear-gradient(90deg,var(--royal-blue-dark) 0,var(--ksu-purple) 51%,var(--royal-blue-dark));
+    --gradient-2: linear-gradient(90deg,var(--razzmatazz) ,var(--rajah));
+
+    --boxshadow: 0 8px 22px rgba(0,0,0,.2);
+    --boxhovered: 0px 1px 3px 3px rgba(0,0,0,.2);
+    --btnfocus: 0px 1px 3px 3px var(--primary);
+}
+
+
+body {
+    font-family: 'myFont', sans-serif;
+    line-height: 1.7rem;
+    color: var(--body-text);
+    background-color: var(--body-bg);
+    font-size: .9em;
+}

@@ -1,0 +1,44 @@
+{% load static %}
+
+{% if is_link %}
+    <a href="{{link_to}}" class="logoIcon text-decoration-none {{class_}}">
+        <img height={{height}} src="{% static 'images/icon.png' %}" alt="logo">
+    </a>
+{% else %}
+    <img class="logoIcon text-decoration-none {{class_}}" height={{height}} src="{% static 'images/icon.png' %}" alt="brand">
+{% endif %}
+
+<style>
+    .logoIcon>img {
+        opacity: .8;
+        animation-name: logoRotate;
+        animation-duration: .5s;
+        animation-fill-mode: forwards;
+    }
+    .logoIcon>img:hover {
+        animation-name: logoRotateReverse;
+        animation-duration: .9s;
+        animation-fill-mode: forwards;
+    }
+
+    @keyframes logoRotate {
+        from {
+            transform: rotate(360deg);
+            opacity: 1;
+        }
+        to {
+            transform: rotate(0deg);
+            opacity: .8;
+        }
+    }
+    @keyframes logoRotateReverse {
+        from {
+            transform: rotate(0deg);
+            opacity: .8;
+        }
+        to {
+            transform: rotate(360deg);
+            opacity: 1;
+        }
+    }
+</style>

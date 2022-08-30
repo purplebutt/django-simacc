@@ -1,0 +1,35 @@
+{% load static %}
+{% load core_tags %}
+
+
+{% include '_comps/_partials/upnav.html' %}
+<nav class="sticky-top border-top border-bottom navbar navbar-expand-lg navbar-light bg-light mb-3 shadow">
+    <div class="container text-center text-lg-start">
+        {% brand 1 35 "me-2" %}
+        <div class="d-lg-none">
+            {% include '_comps/_partials/user_menu.html' %}
+        </div>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse pt-3 mt-2 mt-lg-0 pt-lg-0 navbar-collapse d-lg-flex justify-content-end" id="navbarSupportedContent">
+            {% comment %} <form class="d-flex my-2 my-lg-0">
+                <input class="form-control rounded-0 rounded-start border-secondary" type="search" placeholder="Search" aria-label="Search" />
+                <button class="btn btn-outline-primary rounded-0 rounded-end border-0 border-top 
+                    border-end border-bottom border-secondary" type="submit">
+                    <i class="fa fa-magnifying-glass"></i></button>
+            </form> {% endcomment %}
+            <div class="d-none d-lg-block ms-2">
+                {% include '_comps/_partials/user_menu.html' %}
+            </div>
+        </div>
+    </div>
+</nav>

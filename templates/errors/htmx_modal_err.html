@@ -1,0 +1,22 @@
+{% load i18n %}
+{% load core_tags %}
+
+
+<div class="modal-content text-secondary">
+    <div class="modal-header">
+        <h5 class="modal-title"><i class="fa fa-exclamation-triangle me-2"></i>{{title}}</h5>
+        <button type="button" tabindex=-1 class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="alert alert-light border-1" role="alert">
+            <h4 class="alert-heading">{{head}}<i class="fa fa-exclamation-triangle text-danger ms-2" aria-hidden="true"></i></h4>
+            <p class="mb-1">Reason: </p>
+            <h6>{{msg|capfirst}}</h6>
+            <hr>
+        </div>
+        <h6 class="mb-0">Contact admin for more support.</h6>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>

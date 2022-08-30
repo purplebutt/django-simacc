@@ -1,0 +1,74 @@
+{% extends '_shared/base.html' %}
+{% load static %}
+{% load core_tags %}
+
+
+{% block page_title %}{{user|title}} profile{% endblock page_title %}
+
+{% block base_content %}
+<section id="profile">
+    <div class="container">
+        <div class="py-1 d-flex flex-column justify-content-between align-items-center">
+            <div> {% brand 1 70 %} </div>
+            <h4 class="mt-2">{{user|title}} Profile</h4>
+            <p>This is your account profile, you can modify or update your profile here</p>
+            <div class="row border-top pt-2">
+                <div class="col-md-4 mb-3 mb-md-0 text-center">
+                    <img id="profileImage" class="profile-left-img rounded-circle"
+                        type="button"
+                        title="change picture"
+                        data-bs-toggle="modal"
+                        data-bs-target="#updatePictureModal"
+                        hx-get="{% url 'accounts:update_picture' %}"
+                        hx-swap="innerHTML"
+                        hx-target="#updatePictureModalContent"
+                        src="{{user.profile.image.url}}" alt="{{user|title}} picture">
+                </div>
+                <div class="col-md-8">
+                    <form method="POST" action="{% url 'accounts:myprofile' %}" class="row g-2">
+                        {% csrf_token %}
+                        {% form_float forms 2 %}
+                        <div class="text-center mt-2 border-top pt-3">
+                            <a type='button' onclick='history.back()' class='btn btn-secondary'>
+                                <i class='fa fa-rotate-left me-1'></i>Go back</a>
+                            <button id="btnProfileUpdate" type="submit" class="mx-2 btn btn-primary">
+                                <i class="fa fa-save me-1" aria-hidden="true"></i>Update</button>
+                            <button id="btnLockUnlock" onclick="lockUnlockInput()" type="button" class="btn btn-warning">
+                                <i class="fa fa-unlock me-2"></i>Unlock</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% include 'account/_partials/mod_wrapper.html' with modal_id="updatePictureModal" modal_content_id="updatePictureModalContent" %}
+        {% include '_comps/toast_info.html' %}
+        {% comment %} {% notification messages %} {% endcomment %}
+        {% include '_comps/footer.html' %}
+    </div>
+    <script type="text/javascript">
+        function lockFormInput(){
+            const btnLockUnlock = document.getElementById("btnLockUnlock");
+            const inputs = document.querySelectorAll("input,textarea,select,#btnProfileUpdate");
+            inputs.forEach(i => {
+                i.setAttribute('disabled', null);
+                btnLockUnlock.innerHTML="<i class='fa fa-unlock me-2'></i>Unlock"
+            });
+        }
+        function lockUnlockInput(){
+            const btnLockUnlock = document.getElementById("btnLockUnlock");
+            const inputs = document.querySelectorAll("input,textarea,select,#btnProfileUpdate");
+            inputs.forEach(i => {
+                if (i.hasAttribute('disabled')){
+                    i.removeAttribute('disabled');
+                    btnLockUnlock.innerHTML="<i class='fa fa-lock me-2'></i>Lock"
+                }
+                else {
+                    i.setAttribute('disabled', null);
+                    btnLockUnlock.innerHTML="<i class='fa fa-unlock me-2'></i>Unlock"
+                }
+            });
+        }
+        lockFormInput() // call lockFormInput() to lock form by default
+    </script>
+</section>
+{% endblock base_content %}

@@ -1,0 +1,39 @@
+{% load humanize %} 
+{% load core_filters %}
+{% load core_tags %}
+
+<main id="mainContent">
+    <table class="table bg-white table-sm table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th class="text-center" scope="col">Id</th>
+                <th class="text-center" scope="col">Name</th>
+                <th class="text-center" scope="col">Price</th>
+                <th class="text-center" scope="col">Size</th>
+                <th class="text-center" scope="col">Stock</th>
+                <th class="text-center" scope="col">Category</th>
+                <th class="text-center" scope="col">Modified</th>
+                <th class="text-center" scope="col">Active</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in objects %}
+                <tr>
+                    <th scope="row">{{p.pk}}</th>
+                    <td><a href="{% url_queryGrab p.get_update_url request 'next' request.path %}">{{p.name}}</a></td>
+                    <td class="text-end">{{p.price|intcomma}}</td>
+                    <td>{{p.size|title}}</td>
+                    <td class="text-center">{{p.stock}}</td>
+                    <td>{{p.category}}</td>
+                    <td>{{p.modified|date:"M d, Y"}}</td>
+                    <td>
+                        <input class="form-check-input" type="checkbox" disabled readonly checked="{{p.is_active}}">
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <footer class="paginator border-top py-2 mt-3">
+        {% htmx_paginator 'main#mainContent' objects request %}
+    </footer>
+</main>

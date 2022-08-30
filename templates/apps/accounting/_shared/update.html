@@ -1,0 +1,91 @@
+{% load i18n %}
+{% load core_tags %}
+
+
+<div class="modal-content">
+    <div class="modal-header">
+        {% if is_user_allowed %}
+            <h5 class="modal-title"><i class="fa fa-right-to-bracket me-2"></i>Update {{object|capfirst|truncatewords:4}}</h5>
+        {% else %}
+            {% if form %}
+                <h5 class="modal-title"><i class="fa fa-right-to-bracket me-2"></i>{{object|capfirst|truncatewords:4}} details</h5>
+            {% else %}
+                <h5 class="modal-title"><i class="fa fa-ban me-2"></i>Forbidden</h5>
+            {% endif %}
+        {% endif %}
+        <button type="button" tabindex=-1 class="btn-close btn-close_update" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        {% if is_user_allowed %}
+            <h6 class="text-center text-primary fw-bold mb-4">Fill in to update {{page_title|title}}</h6>
+        {% endif %}
+        <form class="needs-validation form-update row g-2">
+            {% csrf_token %}
+            {% if is_user_allowed %}
+                {% form_float_cbleft form %}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <input type="reset" class="btn btn-secondary btn-reset" value="Reset" disabled>
+                    <button type="button" class="btn btn-primary btn-submit" disabled
+                        hx-swap="innerHTML"
+                        hx-post="{{object.get_update_url}}"
+                        hx-target="#{{model_name}}UpdateModalContent">Update</button>
+                </div>
+                <script type="text/javascript">
+                    function lockUpdateButton() {
+                        const submitBtn = document.querySelector("form.form-update>div.modal-footer button.btn-submit");
+                        const resetBtn = document.querySelector("form.form-update>div.modal-footer input.btn-reset");
+                        const inputs = document.querySelectorAll("form.form-update input,form.form-update textarea,form.form-update select");
+                        inputs.forEach(i => {
+                            i.onchange = function() {
+                                submitBtn.removeAttribute("disabled");
+                                resetBtn.removeAttribute("disabled");
+                            }
+                        });
+                    }
+                    lockUpdateButton();
+                </script>
+            {% else %}
+                {% if form %}
+                    {% form_float_cbleft form %}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                    <script>
+                        function lockForm(){
+                            const inputs = document.querySelectorAll("input,textarea,select");
+                            inputs.forEach(i => { i.setAttribute('disabled', null); });
+                        }
+                        lockForm()
+                    </script>
+                {% else %}
+                    {% include 'apps/_comps/info.html' %}
+                {% endif %}
+            {% endif %}
+        </form> 
+        {% if request.htmx_closemodal %}
+            {{request.htmx_message|json_script:'msg_update'}}
+            <script type="text/javascript">
+                var htmxCloseModal = ()=> {
+                    let target = document.querySelector('button.btn-close_update[data-bs-dismiss="modal"]');
+                    target.click();
+
+                    // show toast message
+                    let toastTemplate = document.querySelector('div#toastInfo');
+                    let toastBody = document.querySelector('div#toastInfo>div.toast-body');
+                    let msg = document.querySelector('script#msg_update').textContent;
+                    if (msg.length > 0) {
+                        msg = msg.substring(1, msg.length-1);
+                        toastBody.innerText = msg;
+                        new bootstrap.Toast(toastTemplate).show();
+                    }
+                }
+                {% comment %} updateTable = document.querySelector("nav>ul>li.active>a");
+                updateTable.click(); {% endcomment %}
+                var refresher = document.querySelector("a#table-refresher");
+                refresher.click()
+                htmxCloseModal();
+            </script>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,21 @@
+{% if messages %}
+    <div class="{{class_}}">
+        {% for msg in messages %}
+            <div class="alert alert-{{msg.tags}} alert-dismissible fade show shadow" role="alert">
+                {% autoescape off %}
+                    {{msg}}
+                {% endautoescape %}
+                <button type="button" class="btn-close auto-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    <script type="text/javascript">
+        const autoCloseAlert = ()=> {
+            let closeBtns = document.querySelectorAll("button.btn-close.auto-close");
+            closeBtns.forEach(btn => {
+                btn.click();
+            });
+        }
+        setTimeout(autoCloseAlert, 5_000);
+    </script>
+{% endif %}

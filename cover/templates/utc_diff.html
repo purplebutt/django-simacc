@@ -1,0 +1,11 @@
+<div id="utcLocalDiffInfo" {% if class_ %}class="{{class_}}"{% endif %}></div>
+<script type="text/javascript">
+    var utcLocalDiffInfoDiv = document.getElementById("utcLocalDiffInfo");
+    var utcDiff = (new Date()).getTimezoneOffset();
+    if (utcDiff<0) {
+        utcLocalDiffInfoDiv.innerText = 'Your are ' + Math.abs(utcDiff/60) + ' hour(s) ahead of server time';
+    }
+    else {
+        utcLocalDiffInfoDiv.innerText = 'Your are ' + Math.abs(utcDiff/60) + ' hour(s) behind of server time';
+    }
+</script>

@@ -1,0 +1,40 @@
+{% if is_multi %}
+    {% for form in forms %}
+        {% for f in form %}
+            {% include '_partials/form_float.html' with form=form %}
+        {% endfor %}
+        {{form.non_field_errors}}
+    {% endfor %}
+{% else %}
+    {% for f in forms %}
+        {% include '_partials/form_float.html' with form=forms %}
+    {% endfor %}
+    {{forms.non_field_errors}}
+{% endif %}
+{% if not forms.no_password %}
+    <script type="text/javascript">
+        function showHidePasswordIconClick(caller) {
+            const siblings = Array.from(caller.parentElement.children);
+            let otherBtn = siblings.filter(e => e.nodeName == 'svg' && e !== caller)[0];
+            caller.classList.toggle('hide');
+            otherBtn.classList.toggle('hide');
+            let target = siblings.filter(e => e.nodeName == 'INPUT')[0];
+            let flag = target.getAttribute('type');
+            (flag == 'password') ? target.setAttribute('type', 'text') : target.setAttribute('type', 'password');
+        }
+        function onPasswordInputChange() {
+            let inpass = document.querySelectorAll('input[type="password"]');
+
+            inpass.forEach(elm => {
+                elm.addEventListener('change', ()=> {
+                    elm.classList.remove('is-invalid');
+                    const siblings = Array.from(elm.parentElement.children);
+                    let svgicon = siblings.filter(e => e.nodeName == 'svg')[0];
+                    svgicon.classList.remove('hide');
+                    svgicon.addEventListener('click', showHidePasswordIconClick);
+                })
+            });
+        }
+        onPasswordInputChange();
+    </script>
+{% endif %}

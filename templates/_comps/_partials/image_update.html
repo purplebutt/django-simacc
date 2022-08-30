@@ -1,0 +1,83 @@
+{% load static %}
+{% load i18n %}
+{% load core_tags %}
+{% load core_filters %}
+
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title"><i class="fa fa-image me-2"></i>Change Picture</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            {{object.image.url|json_script:"newImageUrl"}}
+            {{request.htmx_message|json_script:'msg'}}
+        {% if request.htmx_closemodal %}
+            <script type="text/javascript">
+                var htmxCloseModal = ()=> {
+                    let target = document.querySelector('button.btn-close[data-bs-dismiss="modal"]');
+                    let image = document.querySelector('img#productImage');
+                    let image_url = document.querySelector("script#newImageUrl").textContent;
+                    image_url = image_url.substring(1, image_url.length-1)
+                    target.click();
+                    image.setAttribute('src', image_url);
+
+                    // show toast message
+                    let toastTemplate = document.querySelector('div#toastInfo');
+                    let toastBody = document.querySelector('div#toastInfo>div.toast-body');
+                    let msg = document.querySelector('script#msg').textContent;
+                    msg = msg.substring(1, msg.length-1);
+                    if (msg.length > 0) {
+                        toastBody.innerText = msg;
+                        new bootstrap.Toast(toastTemplate).show();
+                    }
+                }
+                htmxCloseModal();
+            </script>
+        {% endif %}
+    </div>
+    <form>
+        {% csrf_token %}
+        <div class="modal-body">
+            <h5 class="text-center">Choose a new picture</h5>
+            <p class="fs-6 text-danger lh-sm text-center pb-0">Your old picture {{object.image.url}}
+                will be deleted and can not be recover</p>
+                <div class="w-100 d-flex flex-column align-items-center justify-content-center pb-3">
+                    <img id="curImage" class="rounded-circle border" src="{{object.image.url}}" style="max-height: 125px">
+                    <img type="button" id="newImage" class="border rounded p-2 mt-3" alt="Choose New Image" src="" style="max-height: 125px; object-fit: fill;">
+                </div>
+            {% form_float form %}
+            {% if request.htmx %}
+                <script type='text/javascript'>
+                    var onNewImgSelected = ()=> {
+                        const fileSelector = document.getElementById("id_image");
+                        fileSelector.style.display = 'none';
+                        const newImgElement = document.getElementById("newImage");
+                        const oldImgElement = document.getElementById("curImage");
+                        newImgElement.addEventListener('click', ()=> fileSelector.click())
+                        fileSelector.addEventListener('change', ()=> {
+                            const imgfile = fileSelector.files[0];
+                            if (imgfile) {
+                                const fileReader = new FileReader();
+                                fileReader.readAsDataURL(imgfile);
+                                fileReader.addEventListener('load', ()=> {
+                                    oldImgElement.style.opacity = '.7';
+                                    newImgElement.classList.remove('p-2');
+                                    newImgElement.classList.add('rounded-circle');
+                                    newImgElement.setAttribute('src', fileReader.result);
+                                })
+                            }
+                        })
+                    }
+                    onNewImgSelected();
+                </script>
+            {% endif %}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary"
+                hx-swap="innerHTML"
+                hx-post="{{request.path}}"
+                hx-encoding="multipart/form-data"
+                hx-target="#{{target_modal}}">Update</button>
+        </div>
+    </form> 
+</div>

@@ -1,0 +1,20 @@
+{% extends '_shared/base.html' %}
+{% load core_tags %}
+
+{% block base_content %}
+    {% include '_comps/nav_cover.html' %}
+    {% include 'account/_partials/mod_wrapper.html' with static=1 modal_id="signupModal" modal_content_id="signupModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with static=1 modal_id="loginModal" modal_content_id="loginModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="logoutModal" modal_content_id="logoutModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="changePasswordModal" modal_content_id="changePasswordModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with static=1 modal_id="resetPasswordModal" modal_content_id="resetPasswordModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="updatePictureModal" modal_content_id="updatePictureModalContent" %}
+
+        {% block cover_content %}
+        {% endblock cover_content %}
+        {% include '_comps/notif_login_require.html' %}
+        {% scroll_up 'welcome' %}
+        {% notification messages %}
+
+    {% include '_comps/footer.html' %}
+{% endblock base_content %}

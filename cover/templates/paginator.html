@@ -1,0 +1,67 @@
+{% load core_tags %}
+
+
+{% if page %}
+    <nav class="{{outer_class}}" aria-label="paginator">
+        <ul class="{{inner_class}}">
+            {% if page.has_previous and not page.number == 2 %}
+                <li class="page-item" title="first page"><a class="page-link" 
+                    href="{% url_queryAdd request 'page' '1' %}"><i class="fa fa-backward-step"></i></a></li>
+                <li class="page-item" title="previous page"><a class="page-link" 
+                    href="{% url_queryAdd request 'page' page.previous_page_number %}">
+                    <i class="fa fa-circle-chevron-left"></i></a></li>
+            {% endif %}
+
+            {% for p in page.paginator.page_range %}
+                {% if p|is_eq:page.number %}
+                    <li class="page-item active" title="Showing up page {{p}} of total {{page.paginator.num_pages}} pages">
+                        <a class="page-link" href="{% url_queryAdd request 'page' p %}">{{p}} of {{page.paginator.num_pages}}</a></li>
+                {% elif p > page.number|add:'-3' and p < page.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" 
+                        href="{% url_queryAdd request 'page' p %}">{{p}}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page.has_next and not page.number == page.paginator.num_pages|add:'-1' %}
+                <li class="page-item" title="next page"><a class="page-link" 
+                    href="{% url_queryAdd request 'page' page.next_page_number %}">
+                    <i class="fa fa-circle-chevron-right"></i></a></li>
+                <li class="page-item" title="last page"><a class="page-link" 
+                    href="{% url_queryAdd request 'page' page.paginator.num_pages %}">
+                    <i class="fa fa-forward-step"></i></a></li>
+            {% endif %}
+
+
+            <li class="page-item ms-2">
+                <input id="paginatorPageInput" type="number" class="page-link" style="max-width:7rem;" title="enter page number">
+                <small id="paginatorErrMessage" class="ms-3 text-danger d-none"></small>
+            </li>
+            <li class="page-item">
+                <button id="paginatorGoBtn" class="page-link" 
+                        type="button" onclick="requestWithPageNumber()">Go</button>
+            </li>
+
+            <script type="text/javascript">
+                function requestWithPageNumber() {
+                    const numberInput =  document.getElementById("paginatorPageInput");
+                    const errDiv = document.getElementById("paginatorErrMessage");
+
+                    numberInput.addEventListener('keydown', function() {
+                        errDiv.classList.add("d-none");
+                    });
+
+                    if (isNaN(numberInput.value) || (numberInput.value < 1)) {
+                        errDiv.innerText = "Enter a positive number";
+                        errDiv.classList.remove("d-none");
+                    }
+                    else {
+                        errDiv.classList.add("d-none");
+                        let url = new URL(window.location.href);
+                        url.searchParams.set('page', numberInput.value);
+                        window.location.assign(url.href);
+                    }
+                }
+            </script>
+        </ul>
+    </nav>
+{% endif %}

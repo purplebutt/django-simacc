@@ -1,0 +1,41 @@
+{% extends '_shared/base.html' %}
+{% load static %}
+{% load account %}
+{% load core_tags %}
+
+
+{% block page_title %}Confirm Email{% endblock page_title %}
+{% block base_content %}
+    <div class="d-flex flex-column vh-100 vw-100 justify-content-between align-items-center">
+        <div class="container d-flex flex-column justify-content-center align-items-center vh-100">
+            {% brand 1 70 %}
+            {% if confirmation %}
+                {% user_display confirmation.email_address.user as user_display %}
+                <h3 class="border-bottom mb-3">Confirm E-mail Address</h3>
+                {% with confirmation.email_address.email as email %}
+                    <p class="text-center fs-5">Please confirm that <a class="text-primary" href="mailto:{{email}}">{{email}}</a> 
+                    is an email address for user <b>{{user_display}}</b></p>
+                {% endwith %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row gx-3">
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-primary oc-btn-red mt-2">Confirm</button>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'cover:homepage' %}" type="button" class="btn btn-outline-primary oc-btn-red2 mt-2">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+                <p class="text-danger text-center fs-6 mt-4 border-top">
+                    You can only use one email address for one account, email <em>can not be modified</em> <br>
+                    Make sure that the email you provided is a valid one.
+                </p>
+            {% else %}
+                <p>This e-mail confirmation link expired or is invalid. 
+                Please <a href="{% url 'account_email' %}">issue a new e-mail confirmation request</a></p>
+            {% endif %}
+        </div>
+        {% comment %} {% include 'comps/footer.html' %} {% endcomment %}
+    </div>
+{% endblock base_content %}

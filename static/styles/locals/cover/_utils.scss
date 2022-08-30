@@ -1,0 +1,183 @@
+.container {
+    padding-inline: 15px;
+}
+
+.btn.btn-primary {
+    background-image: var(--gradient-2);
+    background-size: 200%;
+    color: var(--white);
+    padding: 12px 35px;
+    font-size: var(--fs-7);
+    font-weight: var(--fw-500);
+    border-radius: 15px 0;
+    transition: var(--transition-2);
+    &:is(:hover,:focus) {
+        background-position: right;
+    }
+}
+
+section {
+    padding-top: 80px;
+    padding-bottom: var(--section-padding);
+    h2 {
+        color: var(--white);
+        font-size: var(--fs-1);
+        margin-block-end: 30px;
+        margin-inline: auto;
+        max-width: max-content;
+    }
+    h3 {
+        color: var(--chrome-yellow);
+        font-size: var(--fs-7);
+        margin-block-end: 15px;
+    }
+    p {
+        color: var(--white);
+        font-size: var(--fs-8);
+        margin-block-end: 30px;
+        text-transform: capitalize;
+    }
+}
+
+a.icon-container {
+    width: fit-content;
+    background-color: rgba(117, 101, 134, 0.327);
+    padding: 5px 8px;
+    border-radius: 50%;
+    font-size: larger;
+    font-weight: 700;
+    transition: .3s all ease-out;
+    &:is(:hover, :focus) {
+        background-color: var(--st-patricks-blue);
+        color: var(--white);
+        transition: .3s all ease-in;
+    }
+}
+
+.stats-card {
+    border: var(--border-light);
+    padding: 10px 15px;
+    box-shadow: var(--shadow);
+    border-radius: var(--radius-12);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 120px;
+    h3 {
+        color: var(--st-patricks-blue);
+        font-size: var(--fs-4);
+        font-weight: var(--fw-700);
+    }
+    p {
+        margin-bottom: 0 !important;
+        text-align: center !important;
+    }
+}
+
+.service-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: var(--border-light);
+    min-height: 260px;
+    padding: 20px;
+    div.icon-container {
+        width: fit-content;
+        background-color: rgba(117, 99, 102, 0.374);
+        padding: 10px;
+        border-radius: 15px;
+        margin-block-end: 10px;
+        svg {
+            font-size: 4rem;
+            position: relative;
+            &::before {
+                content: "";
+                position: absolute;
+                background-color: rgb(102, 125, 125);
+                top:0; left:0;
+                width: 100%;
+                height: 100%;
+                z-index: 2;
+            }
+        }
+    }
+    a {
+        color: var(--st-patricks-blue);
+        background-color: rgba(137, 137, 157, 0.624);
+        width: fit-content;
+        padding: 5px;
+        border-radius: 5px 0;
+        outline: 2px solid rgba(103, 103, 140, 0.753);
+        transition: .5s all ease-out;
+        &:is(:hover,:focus) {
+            color: var(--white);
+            background-color: var(--st-patricks-blue);
+            transition: .5s all ease-out;
+        }
+    }
+}
+
+.feature-card {
+    box-shadow: var(--shadow);
+    padding: 20px;
+    min-height: 200px;
+    position: relative;
+    div.content-container {
+        a {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+    }
+    div.icon-container {
+        width: fit-content;
+        border-radius: 50%;
+        padding: 5px 10px;
+        font-size: 4rem;
+        font-weight: 800;
+        background-color: rgba(142, 93, 142, 0.427);
+        margin-bottom: 10px;
+        transition: .6s all ease-out;
+    }
+    &:hover {
+        div.icon-container {
+            color: var(--white);
+            background-image: var(--gradient-2);
+            transition: .6s all ease-in;
+        }
+    }
+}
+
+.blog-card {
+    box-shadow: var(--shadow);
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    div.content {
+        padding: 10px;
+        padding-bottom: 0px;
+    }
+    info {
+        padding: 10px;
+        padding-top: 0px;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 1.3rem;
+    }
+    p {
+        margin-block-end: 20px;
+        margin-bottom: 5px;
+        text-align: justify;
+        height: auto;
+    }
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}

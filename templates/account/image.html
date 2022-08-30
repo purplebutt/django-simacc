@@ -1,0 +1,56 @@
+{% load static %}
+{% load i18n %}
+{% load core_tags %}
+
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title"><i class="fa fa-image me-2"></i>Change Picture</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <form>
+        {% csrf_token %}
+        <div class="modal-body">
+            <h5 class="text-center">Choose a new picture</h5>
+            <p class="fs-6 text-danger lh-sm text-center pb-0">Your old picture {{object.image.url}}
+                will be deleted and can not be recover</p>
+                <div class="w-100 d-flex align-items-center justify-content-center pb-3">
+                    <img class="rounded-circle" src="{{object.image.url}}" style="max-height: 125px">
+                </div>
+            {% if request.htmx_closemodal %}
+                {{object.image.url|json_script:"newImageUrl"}}
+                {{request.htmx_message|json_script:'msg'}}
+                <script type="text/javascript">
+                    var htmxCloseModal = ()=> {
+                        let target = document.querySelector('button.btn-close[data-bs-dismiss="modal"]');
+                        let image = document.querySelector('img#profileImage');
+                        let image_url = document.querySelector("script#newImageUrl").textContent;
+                        image_url = image_url.substring(1, image_url.length-1)
+                        target.click();
+                        image.setAttribute('src', image_url);
+
+                        // show toast message
+                        let toastTemplate = document.querySelector('div#toastInfo');
+                        let toastBody = document.querySelector('div#toastInfo>div.toast-body');
+                        let msg = document.querySelector('script#msg').textContent;
+                        if (msg.length > 0) {
+                            msg = msg.substring(1, msg.length-1);
+                            toastBody.innerText = msg;
+                            new bootstrap.Toast(toastTemplate).show();
+                        }
+                    }
+                    htmxCloseModal();
+                </script>
+            {% endif %}
+            {% form_float form %}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary"
+                hx-swap="innerHTML"
+                hx-post="{% url 'accounts:update_picture' %}"
+                hx-encoding="multipart/form-data"
+                hx-target="#updatePictureModalContent">Update</button>
+        </div>
+    </form> 
+</div>

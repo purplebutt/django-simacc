@@ -1,0 +1,40 @@
+{% load static %}
+{% load humanize %}
+
+<section id="blog" class="blog">
+    <div class="container">
+        <h2 class="underline"> Our Blog & News </h2>
+        <div class="row g-3">
+            {% for b in blogs %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="blog-card">
+                        <a href="{{b.url}}">
+                            <img class="img-fluid" src="{{b.img}}" width="750" height="350"
+                            loading="lazy" alt="blog1" class="img-cover">
+                        </a>
+                        <div class="content mb-auto">
+                            <a class="fs-3 fw-bold" href="#blog1">{{b.title}}</a>
+                            <p class="fs-5">{{b.content}}</p>
+                        </div>
+                        <info>
+                            <div class="publish-date">
+                                <i class="fa fa-clock fa-fw" aria-hidden="true"></i>
+                                {% now "d M, Y" %}
+                            </div>
+                            <div class="comments">
+                                <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
+                                {{ b.comments|intcomma }}
+                            </div>
+                            <a href="{{b.share}}" title="Share">
+                                <i class="fa fa-share-nodes fa-fw" aria-hidden="true"></i>
+                            </a>
+                            <a href="{{b.report}}" title="Report">
+                                <i class="fa fa-flag fa-fw" aria-hidden="true"></i>
+                            </a>
+                        </info>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

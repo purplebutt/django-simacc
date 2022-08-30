@@ -1,0 +1,132 @@
+{% load widget_tweaks %}
+{% load widget_type_checker %}
+{% load core_tags %}
+
+
+{% if is_multi %}
+    {% for form in forms %}
+        {% for f in form %}
+            {% if f|is_field_checkbox %}
+                <div class="form-checkbox mt-{{space}} mb-1 text-center {{f|widget_col_width}}">
+                    {{f.label_tag}} {{f}}
+                    {{f.errors}}
+                </div>
+            {% elif f|is_field_file %} 
+                <div class="form-file mt-{{space}} {{f|widget_col_width}}">
+                    {% if show_file_label %} {{f.label_tag}} {% endif %}
+                    {% if f.errors %}
+                        {% render_field f class+="form-control is-invalid" %}
+                    {% else %}
+                        {% render_field f class+="form-control" %}
+                    {% endif %}
+                    {{f.errors}}
+                </div>
+            {% elif f|is_field_date %} 
+                <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+                    {% if f.errors %}
+                        {% render_field f class+="form-control is-invalid" type="date" %} {{f.label_tag}}
+                    {% else %}
+                        {% render_field f class+="form-control" type="date" %} {{f.label_tag}}
+                    {% endif %}
+                    {{f.errors}}
+                </div>
+            {% elif f|is_field_datetime %} 
+                <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+                    {% if f.errors %}
+                        {% render_field f class+="form-control is-invalid" type="datetime-local" %} {{f.label_tag}}
+                    {% else %}
+                        {% render_field f class+="form-control" type="datetime-local" %} {{f.label_tag}}
+                    {% endif %}
+                    {% utc_diff "ms-3 text-primary fs-7" %}
+                    {{f.errors}}
+                </div>
+            {% elif f|is_field_textarea %} 
+                <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+                    {% if f.errors %}
+                        {% render_field f class+="form-control is-invalid form-control-sm" style+=textarea_height %} {{f.label_tag}}
+                    {% else %}
+                        {% render_field f class+="form-control form-control-sm" style+=textarea_height %} {{f.label_tag}}
+                    {% endif %}
+                    {{f.errors}}
+                </div>
+            {% elif f|is_field_password and show_pswrdbtn %}
+                <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+                    {% if f.errors %}
+                        {% render_field f class+="form-control is-invalid" %} {{f.label_tag}}
+                    {% else %}
+                        {% render_field f class+="form-control" %} {{f.label_tag}}
+                    {% endif %}
+                    <i class="fa fa-eye"></i>
+                    {{f.errors}}
+                </div>
+            {% else %}
+                <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+                    {% if f.errors %}
+                        {% render_field f class+="form-control is-invalid" %} {{f.label_tag}}
+                    {% else %}
+                        {% render_field f class+="form-control" %} {{f.label_tag}}
+                    {% endif %}
+                    {{f.errors}}
+                </div>
+            {% endif %}
+        {% endfor %}
+        {{form.non_field_errors}}
+    {% endfor %}
+{% else %}
+    {% for f in forms %}
+        {% if f|is_field_checkbox %}
+            <div class="form-checkbox mt-{{space}} mb-1 text-center {{f|widget_col_width}}">
+                {{f.label_tag}} {{f}}
+                {{f.errors}}
+            </div>
+        {% elif f|is_field_file %} 
+            <div class="form-file mt-{{space}} {{f|widget_col_width}}">
+                {% if show_file_label %} {{f.label_tag}} {% endif %}
+                {% if f.errors %}
+                    {% render_field f class+="form-control is-invalid" %}
+                {% else %}
+                    {% render_field f class+="form-control" %}
+                {% endif %}
+                {{f.errors}}
+            </div>
+        {% elif f|is_field_date %} 
+            <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+                {% if f.errors %}
+                    {% render_field f class+="form-control is-invalid" type="date" %} {{f.label_tag}}
+                {% else %}
+                    {% render_field f class+="form-control" type="date" %} {{f.label_tag}}
+                {% endif %}
+                {{f.errors}}
+            </div>
+        {% elif f|is_field_datetime %} 
+            <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+                {% if f.errors %}
+                    {% render_field f class+="form-control is-invalid" type="datetime-local" %} {{f.label_tag}}
+                {% else %}
+                    {% render_field f class+="form-control" type="datetime-local" %} {{f.label_tag}}
+                {% endif %}
+                {% utc_diff "ms-3 text-primary fs-7" %}
+                {{f.errors}}
+            </div>
+        {% elif f|is_field_textarea %} 
+            <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+                {% if f.errors %}
+                    {% render_field f class+="form-control is-invalid form-control-sm" style+=textarea_height %} {{f.label_tag}}
+                {% else %}
+                    {% render_field f class+="form-control form-control-sm" style+=textarea_height %} {{f.label_tag}}
+                {% endif %}
+                {{f.errors}}
+            </div>
+        {% else %}
+            <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
+                {% if f.errors %}
+                    {% render_field f class+="form-control is-invalid" %} {{f.label_tag}}
+                {% else %}
+                    {% render_field f class+="form-control" %} {{f.label_tag}}
+                {% endif %}
+                {{f.errors}}
+            </div>
+        {% endif %}
+    {% endfor %}
+    {{forms.non_field_errors}}
+{% endif %}

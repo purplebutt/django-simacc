@@ -1,0 +1,55 @@
+{% load static %}
+{% load core_tags %}
+
+
+<nav class="navbarCover sticky-top py-2 navbar navbar-expand-lg navbar-light bg-light shadow">
+    <div class="overlay"></div>
+    <div class="container">
+        {% brand 1 30 "me-auto" %}
+        <button class="d-block d-lg-none nav-open-btn" aria-label="Open Menu">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </button>
+        <div class="navbarContent">
+            <div class="navbar-top">
+                {% brand 1 30 "me-auto" %}
+                <button class="nav-close-btn" aria-label="Close Menu">
+                    <i class="fa fa-close" aria-hidden="true"></i>
+                </button>
+            </div>
+            <ul class="navbar-nav ms-auto fs-5 fw-bold">
+                <li class="nav-item">
+                    <a href="#welcome" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#services" class="nav-link">Services</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#features" class="nav-link">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#blog" class="nav-link">Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contactus" class="nav-link me-0 pe-0">Contact Us</a>
+                </li>
+            </ul>
+        </div>
+        <div class="nav-user">
+            {% include '_comps/_partials/user_menu.html' %}
+            {% comment %} {% if user.is_authenticated %}
+                {% include '_comps/_partials/user_menu.html' %}
+            {% else %}
+                <a class="ms-4 p-1 btn btn-warning"
+                    data-bs-toggle="modal"
+                    data-bs-target="#loginModal"
+                    hx-swap="innerHTML"
+                    hx-target="#loginModalContent"
+                    hx-get="{% url 'account_login' %}"
+                >Login</a>
+            {% endif %} {% endcomment %}
+        </div>
+    </div>
+</nav>

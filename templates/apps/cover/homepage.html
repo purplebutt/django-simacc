@@ -1,0 +1,19 @@
+{% extends '_shared/base.html' %}
+{% load core_tags %}
+
+{% block page_title %}
+    {% if title %}{{title}}{% else %}SimAcc - Free Simple Powerfull Accounting System{% endif %}
+{% endblock page_title %}
+
+{% block base_content %}
+    {% include 'account/_partials/mod_wrapper.html' with static=1 modal_id="signupModal" modal_content_id="signupModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with static=1 modal_id="loginModal" modal_content_id="loginModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="logoutModal" modal_content_id="logoutModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="changePasswordModal" modal_content_id="changePasswordModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with static=1 modal_id="resetPasswordModal" modal_content_id="resetPasswordModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="updatePictureModal" modal_content_id="updatePictureModalContent" %}
+    {% include '_comps/cover/header.html' %}
+    {% include '_comps/cover/main.html' %}
+    {% include '_comps/notif_login_require.html' %}
+    {% notification messages %}
+{% endblock base_content %}

@@ -1,0 +1,81 @@
+nav.navbarCover {
+    div.overlay {
+        display: none;
+        position: absolute;
+        left: 0px; top: 0px;
+        height: 100vh; width: 100vw;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+    div.navbar-top {
+        display: none;
+    }
+    div.nav-user {
+        a {
+            font-size: 15px;
+        }
+    }
+    button{
+        text-decoration: none;
+        border: none;
+        outline: none;
+        background: none;
+        font-size: 30px;
+        color: rgb(28, 28, 28);
+        &:hover {
+            color: rgb(78, 76, 76); 
+        }
+    }
+}
+
+@media only screen and (max-width: 992px){
+    nav.navbarCover {
+        div.overlay { 
+            display: none;
+        }
+        div.navbarContent {
+            background-color: var(--white);
+            position: fixed;
+            left: -100%; top: 0px;
+            height: 100vh;
+            padding: 10px 10px 10px 30px;
+            width: 270px;
+            transition: .5s ease;
+            div.navbar-top {
+                display: block;
+                margin-bottom: 3rem;
+            }
+            ul.navbar-nav {
+                li {
+                    margin-bottom: .5rem;
+                    a { transition: .2s all ease-out; }
+                    &:hover {
+                        a {
+                            letter-spacing: 1px;
+                            transition: .2s all ease-in;
+                        }
+                    }
+                }
+            }
+            button {
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                transition: .2s all ease-out;
+                &:hover {
+                    transform: rotate(90deg);
+                    transition: .2s all ease-in;
+                }
+            }
+        }
+        &.active {
+            div.overlay {
+                transition: .5s ease;
+                display: block;
+            }
+            div.navbarContent {
+                transition: .5s ease;
+                left: 0px;
+            }
+        }
+    }
+}

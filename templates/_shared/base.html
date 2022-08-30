@@ -1,0 +1,27 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'styles/third_party/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'webfont/fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/site.css' %}">
+    <title>{% block page_title %}{% endblock page_title %}</title>
+</head>
+<body>
+    {% block base_content %}{% endblock base_content %} 
+    <script type='text/javascript'>
+        document.body.addEventListener('htmx:configRequest', (evt) => {
+           evt.detail.headers['X-CSRFToken'] = '{{csrf_token}}';
+        })
+    </script>
+    <script src="{% static 'scripts/third_party/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'webfont/fontawesome/js/all.min.js' %}"></script>
+    <script src="{% static 'scripts/third_party/htmx_1.7.0.min.js' %}" defer></script>
+    <script type="module" src="{% static 'scripts/main.js' %}"></script>
+</body>
+</html>

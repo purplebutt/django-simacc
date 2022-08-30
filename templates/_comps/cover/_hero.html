@@ -1,0 +1,18 @@
+{% load static %}
+
+<section id="home" class="hero">
+    <div class="container">
+        <div class="row g-5">
+            <div class="hero-content col-lg-6">
+                <h3>{{hero.subtitle|capfirst}}</h3>
+                <h2>{{hero.title|capfirst}}</h2>
+                <p>{{hero.content|truncatewords:50|title}}</p>
+                <a class="btn btn-primary" href="{{hero.url}}">Learn More</a>
+            </div>
+            <div class="banner col-lg-6">
+                <img class="img-animate w-100" src="{{hero.image}}" height="529" width="694" 
+                loading="lazy" alt="hero banner">
+            </div>
+        </div>
+    </div>
+</section>

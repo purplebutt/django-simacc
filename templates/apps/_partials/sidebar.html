@@ -1,0 +1,86 @@
+{% load core_filters %}
+{% load core_tags %}
+
+<div class="nav flex-column bg-white rounded user-select-none">
+    <!--product-->
+    <div class="border px-3 py-2">
+        <a class="fs-6 sidebar-collapse-btn fw-bold text-decoration-none" 
+            type="button" data-bs-toggle="collapse" data-bs-target="#sbProdMenu">
+            <i class="d-inline-block fa fa-angle-right"></i>
+            <span class="d-inline-block">Transactions</span>
+        </a>
+        <div id="sbProdMenu" class="collapse show text-center">
+            <ul class="nav">
+                {% for tra in trans %}
+                    <li class="nav-item">
+                        {% if tra.name|is_eq:model_name %}
+                            <a class="nav-link border-bottom border-4 border-secondary pb-0 fw-bolder" href="{{tra.url}}", title="{{tra.verbose|title}}">{{tra.name|upper}}</a>
+                        {% else %}
+                            <a class="nav-link" href="{{tra.url}}", title="{{tra.verbose|title}}">{{tra.name|upper}}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!--product end-->
+
+    <!--category-->
+    <div class="border px-3 py-2">
+        <div class="d-flex justify-content-between">
+            <a class="d-inline-block fs-6 sidebar-collapse-btn fw-bold text-decoration-none" 
+                type="button" data-bs-toggle="collapse" data-bs-target="#sbCatMenu">
+                <i class="d-inline-block fa fa-angle-right"></i>
+                <span class="d-inline-block">Master</span>
+            </a>
+        </div>
+        <div id="sbCatMenu" class="collapse show px-2 text-center">
+            <ul class="nav">
+                {% for mas in master %}
+                    <li class="nav-item">
+                        {% if mas.name|is_eq:model_name %}
+                            <a class="nav-link border-bottom border-4 border-secondary pb-0 fw-bolder" href="{{mas.url}}", title="{{mas.verbose|title}}">{{mas.name|upper}}</a>
+                        {% else %}
+                            <a class="nav-link" href="{{mas.url}}", title="{{mas.verbose|title}}">{{mas.name|upper}}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!--category end-->
+
+    <!--size-->
+    <div class="border px-3 py-2">
+        <div class="d-flex justify-content-between">
+            <a class="fs-6 sidebar-collapse-btn fw-bold text-decoration-none"
+                type="button" data-bs-toggle="collapse" data-bs-target="#sbSizeMenu">
+                <i class="d-inline-block fa fa-angle-right"></i>
+                <span class="d-inline-block">Report</span>
+            </a>
+        </div>
+        <div id="sbSizeMenu" class="collapse show px-2 text-center">
+            <ul class="nav">
+                {% for rep in report %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{rep.url}}", title="{{rep.verbose|title}}">{{rep.name|upper}}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!--size end-->
+
+    <div class="px-3 py-2"> {% include '_comps/range_select.html' %} </div>
+
+    <style>
+        a.sidebar-collapse-btn>svg {
+            transition: all .3s ease;
+            transform: rotate(90deg);
+        }
+        a.sidebar-collapse-btn.collapsed>svg {
+            transition: all .3s ease;
+            transform: rotate(0deg);
+        }
+    </style>
+</div>

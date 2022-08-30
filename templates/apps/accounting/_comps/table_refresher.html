@@ -1,0 +1,7 @@
+{% load core_tags %}
+
+<a id="{{ref_id}}" 
+    style="visibility:hidden"
+    hx-get="{% url_fresp request follow_sort=1%}"
+    hx-swap="{{htmx_swap}}"
+    hx-target="{{htmx_target}}">Refresher</a>

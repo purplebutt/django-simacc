@@ -1,0 +1,53 @@
+{% load core_filters %}
+
+<form method="GET">
+    {% if price_range %}
+        <a class="fs-6 sidebar-collapse-btn fw-bold text-decoration-none"
+            type="button" data-bs-toggle="collapse" data-bs-target="#sbPriceRangeMenu">
+            <i class="d-inline-block fa fa-angle-right"></i>
+            <span class="d-inline-block">Price Range</span>
+        </a>
+        {% for key in request.GET %}
+            {% if key != "pricefr" and key != "priceto" %}
+                <input type="hidden" name="{{key}}" value="{{request.GET|getval:key}}">
+            {% endif %}
+        {% endfor %}
+        <div id="sbPriceRangeMenu" class="collapse show list-unstyled text-center">
+            <label id="priceFormLabel" for="priceFrom" class="form-label mb-0">From: </label>
+            <input type="range" name="pricefr" value="{{request.GET.pricefr|iftrue:'0'}}" 
+                class="form-range" min="{{price_range.min}}" max="{{price_range.max}}" step="{{price_range.step}}" id="priceFrom">
+            <label id="priceToLabel" for="priceTo" class="form-label mb-0">To: </label>
+            <input type="range" name="priceto" value="{{request.GET.priceto|iftrue:'2000000'}}" 
+                class="form-range" min="{{request.GET.pricefr|add:price_range.step}}" max="{{price_range.max}}" step="{{price_range.step}}" id="priceTo">
+            <button class="btn btn-primary btn-sm w-100" type="submit">Apply</button>
+        </div>
+    {% endif %}
+</form>
+<script type="text/javascript">
+    function rangeSelectScript() {
+        let priceRangeSliderFrom = document.getElementById('priceFrom');
+        let priceRangeSliderTo = document.getElementById('priceTo');
+        let rangeFromLabel = document.getElementById('priceFormLabel');
+        let rangeToLabel = document.getElementById('priceToLabel');
+        let numberFormatter = new Intl.NumberFormat('en-US');
+        
+        rangeFromLabel.innerText = `From ` + numberFormatter.format(priceRangeSliderFrom.value)
+        rangeToLabel.innerText = "To " + numberFormatter.format(priceRangeSliderTo.value)
+
+        priceRangeSliderFrom.addEventListener('change', function() {
+            const step = 200000;
+            let valFrom = parseInt(priceRangeSliderFrom.value);
+            let valTo = parseInt(priceRangeSliderTo.value);
+            rangeFromLabel.innerText = "From " + numberFormatter.format(priceRangeSliderFrom.value)
+            priceRangeSliderTo.setAttribute('min', valFrom+step); 
+            if (valTo <= valFrom) {
+                priceRangeSliderTo.value = valFrom+step;
+                rangeToLabel.innerText = "To " + numberFormatter.format(priceRangeSliderTo.value)
+            }
+        });
+        priceRangeSliderTo.addEventListener('change', function() {
+            rangeToLabel.innerText = "To " + numberFormatter.format(priceRangeSliderTo.value)
+        });
+    }
+    rangeSelectScript();
+</script>

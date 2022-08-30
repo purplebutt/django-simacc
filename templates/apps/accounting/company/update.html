@@ -1,0 +1,16 @@
+{% extends 'apps/_shared/acc.html' %}
+{% load core_tags %}
+
+
+{% block title_content %} Update Company {% endblock title_content %}
+
+{% block acc_content %}
+    <form method="POST" action="{{request.path}}" class="row g-2">
+        {% csrf_token %}
+        <h1>Update {{object.name|capfirst}}</h1>
+        {% form_float form %}
+        <div class="text-center mt-2 border-top pt-3">
+            <input class="btn btn-primary mt-2" type="Submit" value="Update">
+        </div>
+    </form>
+{% endblock acc_content %}

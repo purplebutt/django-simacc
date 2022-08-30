@@ -1,0 +1,34 @@
+{% extends '_shared/base.html' %}
+{% load core_tags %}
+
+{% block base_content %}
+    {% include '_comps/nav_top.html' %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="signupModal" modal_content_id="signupModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="loginModal" modal_content_id="loginModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="logoutModal" modal_content_id="logoutModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="changePasswordModal" modal_content_id="changePasswordModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="resetPasswordModal" modal_content_id="resetPasswordModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="updatePictureModal" modal_content_id="updatePictureModalContent" %}
+    <div class="container-fluid px-0">
+        <div class="bg-lightdark mb-3 py-2">
+            <div class="container">
+                <h2>Our Blog</h2>
+            </div>
+        </div>
+        <div class="container-fluid mt-3 mt-md-0">
+            <div class="row gy-2 gx-md-4">
+                <div class="col-md-3 col-lg-2">
+                    <div class="position-sticky" style="top: 4rem">
+                      {% include "apps/_partials/sidebar.html" %}
+                    </div>
+                </div>
+                <div class="col-md-9 col-lg-10">
+                    {% block blog_content %} {% endblock blog_content %}
+                </div>
+            </div>
+        </div>
+        {% scroll_up %}
+        {% notification messages %}
+    </div>
+    {% include '_comps/footer.html' %}
+{% endblock base_content %}

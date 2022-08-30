@@ -1,0 +1,8 @@
+a.sidebar-collapse-btn>svg {
+    transition: all .3s ease;
+    transform: rotate(90deg);
+}
+a.sidebar-collapse-btn.collapsed>svg {
+    transition: all .3s ease;
+    transform: rotate(0deg);
+}

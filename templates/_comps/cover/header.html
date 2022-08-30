@@ -1,0 +1,18 @@
+<header class="header">
+    <div class="container">
+        <div class="overlay"></div>
+        <a href="/" class="logo mb-0">Sim<span>Acc</span></a>
+        {% include '_comps/cover/_navbar.html' %}
+        <a type="button" class="d-block ms-auto ms-lg-4 me-4 btn-join"
+            data-bs-toggle="modal" data-bs-target="#loginModal"
+            hx-target="#loginModalContent"
+            hx-swap="innerHTML"
+            hx-get="{% url 'account_login' %}">
+            <i class="d-inline fa fa-chevron-right" aria-hidden="true"></i>
+            <span class="d-inline">Join now</span>
+        </a>
+        <button class="d-block d-lg-none nav-open-btn" aria-label="Open Menu">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </button>
+    </div>
+</header>

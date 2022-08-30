@@ -1,0 +1,17 @@
+<header class="sticky-top bg-light border-bottom mb-3 py-2">
+    <div class="container-fluid d-flex align-items-center justify-content-between">
+        <ul class="nav fs-5">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'cover:homepage' %}">Home</a>
+            </li>
+        </ul>
+        <div class="leftNavLink">
+            <h6>You are accessing admin site as 
+                <a class="link" href="{% url 'accounts:myprofile' %}">{{user|title}}</a></h6>
+        </div>
+        <div class="rightNavLink">
+            <a type='button' onclick='history.back()' class='btn btn-info btn-sm mt-3'>
+                <i class='fa fa-rotate-left me-1'></i>Go back</a>
+        </div>
+    </div>
+</header>

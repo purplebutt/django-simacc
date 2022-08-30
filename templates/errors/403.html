@@ -1,0 +1,13 @@
+{% extends 'err_base.html' %}
+
+
+{% block page_title %}403 Forbidden{% endblock page_title %}
+{% block err_base_content %}
+    <h1 class="text-danger">Forbidden (403 error)</h1>
+    <h5 class="text-secondary text-center">
+        You don't have permission to access<br>{{request.path}}
+    </h5>
+    <i class="fa fa-ban fs-xl my-auto"></i>
+    <a type="button" onclick="history.back()" class="btn btn-info btn-sm mt-3">
+        <i class="fa fa-rotate-left me-1"></i>Go back</a>
+{% endblock err_base_content %}

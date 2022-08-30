@@ -1,0 +1,34 @@
+{% load static %}
+
+{% if is_link %}
+    <a href="{{link_to}}" class="brandImage text-decoration-none {{class_}}">
+        <img height={{height}} src="{% static 'images/logo.png' %}" alt="brand">
+    </a>
+    {% comment %} <a href="{{link_to}}" class="ms-0 ps-0 brandText nav-link d-block {{class_}}"> Sim<span>Acc</span> </a> {% endcomment %}
+{% else %}
+    <img class="text-decoration-none {{class_}}" height={{height}} src="{% static 'images/logo.png' %}" alt="brand">
+    {% comment %} <div class="ps-0 brandText {{class_}}"> Sim<span>Acc</span> </div> {% endcomment %}
+{% endif %}
+
+<style>
+    .brandImage>img {
+        display: inline-block;
+    }
+    .brandImage>img:hover {
+        transition: all .2s ease;
+        transform: scale(.95);
+    }
+    {% comment %} .brandText {
+        font-size: 30px;
+        font-weight: 800;
+        transition: .2s all ease-out;
+    }
+    .brandText>span {
+        font-weight: bolder; 
+        color: hsl(335, 88%, 38%);
+    }
+    .brandText:hover {
+        letter-spacing: 1px;
+        transition: .2s all ease-in;
+    } {% endcomment %}
+</style>

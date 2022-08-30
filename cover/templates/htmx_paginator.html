@@ -1,0 +1,119 @@
+{% load core_tags %}
+{% load core_filters %}
+
+
+{% if page %}
+<h6 class="text-muted text-center text-lg-start">Showing up {{page.object_list|length}} item{{page.object_list|pluralize}} 
+    on page {{page.number}}, found {{page.paginator.object_list.count}}
+    item{{page.object_list|pluralize}}</h6>
+<div class="row gy-2">
+    <nav class="col-12 col-lg-auto {{outer_class}}" aria-label="paginator">
+        <ul class="justify-content-center {{inner_class}}">
+            {% if page.has_previous and not page.number == 2 %}
+                <li class="page-item" title="first page">
+                    <a  class="page-link" 
+                        type="button"
+                        {% comment %} hx-get="{% url_queryAdd request 'page' '1' ignore_url_queries %}" {% endcomment %}
+                        hx-get="{% url_fresp request page='1' follow_sort=1%}"
+                        hx-swap="innerHTML"
+                        hx-target="{{swap_target}}"><i class="fa fa-backward-step"></i></a>
+                </li>
+                <li class="page-item" title="previous page">
+                    <a  class="page-link" 
+                        type="button"
+                        {% comment %} hx-get="{% url_queryAdd request 'page' page.previous_page_number ignore_url_queries %}" {% endcomment %}
+                        hx-get="{% url_fresp request page=page.previous_page_number follow_sort=1%}"
+                        hx-swap="innerHTML"
+                        hx-target="{{swap_target}}"><i class="fa fa-circle-chevron-left"></i></a>
+                </li>
+            {% endif %}
+
+            {% for p in page.paginator.page_range %}
+                {% if p|is_eq:page.number %}
+                    <li class="page-item active" title="Showing up page {{p}} of total {{page.paginator.num_pages}} pages">
+                        <a  class="page-link" 
+                            type="button"
+                            {% comment %} hx-get="{% url_queryAdd request 'page' p ignore_url_queries %}" {% endcomment %}
+                            hx-get="{% url_fresp request page=p follow_sort=1%}"
+                            hx-swap="innerHTML"
+                            hx-target="{{swap_target}}">{{p}} of {{page.paginator.num_pages}}</a>
+                    </li>
+                {% elif p > page.number|add:'-3' and p < page.number|add:'3' %}
+                    <li class="page-item">
+                        <a  class="page-link" 
+                            type="button"
+                            {% comment %} hx-get="{% url_queryAdd request 'page' p ignore_url_queries %}" {% endcomment %}
+                            hx-get="{% url_fresp request page=p follow_sort=1%}"
+                            hx-swap="innerHTML"
+                            hx-target="{{swap_target}}">{{p}}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page.has_next and not page.number == page.paginator.num_pages|add:'-1' %}
+                <li class="page-item" title="next page">
+                    <a  class="page-link" 
+                        type="button"
+                        {% comment %} hx-get="{% url_queryAdd request 'page' page.next_page_number ignore_url_queries %}" {% endcomment %}
+                        hx-get="{% url_fresp request page=page.next_page_number follow_sort=1%}"
+                        hx-swap="innerHTML",
+                        hx-target="{{swap_target}}"><i class="fa fa-circle-chevron-right"></i></a>
+                </li>
+                <li class="page-item" title="last page">
+                    <a  class="page-link" 
+                        type="button"
+                        {% comment %} hx-get="{% url_queryAdd request 'page' page.paginator.num_pages ignore_url_queries %}" {% endcomment %}
+                        hx-get="{% url_fresp request page=page.paginator.num_pages follow_sort=1%}"
+                        hx-swap="innerHTML"
+                        hx-target="{{swap_target}}"><i class="fa fa-forward-step"></i></a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    <nav class="col-12 col-lg-auto {{outer_class}}" aria-label="paginator">
+        <ul class="justify-content-center {{inner_class}}">
+            <li class="page-item">
+                <input 
+                    id="paginatorPageInput" 
+                    type="number" name="page" 
+                    class="page-link" style="max-width:5rem;" 
+                    value="{{page.number}}"
+                    title="enter page number">
+            </li>
+            <li class="page-item">
+                <input 
+                    id="paginatorPerPage" 
+                    type="number" name="per_page" 
+                    class="page-link" style="max-width:5rem;" 
+                    title="number of items per page"
+                    value="{{page.paginator.per_page}}"
+                    placeholder="n/page">
+            </li>
+            <li class="page-item">
+                <a id="paginatorGoBtn" class="page-link" 
+                    type="button" 
+                    hx-swap="innerHTML"
+                    hx-target="{{swap_target}}"
+                    hx-include="input[type='number'][name='per_page'],#paginatorPageInput"
+                    hx-get="{{ request.get_full_path }}">Go</a>
+            </li>
+
+
+        </ul>
+    </nav>
+</div>
+<script type="text/javascript">
+    function paginatorInputValidation() {
+        const numberInputPage =  document.getElementById("paginatorPageInput");
+        const numberInputPerPage =  document.getElementById("paginatorPerPage");
+        const validateNumInput = (evt)=> {
+            if ((isNaN(evt.target.value) && evt.target.value !== "") || (evt.target.value < 1)){
+                evt.target.value = "";
+            }
+        };
+        numberInputPage.addEventListener('keyup', validateNumInput);
+        numberInputPerPage.addEventListener('keyup', validateNumInput);
+    }
+    paginatorInputValidation();
+</script>
+{% endif %}

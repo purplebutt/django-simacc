@@ -1,0 +1,11 @@
+{% extends 'err_base.html' %}
+
+
+{% block page_title %}404 Not Found{% endblock page_title %}
+{% block err_base_content %}
+    <h1 class="text-danger">Not Found (404 error) <i class="bi-emoji-frown-fill"></i></h1>
+    <h5 class="text-secondary text-center">
+        {{request.path}}<br>
+        Is not exist on our server!
+    </h5>
+{% endblock err_base_content %}

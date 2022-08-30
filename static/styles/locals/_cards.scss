@@ -1,0 +1,46 @@
+@media only screen and (min-width: 992px){
+    .card.card-product {
+        position: relative;
+        overflow: hidden;
+        span.card-layer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: all .2s ease-in;
+            position: absolute;
+            top: -30%;
+            left: 0;
+            height: 30%;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.597);
+            .btn {
+                margin-top: 4px;
+                margin-bottom: 4px;
+            }
+        }    
+        &:hover {
+            span.card-layer {
+                transition: all .2s ease-in;
+                top: 0;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 992px){
+    .card.card-product {
+        div.card-footer {
+            border: none;
+            height: 100%;
+        }
+        span.card-layer {
+            .btn {
+                font-size: small;
+                padding: 3px;
+                margin-top: 3px;
+                margin-bottom: 3px;
+            }
+        }
+    }
+}

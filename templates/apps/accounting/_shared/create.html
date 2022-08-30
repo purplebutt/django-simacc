@@ -1,0 +1,72 @@
+{% load i18n %}
+{% load core_tags %}
+
+
+<div class="modal-content">
+    <div class="modal-header">
+        {% if is_user_allowed %}
+            <h5 class="modal-title"><i class="fa fa-right-to-bracket me-2"></i>Add new {{model_name|upper}}</h5>
+        {% else %}
+            <h5 class="modal-title"><i class="fa fa-ban me-2"></i>Forbidden</h5>
+        {% endif %}
+        <button type="button" tabindex=-1 class="btn-close btn-close_create" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        {% if is_user_allowed %}
+            <h6 class="text-center text-primary fw-bold mb-4">Fill in to add new {{page_title|title}}</h6>
+        {% endif %}
+        {% if not request.htmx_closemodal %}
+            <form class="needs-validation form-create row g-2">
+                {% csrf_token %}
+                {% if is_user_allowed %}
+                    {% form_float_cbleft form %}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <input type="reset" class="btn btn-secondary btn-reset" value="Reset" disabled>
+                        <button type="button" class="btn btn-primary btn-submit" disabled
+                            hx-swap="innerHTML"
+                            hx-post="{{add_url}}"
+                            hx-target="#{{model_name}}AddModalContent">Add</button>
+                    </div>
+                    <script type="text/javascript">
+                        function lockCreateButton() {
+                            const submitBtn = document.querySelector("form.form-create>div.modal-footer button.btn-submit");
+                            const resetBtn = document.querySelector("form.form-create>div.modal-footer input.btn-reset");
+                            const inputs = document.querySelectorAll("form.form-create input,form.form-create textarea,form.form-create select");
+                            inputs.forEach(i => {
+                                i.onchange = function() {
+                                    submitBtn.removeAttribute("disabled")
+                                    resetBtn.removeAttribute("disabled")
+                                }
+                            });
+                        }
+                        lockCreateButton();
+                    </script>
+                {% else %}
+                    {% include 'apps/_comps/info.html' %}
+                {% endif %}
+            </form> 
+        {% else %}
+            {{request.htmx_message|json_script:'msg_create'}}
+            <script type="text/javascript">
+                var htmxCloseModal = ()=> {
+                    let target = document.querySelector('button.btn-close_create[data-bs-dismiss="modal"]');
+                    target.click();
+
+                    // show toast message
+                    let toastTemplate = document.querySelector('div#toastInfo');
+                    let toastBody = document.querySelector('div#toastInfo>div.toast-body');
+                    let msg = document.querySelector('script#msg_create').textContent;
+                    if (msg.length > 0) {
+                        msg = msg.substring(1, msg.length-1);
+                        toastBody.innerText = msg;
+                        new bootstrap.Toast(toastTemplate).show();
+                    }
+                }
+                var refresher = document.querySelector("a#table-refresher");
+                refresher.click()
+                htmxCloseModal();
+            </script>
+        {% endif %}
+    </div>
+</div>

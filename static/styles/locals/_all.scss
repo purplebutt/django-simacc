@@ -1,0 +1,64 @@
+section {
+    padding-top: 80px;
+    padding-bottom: 20px;
+    h1 {
+        color: var(--chrome-yellow);
+        font-weight: 700;
+    }
+    div.banner {
+        user-select: none;
+        img {
+            width: 100%;
+            height: auto;
+        }
+    }
+}
+
+a.navbar-brand {
+    img {
+        max-height: 2rem;
+    }
+}
+
+div.cartIcon {
+    width: 30px;
+    height: 30px;
+    border-radius: 30px;
+    background-color: var(--light);
+    text-align: center;
+    img {
+        height: 23px;
+        width: 23px;
+    }
+}
+
+p.text-small {
+    font-weight: 300;
+    font-size: small;
+    line-height: .9rem;
+}
+
+ul.errorlist {
+    color: crimson;
+}
+
+img#newImage {
+    background-color: var(--primary);
+    text-transform: uppercase;
+    color: white;
+    transition: all .2s ease;
+    &:hover {
+        background-color: var(--light);
+        color: var(--primary);
+        font-weight: bold;
+        letter-spacing: .1rem;
+    }
+}
+
+.icon-link {
+    color: var(--primary);
+    text-transform: capitalize;
+    &:hover {
+        color: var(--primary-light);
+    }
+}

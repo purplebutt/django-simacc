@@ -1,0 +1,107 @@
+{% load static %}
+{% load core_tags %}
+
+<section id="welcome" class="hero">
+    <div class="container">
+        <div class="row g-2">
+            <div class="hero-content col-lg-6">
+                {% if user.is_authenticated %}
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <h3>Welcome back {{user.username|title}}</h3>
+                        {% comment %} <h1>{{hero.title|capfirst}}</h1>
+                        <h3>{{hero.subtitle|capfirst}}</h3> {% endcomment %}
+
+                        <div title="{{user|title}}">{% profile_pic user 80 80 %} </div>
+                    </div>
+                    <hr>
+                    <button class="collapse-btn ps-0 fw-bold fs-6" data-bs-toggle="collapse" data-bs-target="#quickAccessCollapse">
+                        <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i> Quick Access
+                    </button>
+                    <div id="quickAccessCollapse" class="collapse ps-4">
+                        <a class="m-1 btn btn-outline-warning" href="#">Transactions</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Last Activity</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">My Todo List</a>
+                        <a class="m-1 btn btn-outline-warning" href="{% url 'accounts:myprofile' %}">My Profile</a>
+                    </div>
+                    <button class="collapse-btn ps-0 fw-bold fs-6" data-bs-toggle="collapse" data-bs-target="#transactionsCollapse">
+                        <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i> Transactions
+                    </button>
+                    <div id="transactionsCollapse" class="collapse ps-4">
+                        <a class="m-1 btn btn-outline-warning" href="#">Accounting</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Purchasing</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Selling</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Inventory</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Payments</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Fixed Asset</a>
+                    </div>
+                    <button class="collapse-btn ps-0 fw-bold fs-6" data-bs-toggle="collapse" data-bs-target="#masterDataCollapse">
+                        <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i> Master Data
+                    </button>
+                    <div id="masterDataCollapse" class="collapse ps-4">
+                        <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:coh_list' %}">COA Header</a>
+                        <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:coa_list' %}">Chart Of Account</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Chart Of Cash Flow</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Business Segment</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Customer</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Vendor</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Inventory</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Fixed Assets</a>
+                    </div>
+                    <button class="collapse-btn ps-0 fw-bold fs-6" data-bs-toggle="collapse" data-bs-target="#reportCollapse">
+                        <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i> Reports
+                    </button>
+                    <div id="reportCollapse" class="collapse ps-4">
+                        <a class="m-1 btn btn-outline-warning" href="#">Trial Balance</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Income Statement</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Equity Statement</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Balance Sheet</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Sales Report</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Purchase Report</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Inventory Report</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Fixed Assets</a>
+                    </div>
+                    <button class="collapse-btn ps-0 fw-bold fs-6" data-bs-toggle="collapse" data-bs-target="#mycompanyCollapse">
+                        <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i> My Company
+                    </button>
+                    <div id="mycompanyCollapse" class="collapse ps-4">
+                        {% if user.profile.company %}
+                            <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:comp_update' user.profile.company.slug %}">Company Profile</a>
+                            <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:comp_emp_list' %}">Employees</a>
+                        {% else %}
+                            <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:comp_add' %}">Create My Company</a>
+                        {% endif %}
+                    </div>
+                    <button class="collapse-btn ps-0 fw-bold fs-6" data-bs-toggle="collapse" data-bs-target="#othersCollapse">
+                        <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i> Others
+                    </button>
+                    <div id="othersCollapse" class="collapse ps-4">
+                        <a class="m-1 btn btn-outline-warning" href="#">Todo</a>
+                        <a class="m-1 btn btn-outline-warning" href="#">Blog</a>
+                    </div>
+                {% else %}
+                    <h3>{{hero.subtitle|capfirst}}</h3>
+                    <h1>{{hero.title|capfirst}}</h1>
+                    <p>{{hero.content|truncatewords:50|title}}</p>
+                    <a class="btn btn-outline-warning"
+                        data-bs-toggle="modal"
+                        data-bs-target="#signupModal"
+                        hx-swap="innerHTML"
+                        hx-target="#signupModalContent"
+                        hx-get="{% url 'account_signup' %}"
+                    >Join Now</a>
+                    <a class="mx-2 btn btn-outline-warning"
+                        data-bs-toggle="modal"
+                        data-bs-target="#loginModal"
+                        hx-swap="innerHTML"
+                        hx-target="#loginModalContent"
+                        hx-get="{% url 'account_login' %}"
+                    >Login</a>
+                {% endif %}
+            </div>
+            <div class="banner col-lg-6">
+                <img class="img-animate" src="{{hero.image}}" height="529" width="694" 
+                loading="lazy" alt="hero banner">
+            </div>
+        </div>
+    </div>
+</section>

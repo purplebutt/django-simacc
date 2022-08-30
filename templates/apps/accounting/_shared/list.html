@@ -1,0 +1,17 @@
+{% load core_tags %}
+{% load core_filters %}
+
+
+<table id="{{model_name}}-table" class="table table-data table-hover mt-3">
+    {{table_obj}}
+</table>
+
+<footer id="{{model_name}}_paginator" class="paginator py-2 mt-3">
+    {% with 'div#'|concat:model_name|concat:'Content' as target %}
+        {% htmx_paginator target objects request %}
+    {% endwith %}
+</footer>
+
+{% with "div#"|concat:model_name|concat:"Content" as htmx_target %}
+    {% include 'apps/accounting/_comps/table_refresher.html' with ref_id='table-refresher' htmx_swap='innerHTML' %}
+{% endwith %}

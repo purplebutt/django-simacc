@@ -1,0 +1,32 @@
+<a href="#{{target}}" class="oc-scroll-up {{class_}}">
+    <i class="fa fa-chevron-up fa-fw" aria-hidden="true"></i>
+</a>
+
+<style>
+    a.oc-scroll-up {
+        position: fixed;
+        bottom: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        padding: 6px;
+        background-image: var(--gradient-2);
+        text-align: center;
+        font-size: 1.3rem;
+        font-weight: bold;
+        display: none;
+        opacity: .85;
+        color: var(--white);
+        font-weight: 700;
+        transition: .2s all ease-out;
+    }
+    a.oc-scroll-up:hover {
+        opacity: 1;
+        transition: .2s all ease-out;
+    }
+    a.oc-scroll-up.active {
+        display: block;
+        transition: .3s all ease-in;
+    }
+</style>

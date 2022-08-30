@@ -1,0 +1,27 @@
+(done)>> Implement htmx request and use bootstrap modal for create and update
+(done)>> Add toast message when COA created or updated
+(done)>> Add deactive functionality to deactivate an account
+(done)>> Complete the functionality (filter and pagination) for coa list
+(done)>> Also style (with css) the appearance of coa list table and filter dropdown
+(done)>> Make it modular so we can reuse all the components for other model as well
+(done)>> Add search functionality to coa and coh table    
+(done)>> Add sort functionality by clicking at table header
+(done)>> Continue with General Journal / Journal Entry
+(done)>> Add custom validation to force user to provide cash flow for Cash and Bank transaction
+(done)>> Add custom validation to force user to provide business segment for Revenue and Expense transaction
+(done)>> Add number field for dropdown datalist so account will appear like '11001-Kas Kantor' (fixed COA model)
+
+    >> Add double entry create and update form (you probably want to add pair field on JRE model)
+    >> Add advanced search or filter features 
+    >> Add multiple entry create and update form 
+    >> Add authentication.groups to allow certain user to be able to input journal entries other user can only
+            views data, report and transaction journal but can not modify data
+       
+    Reports
+    >> 1. Add general ledger generator
+    >> 2. Add cashflow ledger generator
+    >> 3. Add adjusted trial balance
+    >> 4. Add Profit and Loss report
+    >> 5. Add Equity/Retained Earnings report
+    >> 6. Add Cash Flow report
+    >> 7. Add Balance Sheet report

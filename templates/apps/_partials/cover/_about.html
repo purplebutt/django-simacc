@@ -1,0 +1,24 @@
+{% load static %}
+{% load humanize %}
+
+<section id="about" class="about">
+    <div class="container">
+        <div class="row g-2">
+            <div class="banner col-lg-6">
+                <img src="{{about.image}}" alt="about banner" 
+                class="img-animate" width="700" height="532" loading="lazy">
+            </div>
+            <div class="about-content col-lg-6">
+                <h1 class="underline">{{about.title}}</h1>
+                <p>{{about.content|truncatewords:40|capfirst}}</p>
+                <ul class="list-unstyled">
+                    {% for d in about.listdt %}
+                        <li>
+                            {{d|capfirst}}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
