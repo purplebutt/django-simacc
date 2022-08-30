@@ -1,6 +1,8 @@
 from django.db import models
-from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 from django.urls import reverse
+from django.conf import settings
+from media.api.manager import resize_image, delete_model_image
 
 
 #! Model Managers
@@ -16,7 +18,7 @@ class InactiveManager(models.Manager):
 
 class ActiveManager(models.Manager):
     def get_queryset(self):
-        result = super(type(self), self).get_queryset().order_by('-created').filter(is_active=True)
+        result = super(type(self), self).get_queryset().filter(is_active=True)
         return result
 
 
@@ -41,14 +43,21 @@ class AccModelBase(models.Model):
         ordering = ('-created',)
 
     # instance methods
+    def save(self, *args, **kwargs):
+        if settings.DEBUG:
+            delete_model_image(self, type(self), type(self)._img_def_path)
+            super(AccModelBase, self).save(*args, **kwargs)
+            resize_image(self.image.path)
+        else:
+            super(type(self), self).save(*args, **kwargs)
+
     def get_absolute_url(self):
         return reverse(f'{type(self).app_name}:{type(self).__name__.lower()}_detail', kwargs={'slug': self.slug})
 
     def get_update_url(self):
         return reverse(f'{type(self).app_name}:{type(self).__name__.lower()}_update', kwargs={'slug': self.slug})
 
-    def get_tablerow_style(self):
-        pass
+    def get_tablerow_style(self): pass
 
     # class methods
     @classmethod

@@ -87,7 +87,7 @@ class JRBTable(base.Table):
     description = base.TableRowCell(html_class="border")
     group = base.TableRowCell(html_class="border")
     is_active = base.TableRowCell(html_class="border")
-    balance = base.TableRowCell(html_class="border text-end", val_type="money", marker=('not:0', 'text-danger'))
+    balance = base.TableRowCell(html_class="border text-end", val_type="money")
     entries = base.TableRowCell(html_class="border text-end", val_type="money")
     number = base.TableRowLink(
         hx_target=f'{model.__name__.lower()}UpdateModalContent',
