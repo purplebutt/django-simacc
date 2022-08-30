@@ -20,6 +20,13 @@
                 hx-target="#{{model_name}}AddModalContent"
                 hx-get="{{add_url}}"
                 ><i class="fa fa-plus-square me-2" aria-hidden="true"></i>Add New</button>
+            {% if add_single_url %}
+                <button class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#{{model_name}}AddModal"
+                    hx-swap="innerHTML"
+                    hx-target="#{{model_name}}AddModalContent"
+                    hx-get="{{add_single_url}}"
+                    ><i class="fa fa-plus-square me-2" aria-hidden="true"></i>Add Single</button>
+            {% endif %}
             <button class="btn btn-outline-primary btn-sm" 
                 hx-swap="innerHTML"
                 hx-target="div#{{model_name}}Content"

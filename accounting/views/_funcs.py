@@ -133,6 +133,7 @@ def f_get_context_data(self, *args, **kwargs):
         context["model_name"] = type(self).model.__name__.lower()
         context["page_title"] = type(self).page_title
         context["add_url"] = type(self).model.get_add_url()
+        if hasattr(type(self).model, 'get_add_single_url'): context["add_single_url"] = type(self).model.get_add_single_url()
         return context
 
 
@@ -141,6 +142,7 @@ def f_standard_context(self, context):
     context["model_name"] = type(self).model.__name__.lower()
     context["page_title"] = type(self).page_title
     context["add_url"] = type(self).model.get_add_url()
+    if hasattr(type(self).model, 'get_add_single_url'): context["add_single_url"] = type(self).model.get_add_single_url()
 
     # sidebar data
     context["report"] = data.sidebar("report")

@@ -232,7 +232,7 @@ class JRBUpdateForm(forms.ModelForm):
         fields = ('number', 'group', 'description', 'is_active')
 
 
-#! journal entry
+#! journal single entry
 def jre_clean(self):
     super(type(self), self).clean()     # make sure that others fields validation get fire
     # custom validation for 'batch'
@@ -290,7 +290,7 @@ def jre_clean(self):
         if coa_instance and coa_instance.report() == 'PROFIT & LOSS': 
             self.add_error('segment', f"This field is required.")
 
-class JRECreateForm_bak(forms.ModelForm):
+class JRECreateSingleForm(forms.ModelForm):
     clean = jre_clean
     form_type = 'create'   # mark this form as create form
     date = forms.DateField()
@@ -489,7 +489,8 @@ class JRECreateForm(forms.ModelForm):
     batch = forms.CharField()   # use datalist
     ref = forms.CharField()
     description = forms.CharField(widget=forms.Textarea)
-    amount = forms.CharField(validators=[JRE.amount_validator], help_text="Provide a positive integer")
+    amount = forms.CharField(validators=[JRE.amount_validator], help_text="Provide a positive integer", 
+        widget=forms.TextInput(attrs={'class':'border border-info border-3'}))
     account = forms.CharField(label='Account debited')     # use datalist
     account2 = forms.CharField(label='Account credited')     # use datalist
     segment = forms.ModelChoiceField(BSG.actives, required=False)

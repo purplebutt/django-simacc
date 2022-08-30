@@ -10,6 +10,7 @@ from django.urls.base import reverse_lazy
 from ..models import JRE, JRB, COA, BSG, CCF
 from ..html.table import JRETable
 from ..forms import JREUpdateForm, JRECreateForm
+from ..myforms.jre import JRECreateSingleForm
 from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate
 from cover import data
@@ -24,6 +25,20 @@ class JRECreateView(UserPassesTestMixin, generic.CreateView):
     page_title = PAGE_TITLE
     template_name = DP / 'create.html'
     form_class = JRECreateForm
+    success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
+    allowed_group = 'accounting_admin'
+    form_valid = f_form_valid
+    get_context_data = f_get_context_data
+    post = f_post
+    get = f_get
+    test_func = f_test_func
+
+
+class JRECreateSingle(UserPassesTestMixin, generic.CreateView):
+    model = JRE
+    page_title = PAGE_TITLE
+    template_name = DP / 'create_single.html'
+    form_class = JRECreateSingleForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
     allowed_group = 'accounting_admin'
     form_valid = f_form_valid

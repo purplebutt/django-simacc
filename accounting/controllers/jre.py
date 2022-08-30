@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 from django.template.defaultfilters import slugify
+from django.shortcuts import reverse
 from django.utils import timezone
 from .base import AccModelBase
 from .jrb import JRB; from .coa import COA; from .bsg import BSG; from .ccf import CCF
@@ -114,6 +115,10 @@ class JRE(AccModelBase):
     def get_tablerow_style(self):
         if self.group == 'c': return "table-info"
         else: return "table-light"
+
+    @classmethod
+    def get_add_single_url(cls):
+        return reverse(f'{cls.app_name}:{cls.__name__.lower()}_add_single')
 
     @classmethod
     def get_group(cls, debit_or_credit:str="d", mode:str="long", opposite:bool=False):
