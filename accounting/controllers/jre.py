@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.shortcuts import reverse
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 from .base import AccModelBase
 from .jrb import JRB; from .coa import COA; from .bsg import BSG; from .ccf import CCF
 from django.contrib.auth.models import User
@@ -11,10 +12,14 @@ from django.contrib.auth.models import User
 class JRE(AccModelBase):
     # helper functions
     def amount_validator(value:str):
-        val = value.replace(",", "")
+        val = str(value).replace(",", "")
         if not val.isnumeric() or int(val) < 0:
             raise ValidationError(
                 f"Invalid value: {value} should be a positive integer"
+            ) 
+        elif int(val) > 99_999_999_999_999:
+            raise ValidationError(
+                f"Max value: 99,999,999,999,999"
             ) 
 
     # class fields
@@ -27,13 +32,13 @@ class JRE(AccModelBase):
 
     # database fields
     date = models.DateField(default=timezone.now)
-    number = models.PositiveIntegerField()
+    number = models.PositiveBigIntegerField()
     batch = models.ForeignKey(JRB, verbose_name='batch', on_delete=models.CASCADE, limit_choices_to={'is_active':True}, related_name='journals', related_query_name='journal')
     ref = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
     group = models.CharField(verbose_name="type",max_length=1, choices=_type)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
-    amount = models.PositiveIntegerField()
+    amount = models.PositiveBigIntegerField(validators=[amount_validator])
     account = models.ForeignKey(COA, on_delete=models.CASCADE, limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
     segment = models.ForeignKey(BSG, on_delete=models.RESTRICT, null=True, limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
     cashflow = models.ForeignKey(CCF, verbose_name="cash flow", null=True, on_delete=models.CASCADE, 
@@ -43,14 +48,14 @@ class JRE(AccModelBase):
     edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='jre_editors', related_query_name='jre_editor')
 
     class Meta:
-        ordering = ('-date', '-number',)
+        ordering = ('-date', '-group')
         verbose_name = "JRE"
         verbose_name_plural = "JRE"
 
     # instance methods
     def __str__(self):
         batch = JRB.objects.get(number=self.batch)
-        return f"{batch.number}-{self.ref}"
+        return str(self.number)
 
     def create_pair(self, **kwargs):
         p = type(self)()
@@ -75,7 +80,7 @@ class JRE(AccModelBase):
             # auto input journal number
             last = type(self).objects.order_by('-created').first()
             now = timezone.now()
-            if now.day == 1 and last.created.day > 1:
+            if (last == None) or (now.day == 1 and last.created.day > 1):
                 n = now.date().strftime("%y%m%d") + "{:0>5}".format(0)
             else:
                 n = int(str(last.number)[-5:]) + 1
@@ -113,7 +118,7 @@ class JRE(AccModelBase):
         return (self.number, pair_instance.number)
 
     def get_tablerow_style(self):
-        if self.group == 'c': return "table-info"
+        if self.group == 'd': return "table-info"
         else: return "table-light"
 
     @classmethod

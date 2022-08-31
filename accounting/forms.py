@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.db.models import Q
 from .models import *
 
@@ -49,7 +48,7 @@ class COHCreateForm(forms.ModelForm):
     name = forms.CharField()
     report = forms.ChoiceField(choices=COH._reports)
     group = forms.ChoiceField(choices=COH._account_group)
-    notes = forms.CharField(widget=forms.Textarea(), required=False)
+    notes = forms.CharField(widget=forms.Textarea(attrs={'style':'height:120px'}), required=False)
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
     number.col_width = 3
@@ -67,7 +66,7 @@ class COHUpdateForm(forms.ModelForm):
     name = forms.CharField()
     report = forms.ChoiceField(choices=COH._reports)
     group = forms.ChoiceField(choices=COH._account_group)
-    notes = forms.CharField(widget=forms.Textarea(), required=False)
+    notes = forms.CharField(widget=forms.Textarea(attrs={'style':'height:120px'}), required=False)
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
     number.col_width = 3
@@ -87,7 +86,7 @@ class COACreateForm(forms.ModelForm):
     name = forms.CharField()
     normal = forms.ChoiceField(choices=COA._normal_balance, widget=forms.RadioSelect)
     header = forms.ModelChoiceField(COH.objects)
-    notes = forms.CharField(widget=forms.Textarea(), required=False)
+    notes = forms.CharField(widget=forms.Textarea(attrs={'style':'height:120px'}), required=False)
     is_cashflow = forms.CharField(widget=forms.CheckboxInput(), label_suffix="")
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
@@ -106,7 +105,7 @@ class COAUpdateForm(forms.ModelForm):
     name = forms.CharField()
     normal = forms.ChoiceField(choices=COA._normal_balance, widget=forms.RadioSelect)
     header = forms.ModelChoiceField(COH.objects)
-    notes = forms.CharField(widget=forms.Textarea(), required=False)
+    notes = forms.CharField(widget=forms.Textarea(attrs={'style':'height:120px'}), required=False)
     is_cashflow = forms.CharField(widget=forms.CheckboxInput(), label_suffix="")
     is_active = forms.CharField(widget=forms.CheckboxInput(), label_suffix="")
     no_password = True  # prevent password hide/show javascript to load (form without password field)
@@ -128,7 +127,7 @@ class CCFCreateForm(forms.ModelForm):
     name = forms.CharField()
     flow = forms.ChoiceField(choices=CCF._flow, widget=forms.RadioSelect)
     activity = forms.ChoiceField(choices=CCF._activities)
-    notes = forms.CharField(widget=forms.Textarea(), required=False)
+    notes = forms.CharField(widget=forms.Textarea(attrs={'style':'height:120px'}), required=False)
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
     number.col_width = 3
@@ -146,7 +145,7 @@ class CCFUpdateForm(forms.ModelForm):
     name = forms.CharField()
     flow = forms.ChoiceField(choices=CCF._flow, widget=forms.RadioSelect)
     activity = forms.ChoiceField(choices=CCF._activities)
-    notes = forms.CharField(widget=forms.Textarea(), required=False)
+    notes = forms.CharField(widget=forms.Textarea(attrs={'style':'height:120px'}), required=False)
     is_active = forms.CharField(widget=forms.CheckboxInput(), label_suffix="")
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
@@ -164,45 +163,45 @@ class CCFUpdateForm(forms.ModelForm):
 class BSGCreateForm(forms.ModelForm):
     form_type = 'create'   # mark this form as create form
     number = forms.CharField()
+    group = forms.CharField(label='Type')
     name = forms.CharField(label='Business Name')
-    group = forms.CharField()
-    notes = forms.CharField(widget=forms.Textarea(), required=False)
+    notes = forms.CharField(widget=forms.Textarea(attrs={'style':'height:150px'}), required=False)
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
-    number.col_width = 3
-    name.col_width = 9
-    group.col_width = 7
+    number.col_width = 4
+    group.col_width = 8
+    name.col_width = 12
     group.as_datalist = {'url':'accounting:utils_datalist', 'model':'BSG', 'query':'?field=group'}
 
     class Meta:
         model = BSG
-        fields = ('number', 'name', 'group', 'notes')
+        fields = ('number', 'group', 'name', 'notes')
 
 class BSGUpdateForm(forms.ModelForm):
     form_type = 'update'   # mark this form as update form
     number = forms.CharField()
+    group = forms.CharField(label='Type')
     name = forms.CharField(label='Business Name')
-    group = forms.CharField()
-    notes = forms.CharField(widget=forms.Textarea(), required=False)
+    notes = forms.CharField(widget=forms.Textarea(attrs={'style':'height:150px'}), required=False)
     is_active = forms.CharField(widget=forms.CheckboxInput(), label_suffix="")
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
-    number.col_width = 3
-    name.col_width = 9
-    group.col_width = 7
+    number.col_width = 4
+    group.col_width = 8
+    name.col_width = 12
     group.as_datalist = {'url':'accounting:utils_datalist', 'model':'BSG', 'query':'?field=group'}
 
     class Meta:
         model = BSG
-        fields = ('number', 'name', 'group', 'notes', 'is_active')
+        fields = ('number', 'group', 'name', 'notes', 'is_active')
 
 
 #! journal batch forms 
 class JRBCreateForm(forms.ModelForm):
     form_type = 'create'   # mark this form as create form
-    number = forms.CharField(validators=[JRB.number_validator])
+    number = forms.CharField(validators=[JRB.number_validator], label='Code')
     group = forms.CharField(label="Type")
-    description = forms.Textarea()
+    description = forms.CharField(widget=forms.Textarea(attrs={'style':'height:150px'}))
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
     number.col_width = 5
@@ -216,9 +215,9 @@ class JRBCreateForm(forms.ModelForm):
 
 class JRBUpdateForm(forms.ModelForm):
     form_type = 'update'   # mark this form as update form
-    number = forms.CharField()
+    number = forms.CharField(label='Code')
     group = forms.CharField(label="Type")
-    description = forms.Textarea()
+    description = forms.CharField(widget=forms.Textarea(attrs={'style':'height:150px'}))
     is_active = forms.CharField(widget=forms.CheckboxInput(), label_suffix="")
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
@@ -445,7 +444,7 @@ def jre_double_entry_clean(self):
                 self.add_error('account', f"No account with name '{ccval}'") 
     # custom validation for 'account credited'
     ccval = self.cleaned_data.get('account2') 
-    if ccval is not None and ccval is not "":
+    if ccval != None and ccval != "":
         if "|" in ccval and ccval[:1].isnumeric():
             number, name = ccval.split("|")
             if COA.actives.filter(Q(name=name)&Q(number=number)).exists():
@@ -489,10 +488,10 @@ class JRECreateForm(forms.ModelForm):
     batch = forms.CharField()   # use datalist
     ref = forms.CharField()
     description = forms.CharField(widget=forms.Textarea)
-    amount = forms.CharField(validators=[JRE.amount_validator], help_text="Provide a positive integer", 
-        widget=forms.TextInput(attrs={'class':'border border-info border-3'}))
-    account = forms.CharField(label='Account debited')     # use datalist
+    account = forms.CharField(label='Account debited', widget=forms.TextInput(attrs={'class':'bg-secondary'}))     # use datalist
     account2 = forms.CharField(label='Account credited')     # use datalist
+    amount = forms.CharField(validators=[JRE.amount_validator], help_text="Provide a positive integer", 
+        widget=forms.TextInput(attrs={'class':'border border-info border-3 text-end', 'as_money': 'true'}))
     segment = forms.ModelChoiceField(BSG.actives, required=False)
     cashflow = forms.CharField(required=False)    # use datalist
     notes = forms.CharField(widget=forms.Textarea, required=False)
@@ -501,12 +500,12 @@ class JRECreateForm(forms.ModelForm):
     date.col_width = 4
     batch.col_width = 4
     ref.col_width = 4
-    description.col_width = 7
-    amount.col_width = 5
+    description.col_width = 12
     account.col_width = 6
     account2.col_width = 6
-    segment.col_width = 5
-    cashflow.col_width = 7
+    amount.col_width = 3
+    segment.col_width = 4
+    cashflow.col_width = 5
     notes.col_width = 12
     batch.as_datalist = {'url':'accounting:utils_datalist', 'model':'JRB'}
     account.as_datalist = {'url':'accounting:utils_datalist', 'model':'COA'}
@@ -515,7 +514,7 @@ class JRECreateForm(forms.ModelForm):
 
     class Meta:
         model = JRE
-        fields = ('date', 'batch', 'ref', 'description', 'amount', 'account', 'account2', 'segment', 'cashflow', 'notes')
+        fields = ('date', 'batch', 'ref', 'description', 'account', 'account2', 'amount', 'segment', 'cashflow', 'notes')
 
 class JREUpdateForm_bak(forms.ModelForm):
     clean = jre_double_entry_clean

@@ -1,8 +1,28 @@
 from django.db import models
 from django.template.defaultfilters import slugify
-from .base import AccModelBase
+from django.db.models import Case, When, Sum, Count, F, Q
+from .base import AccModelBase, ActiveManager
 from django.contrib.auth.models import User
 from .coh import COH
+
+
+class COATBManager(models.Manager):
+    def get_queryset(self):
+        result = super(type(self), self).get_queryset().filter(is_active=True).annotate(
+            debit=Sum(Case(
+                When(journal__group='d', then=F('journal__amount')), default=0,
+            )),
+            credit=Sum(Case(
+                When(journal__group='c', then=F('journal__amount')), default=0,
+            )),
+            balance=Sum(Case(
+                When(journal__group='d', then=F('journal__amount')),
+                When(journal__group='c', then=F('journal__amount')*-1),
+                default=0,
+            )),
+            entries=Count('journal')
+        )
+        return result.filter(Q(balance__gt=0)|Q(balance__lt=0)).order_by('number')
 
 
 class COA(AccModelBase):
@@ -22,6 +42,9 @@ class COA(AccModelBase):
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
     author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='coa_authors', related_query_name='coa_author')
     edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='coa_editors', related_query_name='coa_editor')
+
+    objects = ActiveManager()
+    trialbalance = COATBManager()
 
     class Meta:
         ordering = ('number',)

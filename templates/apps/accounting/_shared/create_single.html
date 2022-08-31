@@ -15,6 +15,11 @@
         {% if is_user_allowed %}
             <h6 class="text-center text-primary fw-bold mb-4">Fill in to add new {{page_title|title}}</h6>
         {% endif %}
+        <div class="alert alert-warning alert-dismissible fade show border-1" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            Double entry is a preferred way to input transaction journal.
+        </div>
+
         {% if not request.htmx_closemodal %}
             <form class="needs-validation form-create row g-2">
                 {% csrf_token %}

@@ -33,3 +33,6 @@ def htmx_modal_error(request):
     ctx = {}
     ctx["error"] = queries
     return render(request, template_name="errors/htmx_modal_err.html", context=ctx)
+
+def error_forbidden(request):
+    return render(request, template_name="errors/403.html")

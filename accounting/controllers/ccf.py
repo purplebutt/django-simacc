@@ -40,13 +40,7 @@ class CCF(AccModelBase):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
-
-        if settings.DEBUG:
-            delete_model_image(self, type(self), type(self)._img_def_path)
-            super(type(self), self).save(*args, **kwargs)
-            resize_image(self.image.path)
-        else:
-            super(type(self), self).save(*args, **kwargs)
+        super(type(self), self).save(*args, **kwargs)
 
     def get_tablerow_style(self):
         if self.flow == 'i':

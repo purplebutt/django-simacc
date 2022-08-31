@@ -1,3 +1,4 @@
+from django.urls.base import reverse_lazy
 from accounting.html import base
 from ..models import COH, COA, CCF, BSG, JRB, JRE
 
@@ -36,6 +37,9 @@ class COATable(base.Table):
         modal_target=f'{model.__name__.lower()}UpdateModal',
         html_class='text-decoration-none'
     )
+    debit = base.TableRowCell(html_class="border text-end", val_type="money")
+    credit = base.TableRowCell(html_class="border text-end", val_type="money")
+    balance = base.TableRowCell(html_class="border text-end", val_type="money")
 
     def __init__(self, model, fields, **kwargs):
         super(type(self), self).__init__(model, fields, **kwargs)
@@ -127,3 +131,26 @@ class JRETable(base.Table):
         # custom table header (can only be add on __init__ method because it's need self/instance)
         self.table_header = base.TableHead(self, html_class="text-warning text-center border", thead_class="bg-secondary", 
             filter_data=kwargs.get('filter_data'), ignore_query=kwargs.get('ignore_query'), list_url=type(self).model.get_list_url())
+
+
+class TBTable(base.Table):
+    model_name = 'tb'
+    list_url = reverse_lazy("accounting:report_tb")
+    number = base.TableRowHeader(html_class="border")
+    normal = base.TableRowCell(mask=COA._normal_balance, html_class="border")
+    is_active = base.TableRowCell(html_class="border", mask=[(True, "Yes"), (False, "No")])
+    is_cashflow = base.TableRowCell(html_class="border", mask=[(True, "Yes"), (False, "No")])
+    name = base.TableRowLink(
+        hx_target=f'{model_name}UpdateModalContent',
+        modal_target=f'{model_name}UpdateModal',
+        html_class='text-decoration-none'
+    )
+    debit = base.TableRowCell(html_class="border text-end", val_type="money")
+    credit = base.TableRowCell(html_class="border text-end", val_type="money")
+    balance = base.TableRowCell(html_class="border text-end", val_type="money")
+
+    def __init__(self, model, fields, **kwargs):
+        super(type(self), self).__init__(model, fields, **kwargs)
+        # custom table header (can only be add on __init__ method because it's need self/instance)
+        self.table_header = base.TableHead(self, html_class="text-warning text-center border", thead_class="bg-secondary", 
+            filter_data=kwargs.get('filter_data'), ignore_query=kwargs.get('ignore_query'), list_url=type(self).list_url)

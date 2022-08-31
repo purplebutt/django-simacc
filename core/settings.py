@@ -82,15 +82,15 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'sqlite3': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'simaccdb.sqlite3',
     },
-    'postgresql': {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'HOST': 'localhost',
         'USER': 'postgres',
-        'NAME': 'simaccdb',
+        'NAME': 'simacc2db',
         'PORT': '5432' 
     }
 }

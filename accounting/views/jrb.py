@@ -25,7 +25,7 @@ class JRBCreateView(UserPassesTestMixin, generic.CreateView):
     template_name = DP / 'create.html'
     form_class = JRBCreateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
-    allowed_group = 'accounting_admin'
+    allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     post = f_post
@@ -39,7 +39,7 @@ class JRBUpdateView(UserPassesTestMixin, generic.UpdateView):
     template_name = DP / 'update.html'
     form_class = JRBUpdateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list") 
-    allowed_group = 'accounting_admin'
+    allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     post = f_post
@@ -50,7 +50,8 @@ class JRBListView(UserPassesTestMixin, generic.ListView):
     model = JRB
     table = JRBTable
     table_fields = ('created', 'number', 'description', 'group', 'is_active', 'balance', 'entries')
-    table_header = ('Date', 'Batch Number', 'Description', 'Type', 'Active', 'Balance', 'Entries')
+    table_header = ('Date', 'Batch Code', 'Description', 'Type', 'Active', 'Balance', 'Entries')
+    allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     template_name = DP / 'regular/list.html'
@@ -59,16 +60,20 @@ class JRBListView(UserPassesTestMixin, generic.ListView):
     test_func = f_test_func
     get = f_get
     get_context_data = f_get_context_data
-    table_filters = {
-        'is_active': [("true", "Yes"), ("false", "No")]
-    }
+
+    @classmethod
+    def get_table_filters(cls):
+        return { 
+            'is_active': [("true", "Yes"), ("false", "No")],
+            'group': sorted(set(map(lambda i: i[0], JRB.actives.values_list('group'))))
+        }
 
     def filter_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if len(self.request.GET) > 0:
             for k, v in self.request.GET.items():
                 if k == "group":
-                    context[type(self).context_object_name] = context[type(self).context_object_name].filter(**{k:v.lower()})
+                    context[type(self).context_object_name] = context[type(self).context_object_name].filter(**{k:v.upper()})
                 elif k == "is_active":
                     x = True if v == "true" else False
                     context[type(self).context_object_name] = context[type(self).context_object_name].filter(**{k:x})
@@ -80,18 +85,16 @@ def search(request):
     model = JRB
     table = JRBTable
     table_fields = ('created', 'number', 'description', 'group', 'is_active')
-    table_filters = {
-        'is_active': [("true", "Yes"), ("false", "No")]
-    }
-    header_text = ('Date', 'Batch Number', 'Description', 'Type', 'Active')
+    header_text = ('Date', 'Batch Code', 'Description', 'Type', 'Active')
+    table_filters = JRBListView.get_table_filters()
     template_name = DP/"list.html"
 
     search_key = request.POST.get('search_key') or ""
 
-    if not search_key.isnumeric():
-        filter_q = Q(description__contains=search_key)
+    if search_key.isnumeric():
+        filter_q = Q(created__contains=search_key)
     else:
-        filter_q = Q(number__contains=search_key)
+        filter_q = Q(description__icontains=search_key)|Q(number__icontains=search_key)
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
                         table_fields=table_fields, header_text=header_text, template_name=template_name)

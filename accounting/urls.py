@@ -7,6 +7,7 @@ from .views import ccf as ccf_view
 from .views import bsg as bsg_view
 from .views import jrb as jrb_view
 from .views import jre as jre_view
+from .views import reports as rep_view
 
 
 app_name='accounting'
@@ -64,4 +65,8 @@ urlpatterns = [
     path("jre_update/<slug:slug>/", jre_view.JREUpdateView.as_view(), name="jre_update"),
     path("jre_list/", jre_view.JREListView.as_view(), name="jre_list"),
     path("jre_search/", jre_view.search, name="jre_search"),
+
+    #! Trial Balance
+    path("report/trial_balance/", rep_view.TBListView.as_view(), name="report_tb"),
+    path("report/trial_balance/search/", rep_view.tb_search, name="report_tb_search"),
 ]

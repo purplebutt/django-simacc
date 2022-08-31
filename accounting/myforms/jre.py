@@ -69,7 +69,7 @@ class JRECreateSingleForm(forms.ModelForm):
     ref = forms.CharField()
     description = forms.CharField(widget=forms.Textarea)
     group = forms.ChoiceField(choices=JRE._type, widget=forms.RadioSelect, label="Type")
-    amount = forms.CharField(validators=[JRE.amount_validator], widget=forms.TextInput(attrs={'class': 'border border-info border-3'}))
+    amount = forms.CharField(validators=[JRE.amount_validator], widget=forms.TextInput(attrs={'class': 'border border-info border-3', 'as_money': 'true'}))
     account = forms.CharField()     # use datalist
     segment = forms.ModelChoiceField(BSG.actives, required=False)
     cashflow = forms.CharField(required=False)    # use datalist

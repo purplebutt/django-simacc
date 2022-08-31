@@ -440,8 +440,8 @@ a.sidebar-collapse-btn.collapsed > svg {
   }
 }
 table.table.table-data tbody tr th, table.table.table-data tbody tr td {
-  padding-top: 2px !important;
-  padding-bottom: 2px !important;
+  padding-top: 1px;
+  padding-bottom: 1px;
 }
 
 footer a.to-top {

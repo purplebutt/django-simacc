@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from datetime import datetime
-from .controllers.base import AccModelBase
+from .code.base import AccModelBase
 
 
 #! Company
@@ -16,46 +16,43 @@ class Company(AccModelBase):
         ('ud','UD'),
         ('cv','CV'),
         ('pt','PT'),
+        ('lc','LLC'),
         ('kp','Koperasi'),
         ('ys','Yayasan'),
         ('ot','Lainnya'),
     ]
     name = models.CharField(max_length=125, unique=True)
+    number = models.CharField(verbose_name="tax number", default="000.000.000", unique=True, max_length=30)
     legal = models.CharField(max_length=3, choices=_legal, default='ot')
     business_type = models.CharField(max_length=125)
-    address = models.CharField(max_length=125)
+    address = models.CharField(max_length=255)
     city = models.CharField(max_length=125)
     country = models.CharField(max_length=125)
     phone = models.CharField(max_length=25, blank=True)
     email = models.EmailField(max_length=64, unique=True)
     desc = models.TextField(blank=True)
+    config = models.JSONField(null=True)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
-    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'created_companys', related_query_name='created_company')
-    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'edited_companys', related_query_name='edited_company')
+    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='comp_authors', related_query_name='comp_author')
+    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='comp_editors', related_query_name='comp_editor')
 
     class Meta:
         verbose_name = "Company"
-        verbose_name_plural = "Company"
+        verbose_name_plural = "Companies"
 
     def __repr__(self):
         return self.name
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
-
-        if settings.DEBUG:
-            delete_model_image(self, Company, Company._img_def_path)
-            super(Company, self).save(*args, **kwargs)
-            resize_image(self.image.path)
-        else:
-            super(Company, self).save(*args, **kwargs)
+        super(type(self), self).save(*args, **kwargs)
 
 
 #! COA header
 class COH(AccModelBase):
     # class fields
-    _img_path = 'images/COH/'
-    _img_def_path = 'images/default/COH.png'
+    _img_path = 'images/accounting/coh/'
+    _img_def_path = 'images/default/coh.png'
     _account_group = [
         (1, 'ASSET'),
         (2, 'LIABILITY'),
@@ -80,8 +77,8 @@ class COH(AccModelBase):
     group = models.IntegerField("account group", choices=_account_group)
     notes = models.TextField(blank=True)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
-    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'created_cohs', related_query_name='created_coh')
-    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'edited_cohs', related_query_name='edited_coh')
+    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='coh_authors', related_query_name='coh_author')
+    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='coh_editors', related_query_name='coh_editor')
 
     class Meta:
         ordering = ('number',)
@@ -93,13 +90,7 @@ class COH(AccModelBase):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
-
-        if settings.DEBUG:
-            delete_model_image(self, type(self), type(self)._img_def_path)
-            super(type(self), self).save(*args, **kwargs)
-            resize_image(self.image.path)
-        else:
-            super(type(self), self).save(*args, **kwargs)
+        super(type(self), self).super(*args, **kwargs)
 
     def group_str(self):
         return tuple(filter(lambda x: x[0] == self.group, type(self)._account_group))[0][1]
@@ -117,8 +108,8 @@ class COH(AccModelBase):
 
 #! Chart Of Account
 class COA(AccModelBase):
-    _img_path = 'images/COA/'
-    _img_def_path = 'images/default/COA.png'
+    _img_path = 'images/accounting/coa/'
+    _img_def_path = 'images/default/coa.png'
     _normal_balance = [
         ('d', 'DEBIT'),
         ('c', 'CREDIT'),
@@ -126,12 +117,13 @@ class COA(AccModelBase):
     number = models.FloatField(unique=True)
     name = models.CharField(verbose_name="account name",max_length=125, unique=True)
     normal = models.CharField(verbose_name="normal balance", max_length=1, choices=_normal_balance)
-    header = models.ForeignKey(COH, verbose_name="account header", on_delete=models.RESTRICT, limit_choices_to={'is_active':True}, related_name='accounts', related_query_name='account')
+    header = models.ForeignKey(COH, verbose_name="account header", on_delete=models.RESTRICT, limit_choices_to={'is_active':True}, 
+        related_name='accounts', related_query_name='account')
     is_cashflow = models.BooleanField("is cash flow", default=False)
     notes = models.TextField(blank=True)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
-    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'created_coas', related_query_name='created_coa')
-    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'edited_coas', related_query_name='edited_coa')
+    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='coa_authors', related_query_name='coa_author')
+    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='coa_editors', related_query_name='coa_editor')
 
     class Meta:
         ordering = ('number',)
@@ -151,13 +143,7 @@ class COA(AccModelBase):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
-
-        if settings.DEBUG:
-            delete_model_image(self, type(self), type(self)._img_def_path)
-            super(type(self), self).save(*args, **kwargs)
-            resize_image(self.image.path)
-        else:
-            super(type(self), self).save(*args, **kwargs)
+        super(type(self), self).save(*args, **kwargs)
 
     def group(self):
         return self.header.group_str()
@@ -175,8 +161,8 @@ class COA(AccModelBase):
 #! Chart Of Cash Flow
 class CCF(AccModelBase):
     # class fields
-    _img_path = 'images/CCF/'
-    _img_def_path = 'images/default/CCF.png'
+    _img_path = 'images/accounting/ccf/'
+    _img_def_path = 'images/default/ccf.png'
     _flow = [
         ('i', 'INFLOW'),
         ('o', 'OUTFLOW'),
@@ -195,8 +181,8 @@ class CCF(AccModelBase):
     activity = models.IntegerField(choices=_activities)
     notes = models.TextField(blank=True)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
-    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'created_ccfs', related_query_name='created_ccf')
-    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'edited_ccfs', related_query_name='edited_ccf')
+    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='ccf_authors', related_query_name='ccf_author')
+    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='ccf_editors', related_query_name='ccf_editor')
 
     class Meta:
         ordering = ('number',)
@@ -227,8 +213,8 @@ class CCF(AccModelBase):
 #! Business Segment
 class BSG(AccModelBase):
     # class fields
-    _img_path = 'images/BSG/'
-    _img_def_path = 'images/default/BSG.png'
+    _img_path = 'images/bsg/'
+    _img_def_path = 'images/default/bsg.png'
 
     # database fields
     number = models.FloatField(unique=True)
@@ -236,8 +222,8 @@ class BSG(AccModelBase):
     group = models.CharField(verbose_name="type",max_length=125)
     notes = models.TextField(blank=True)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
-    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'created_bsgs', related_query_name='created_bsg')
-    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'edited_bsgs', related_query_name='edited_bsg')
+    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='bsg_authors', related_query_name='bsg_author')
+    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='bsg_editors', related_query_name='bsg_editor')
 
     class Meta:
         ordering = ('number',)
@@ -251,19 +237,12 @@ class BSG(AccModelBase):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         self.group += self.group.upper()
-
-        if settings.DEBUG:
-            delete_model_image(self, type(self), type(self)._img_def_path)
-            super(type(self), self).save(*args, **kwargs)
-            resize_image(self.image.path)
-        else:
-            super(type(self), self).save(*args, **kwargs)
+        super(type(self), self).save(*args, **kwargs)
 
 
 #! Journal Batch 
 class JRBManager(models.Manager):
     def get_queryset(self):
-        c = JRE()
         result = super(type(self), self).get_queryset().filter(is_active=True).annotate(
             balance=Sum(Case(
                 When(journal__group='d', then=F('journal__amount')),
@@ -283,16 +262,16 @@ class JRB(AccModelBase):
             ) 
 
     # class fields
-    _img_path = 'images/JRB/'
-    _img_def_path = 'images/default/JRB.png'
+    _img_path = 'images/jrb/'
+    _img_def_path = 'images/default/jrb.png'
 
     # database fields
     number = models.CharField(max_length=30, unique=True)
     description = models.CharField(max_length=125)
     group = models.CharField(verbose_name="type",max_length=125)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
-    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'created_jrbs', related_query_name='created_jrb')
-    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'edited_jrbs', related_query_name='edited_jrb')
+    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='jrb_authors', related_query_name='jrb_author')
+    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='jrb_editors', related_query_name='jrb_editor')
 
     objects = JRBManager()
 
@@ -308,13 +287,7 @@ class JRB(AccModelBase):
         self.slug = slugify(self.number)
         self.number = self.number.lower()
         self.group = self.group.upper()
-
-        if settings.DEBUG:
-            delete_model_image(self, type(self), type(self)._img_def_path)
-            super(type(self), self).save(*args, **kwargs)
-            resize_image(self.image.path)
-        else:
-            super(type(self), self).save(*args, **kwargs)
+        super(type(self), self).save(*args, **kwargs)
 
     def get_tablerow_style(self):
         x = type(self).objects.filter(pk=self.pk).first().balance
@@ -335,8 +308,8 @@ class JRE(AccModelBase):
             ) 
 
     # class fields
-    _img_path = 'images/JRE/'
-    _img_def_path = 'images/default/JRE.png'
+    _img_path = 'images/jre/'
+    _img_def_path = 'images/default/jre.png'
     _type = [
         ('d', 'DEBIT'),
         ('c', 'CREDIT'),
@@ -353,10 +326,11 @@ class JRE(AccModelBase):
     amount = models.PositiveIntegerField()
     account = models.ForeignKey(COA, on_delete=models.CASCADE, limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
     segment = models.ForeignKey(BSG, on_delete=models.RESTRICT, null=True, limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
-    cashflow = models.ForeignKey(CCF, verbose_name="cash flow", null=True, on_delete=models.CASCADE, limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
+    cashflow = models.ForeignKey(CCF, verbose_name="cash flow", null=True, on_delete=models.CASCADE, 
+        limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
     notes = models.TextField(blank=True)
-    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'created_jres', related_query_name='created_jrb')
-    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name=f'edited_jres', related_query_name='edited_jrb')
+    author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='jre_authors', related_query_name='jre_author')
+    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='jre_editors', related_query_name='jre_editor')
 
     class Meta:
         ordering = ('-date', '-number',)
@@ -403,13 +377,7 @@ class JRE(AccModelBase):
             else:
                 s = str(self.number) + str(type(self).objects.count())
                 self.slug = slugify(s)
-
-        if settings.DEBUG:
-            delete_model_image(self, type(self), type(self)._img_def_path)
-            super(type(self), self).save(*args, **kwargs)
-            resize_image(self.image.path)
-        else:
-            super(type(self), self).save(*args, **kwargs)
+        super(type(self), self).save(*args, **kwargs)
 
     def save_pair(self, pair:str):
         if "|" in pair:      # if account format is "NUMBER|ACCOUNT-NAME"
@@ -435,10 +403,12 @@ class JRE(AccModelBase):
         return (self.number, pair_instance.number)
 
     def get_tablerow_style(self):
-        if self.group == 'c':
-            return "table-info"
-        else:
-            return "table-light"
+        if self.group == 'c': return "table-info"
+        else: return "table-light"
+
+    @classmethod
+    def get_add_single_url(cls):
+        return reverse(f'{cls.app_name}:{cls.__name__.lower()}_add_single')
 
     @classmethod
     def get_group(cls, debit_or_credit:str="d", mode:str="long", opposite:bool=False):

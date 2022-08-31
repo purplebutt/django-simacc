@@ -10,7 +10,9 @@ from cover import data
 
 # functions for class compositions
 def f_user_ingroup(self):
-    ingroup = self.request.user.groups.filter(name=type(self).allowed_group).exists()
+    ingroup = False
+    for group in type(self).allowed_groups:
+        if ingroup:= self.request.user.groups.filter(name=group).exists(): break
     return ingroup
 
 
@@ -21,26 +23,23 @@ def f_test_func(self):
 def f_get(self, *args, **kwargs):
     # checks if user have permission to update or modify data
     err_info = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
-    if isinstance(self, CreateView):
-        if not f_user_ingroup(self):
-            if not self.request.htmx:
-                return HttpResponseForbidden(err_info["msg"])
-            else:
-                return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
-    elif isinstance(self, ListView):
-        if self.request.htmx:
-            self.template_name = type(self).htmx_template   # change to htmx template
-    return super(type(self), self).get(self.request, *args, **kwargs)
+    if f_user_ingroup(self):
+        if isinstance(self, ListView):
+            if self.request.htmx: self.template_name = type(self).htmx_template   # change to htmx template
+        return super(type(self), self).get(self.request, *args, **kwargs)
+    else:
+        if not self.request.htmx: return redirect('cover:error403')
+        else: return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
 
 
 def f_post(self, *args, **kwargs):
     # checks if user have permission to update or modify data
     err_info = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
     if not f_user_ingroup(self):
-        if not self.request.htmx:
-            return HttpResponseForbidden(err_info["msg"])
-        else:
+        if self.request.htmx:
             return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
+        else:
+            return HttpResponseForbidden(err_info["msg"])
     else:
         return super(type(self), self).post(self.request, *args, **kwargs)
 
@@ -116,13 +115,16 @@ def f_get_context_data(self, *args, **kwargs):
                     self.request.session[f"{type(self).__name__}_sortmode"] = "asc"
 
         context = f_standard_context(self, context)
-        context["search_url"] = type(self).model.get_search_url()
+
+        # context["search_url"] = type(self).model.get_search_url()
+        context.setdefault("search_url", type(self).model.get_search_url())
+
         context[type(self).context_object_name] = paginate(page, context[type(self).context_object_name], paginateBy=per_page)
         context[type(self).table_object_name] = type(self).table(context[type(self).context_object_name], type(self).table_fields, 
             table_name=type(self).model.__name__.lower(),
             htmx_target=f"div#{type(self).model.__name__.lower()}Content",
             header_text=type(self).table_header, 
-            filter_data=type(self).table_filters,
+            filter_data = type(self).get_table_filters() if hasattr(type(self), 'get_table_filters') else None,
             ignore_query=("follow_sort",),
             request=self.request)
         return context
@@ -130,7 +132,8 @@ def f_get_context_data(self, *args, **kwargs):
         context = super(type(self), self).get_context_data(*args, **kwargs)
         context["is_user_allowed"] = f_user_ingroup(self)
         # general data
-        context["model_name"] = type(self).model.__name__.lower()
+        # context["model_name"] = type(self).model.__name__.lower()
+        context.setdefault("model_name", type(self).model.__name__.lower())
         context["page_title"] = type(self).page_title
         context["add_url"] = type(self).model.get_add_url()
         if hasattr(type(self).model, 'get_add_single_url'): context["add_single_url"] = type(self).model.get_add_single_url()
@@ -139,7 +142,8 @@ def f_get_context_data(self, *args, **kwargs):
 
 def f_standard_context(self, context):
     # general data
-    context["model_name"] = type(self).model.__name__.lower()
+    # context["model_name"] = type(self).model.__name__.lower()
+    context.setdefault("model_name", type(self).model.__name__.lower())
     context["page_title"] = type(self).page_title
     context["add_url"] = type(self).model.get_add_url()
     if hasattr(type(self).model, 'get_add_single_url'): context["add_single_url"] = type(self).model.get_add_single_url()
@@ -153,6 +157,17 @@ def f_standard_context(self, context):
 
 
 def f_search(request, **kwargs):
+    # checks if user have permission to view data
+    err_info = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
+    allowed_groups = ('accounting_viewer',)
+    ingroup = False
+    for group in allowed_groups:
+        if request.user.groups.filter(name=group).exists(): 
+            ingroup = True; break
+    if not ingroup:
+        if not self.request.htmx: return redirect('cover:error403')
+        else: return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
+
     obj_name = "objects" 
     tbl_name = "table_obj"
     # read data from kwargs dictionary
@@ -168,8 +183,17 @@ def f_search(request, **kwargs):
     page = request.GET.get('page') or 1
     per_page = request.GET.get('per_page') or 10
 
-    context = {obj_name: model.objects.all()}
-    context[model_name] = model.__name__.lower()
+    if hasattr(model, kwargs.setdefault('querymanager', 'objects')):
+        # dynamically get queryset attribute from model
+        # the queryset name come from kwargs['querymanager']
+        # because model is a class (not instance), then we need to
+        # call __getattribute__ from model super class, in this case the type() class
+        context = {obj_name: type.__getattribute__(model, kwargs.get('querymanager')).all()}
+    else:
+        context = {obj_name: model.objects.all()}
+
+    context.setdefault(model_name, model.__name__.lower())
+    # context[model_name] = model.__name__.lower()
     context[obj_name] = context[obj_name].filter(filter_q)
     context[obj_name] = paginate(page, context[obj_name], paginateBy=per_page)
     context[tbl_name] = table(context[obj_name], table_fields, 

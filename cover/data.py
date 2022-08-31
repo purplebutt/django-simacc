@@ -38,7 +38,7 @@ def sidebar(mode:str):
         ]
     elif mode == "report":
         return [
-            { 'name': 'tb', 'url': '#tb', 'verbose': 'trial balance'},
+            { 'name': 'tb', 'url': reverse('accounting:report_tb'), 'verbose': 'trial balance'},
             { 'name': 'is', 'url': '#is', 'verbose': 'income statement'},
             { 'name': 'bs', 'url': '#bs', 'verbose': 'balance sheet'},
             { 'name': 'cf', 'url': '#cf', 'verbose': 'cash flow'},

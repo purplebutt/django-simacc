@@ -25,7 +25,7 @@ class COHCreateView(UserPassesTestMixin, generic.CreateView):
     template_name = DP / 'create.html'
     form_class = COHCreateForm
     success_url = reverse_lazy("accounting:coh_list")
-    allowed_group = 'accounting_admin'
+    allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     post = f_post
@@ -40,7 +40,7 @@ class COHUpdateView(UserPassesTestMixin, generic.UpdateView):
     template_name = DP / 'update.html'
     form_class = COHUpdateForm
     success_url = reverse_lazy("accounting:coh_list") 
-    allowed_group = 'accounting_admin'
+    allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     post = f_post
@@ -53,6 +53,7 @@ class COHListView(UserPassesTestMixin, generic.ListView):
     table = COHTable
     table_fields = ('number', 'name', 'report', 'group')
     table_header = ('Code', 'Header Name', 'Report', 'Account Group')
+    allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     template_name = DP / 'regular/list.html'
@@ -61,10 +62,13 @@ class COHListView(UserPassesTestMixin, generic.ListView):
     test_func = f_test_func
     get = f_get
     get_context_data = f_get_context_data
-    table_filters = {
-        'group': COH._account_group,
-        'report': COH._reports
-    }
+
+    @classmethod
+    def get_table_filters(cls):
+        return {
+            'group': COH._account_group,
+            'report': COH._reports
+        }
 
     def filter_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -80,20 +84,15 @@ def search(request):
     model = COH
     table = COHTable
     table_fields = ('number', 'name', 'report', 'group')
-    table_filters = {
-        'group': COH._account_group,
-        'report': COH._reports
-    }
     header_text = ('Code', 'Header Name', 'Report', 'Account Group')
+    table_filters = COHListView.get_table_filters()
     template_name = DP/"list.html"
 
     search_key = request.POST.get('search_key') or ""
     if search_key.isnumeric():
         filter_q = Q(number__contains=search_key)
-    elif any(map(lambda i: i[1].lower()==search_key.lower(), COH._account_group)):
-        filter_q = Q(group=model.get_group_int(search_key))
     else:
-        filter_q = Q(name__contains=search_key)
+        filter_q = Q(name__icontains=search_key)
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
                         table_fields=table_fields, header_text=header_text, template_name=template_name)

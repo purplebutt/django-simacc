@@ -64,26 +64,22 @@ def htmx_paginator(swapTarget:str, page:object, request:object, ignore_url_queri
     }
 
 @register.inclusion_tag('form_float.html')
-def form_float(forms, space=2, textarea_height="120", show_file_label:bool=False):
-    textarea_height = "height: " + textarea_height + "px"
+def form_float(forms, space=2, show_file_label:bool=False):
     is_multi = isinstance(forms, list)
     return {
         'forms': forms, 
         'space': space, 
         'is_multi': is_multi, 
-        'textarea_height': textarea_height,
         'show_file_label': show_file_label
     }
 
 @register.inclusion_tag('form_float.html')
-def form_float_cbleft(forms, space=2, textarea_height="70", show_file_label:bool=False):
-    textarea_height = "height: " + textarea_height + "px"
+def form_float_cbleft(forms, space=2, show_file_label:bool=False):
     is_multi = isinstance(forms, list)
     return {
         'forms': forms, 
         'space': space, 
         'is_multi': is_multi, 
-        'textarea_height': textarea_height,
         'show_file_label': show_file_label,
         'checkbox_left': True
     }

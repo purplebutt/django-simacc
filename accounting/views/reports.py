@@ -8,49 +8,21 @@ from django.contrib.auth.models import Group, User
 from django.db.models import Q, F
 from django.urls.base import reverse_lazy
 from ..models import COA, COH
-from ..html.table import COATable
-from ..forms import COAUpdateForm, COACreateForm
+from ..html.table import TBTable
 from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate
 from cover import data
 
 
 DP = DEFPATH('apps/accounting/_shared')
-PAGE_TITLE = "Chart Of Account"
+PAGE_TITLE = "Trial Balance"
 
 
-class COACreateView(UserPassesTestMixin, generic.CreateView):
+class TBListView(UserPassesTestMixin, generic.ListView):
     model = COA
-    page_title = PAGE_TITLE
-    template_name = DP / 'create.html'
-    form_class = COACreateForm
-    success_url = reverse_lazy("accounting:coa_list")
-    allowed_groups = ('accounting_staff',)
-    form_valid = f_form_valid
-    get_context_data = f_get_context_data
-    post = f_post
-    get = f_get
-    test_func = f_test_func
-
-
-class COAUpdateView(UserPassesTestMixin, generic.UpdateView):
-    model = COA
-    page_title = PAGE_TITLE
-    template_name = DP / 'update.html'
-    form_class = COAUpdateForm
-    success_url = reverse_lazy("accounting:coa_list") 
-    allowed_groups = ('accounting_staff',)
-    form_valid = f_form_valid
-    get_context_data = f_get_context_data
-    post = f_post
-    test_func = f_test_func
-
-
-class COAListView(UserPassesTestMixin, generic.ListView):
-    model = COA
-    table = COATable
-    table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'is_active')
-    table_header = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Active')
+    table = TBTable
+    table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'debit', 'credit', 'balance', 'is_active')
+    table_header = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Debit', 'Credit', 'Balance', 'Active')
     allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
@@ -71,7 +43,10 @@ class COAListView(UserPassesTestMixin, generic.ListView):
         }
 
     def filter_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = {}
+        context["search_url"] = reverse_lazy("accounting:report_tb_search")
+        context["model_name"] = 'tb'    # model_name should be lowercase
+        context[type(self).context_object_name] = type(self).model.trialbalance.all()
         if len(self.request.GET) > 0:
             for k, v in self.request.GET.items():
                 if k == "header":
@@ -86,12 +61,13 @@ class COAListView(UserPassesTestMixin, generic.ListView):
 
 
 @login_required
-def search(request):
+def tb_search(request):
     model = COA
     table = COATable
-    table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'is_active')
-    header_text = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Active')
-    table_filters = COAListView.get_table_filters()
+    querymanager = 'trialbalance'
+    table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'debit', 'credit', 'balance', 'is_active')
+    header_text = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Debit', 'Credit', 'Balance', 'Active')
+    table_filters = TBListView.get_table_filters()
     template_name = DP/"list.html"
 
     search_key = request.POST.get('search_key') or ""
@@ -103,5 +79,5 @@ def search(request):
 
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
-                        table_fields=table_fields, header_text=header_text, template_name=template_name)
+                        table_fields=table_fields, header_text=header_text, template_name=template_name, querymanager=querymanager)
     return response

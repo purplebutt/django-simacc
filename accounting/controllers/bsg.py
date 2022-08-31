@@ -29,5 +29,5 @@ class BSG(AccModelBase):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
-        self.group += self.group.upper()
+        self.group = self.group.upper()
         super(type(self), self).save(*args, **kwargs)

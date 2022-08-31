@@ -45,7 +45,7 @@ class COH(AccModelBase):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
-        super(type(self), self).super(*args, **kwargs)
+        super(type(self), self).save(*args, **kwargs)
 
     def group_str(self):
         return tuple(filter(lambda x: x[0] == self.group, type(self)._account_group))[0][1]

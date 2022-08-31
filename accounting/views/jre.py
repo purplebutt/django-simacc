@@ -26,7 +26,7 @@ class JRECreateView(UserPassesTestMixin, generic.CreateView):
     template_name = DP / 'create.html'
     form_class = JRECreateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
-    allowed_group = 'accounting_admin'
+    allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     post = f_post
@@ -40,7 +40,7 @@ class JRECreateSingle(UserPassesTestMixin, generic.CreateView):
     template_name = DP / 'create_single.html'
     form_class = JRECreateSingleForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
-    allowed_group = 'accounting_admin'
+    allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     post = f_post
@@ -54,7 +54,7 @@ class JREUpdateView(UserPassesTestMixin, generic.UpdateView):
     template_name = DP / 'update.html'
     form_class = JREUpdateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list") 
-    allowed_group = 'accounting_admin'
+    allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     post = f_post
@@ -66,6 +66,7 @@ class JREListView(UserPassesTestMixin, generic.ListView):
     table = JRETable
     table_fields = ('date', 'number', 'batch', 'ref', 'description', 'amount', 'group', 'account', 'segment', 'cashflow')
     table_header = ('Date', 'number', 'Batch', 'REF', 'Description', 'Amount', 'Type', 'Account', 'B.Segment', 'Cash Flow')
+    allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     template_name = DP / 'regular/list.html'
@@ -74,13 +75,16 @@ class JREListView(UserPassesTestMixin, generic.ListView):
     test_func = f_test_func
     get = f_get
     get_context_data = f_get_context_data
-    table_filters = {
-        'group': model._type,
-        'account': sorted(set(map(lambda i: i.name, COA.actives.all()))),
-        'segment': sorted(set(map(lambda i: i.name, BSG.actives.all()))),
-        'cashflow': sorted(set(map(lambda i: i.name, CCF.actives.all()))),
-        'is_active': [("true", "Yes"), ("false", "No")]
-    }
+
+    @classmethod
+    def get_table_filters(cls):
+        return {
+            'group': cls.model._type,
+            'account': sorted(set(map(lambda i: i.name, COA.actives.all()))),
+            'segment': sorted(set(map(lambda i: i.name, BSG.actives.all()))),
+            'cashflow': sorted(set(map(lambda i: i.name, CCF.actives.all()))),
+            'is_active': [("true", "Yes"), ("false", "No")]
+        }
 
     def filter_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -110,13 +114,7 @@ def search(request):
     template_name = DP/"list.html"
     table_fields = ('date', 'number', 'batch', 'ref', 'description', 'amount', 'group', 'account', 'segment', 'cashflow')
     header_text = ('Date', 'number', 'Batch', 'REF', 'Description', 'Amount', 'Type', 'Account', 'B.Segment', 'Cash Flow')
-    table_filters = {
-        'group': model._type,
-        'account': sorted(set(map(lambda i: i.name, COA.actives.all()))),
-        'segment': sorted(set(map(lambda i: i.name, BSG.actives.all()))),
-        'cashflow': sorted(set(map(lambda i: i.name, CCF.actives.all()))),
-        'is_active': [("true", "Yes"), ("false", "No")]
-    }
+    table_filters = JREListView.get_table_filters()
 
     search_key = request.POST.get('search_key') or ""
     batch = JRB.objects.filter(number__contains=search_key)
@@ -126,7 +124,7 @@ def search(request):
     if search_key[:1].isnumeric():
         filter_q = filter_q|Q(number__contains=search_key)|Q(date__contains=search_key)|Q(amount__contains=search_key)
     else:
-        filter_q = filter_q|Q(ref__contains=search_key)|Q(description__contains=search_key)
+        filter_q = filter_q|Q(ref__icontains=search_key)|Q(description__icontains=search_key)
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
                         table_fields=table_fields, header_text=header_text, template_name=template_name)
