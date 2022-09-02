@@ -45,7 +45,7 @@ def paginator(page:object, request:object, outerClass: str=None, innerClass: str
     }
 
 @register.inclusion_tag('htmx_paginator.html')
-def htmx_paginator(swapTarget:str, page:object, request:object, ignore_url_queries:str="", outer_class: str=None, inner_class: str="pagination mb-0"):
+def htmx_paginator(swapTarget:str, page:object, request:object, ignore_url_queries:str="", outer_class: str=None, inner_class: str="pagination pagination-sm mb-0"):
     """
         ignore_url_queries -> string with comma separated url key to be ignore. ex -> "id,page,color"
         outer_class  -> defined bootstrap css class on outer element

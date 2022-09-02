@@ -58,7 +58,14 @@ def f_form_valid(self, form):
         fmode, ftype = formtype.split(":")
         is_update = ftype == "update"
         if fmode == "double":
-            obj_instance.save_pair(self.request.POST.get('account2'))
+            try:
+                if is_update:
+                    obj_instance.update_pair()
+                else:
+                    obj_instance.save_pair(self.request.POST.get('account2'))
+            except Exception as err:
+                err_info = {"title":"Form Error", "head":"Journal syncronization failed!", "msg":f"{err}"}
+                return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
         else:
             err_info = {"title":"Form Error", "head":"Unknown form type", "msg":f"'{formtype}' is not a valid form type!"}
             return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
@@ -149,9 +156,12 @@ def f_standard_context(self, context):
     if hasattr(type(self).model, 'get_add_single_url'): context["add_single_url"] = type(self).model.get_add_single_url()
 
     # sidebar data
-    context["report"] = data.sidebar("report")
-    context["master"] = data.sidebar("master")
-    context["trans"] = data.sidebar("trans")
+    context["side_menu_group"] = type(self).side_menu_group
+    context["side_menu"] = {
+        'reports': data.sidebar("report"),
+        'master': data.sidebar("master"),
+        'transactions': data.sidebar("trans")
+    }
 
     return context
 

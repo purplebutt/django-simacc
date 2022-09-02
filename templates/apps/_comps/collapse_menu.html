@@ -1,0 +1,33 @@
+{% load core_filters %}
+
+<div class="border px-2 py-2">
+    {% if side_menu_group|is_eq:name %}
+        <a class="fs-6 sidebar-collapse-btn fw-bold text-decoration-none text-dark" 
+            type="button" data-bs-toggle="collapse" data-bs-target="#sb_{{name}}">
+            <i class="d-inline-block fa fa-angle-right"></i>
+            <span class="d-inline-block">{{name|title}}</span>
+        </a>
+        <div id="sb_{{name}}" class="collapse show text-center">
+    {% else %}
+        <a class="fs-6 sidebar-collapse-btn fw-bold text-decoration-none text-dark collapsed" 
+            type="button" data-bs-toggle="collapse" data-bs-target="#sb_{{name}}">
+            <i class="d-inline-block fa fa-angle-right"></i>
+            <span class="d-inline-block">{{name|title}}</span>
+        </a>
+        <div id="sb_{{name}}" class="collapse text-center">
+    {% endif %}
+        <ul class="nav ms-2">
+            {% for item in items %}
+                <li class="nav-item">
+                    {% if item.name|is_eq:model_name %}
+                        <a class="fw-bolder border-bottom border-3 border-primary text-decoration-none m-1 fs-6" 
+                            href="{{item.url}}", title="{{item.verbose|title}}">{{item.name|upper}}</a>
+                    {% else %}
+                        <a class="text-decoration-none m-1 fs-6 text-secondary" 
+                            href="{{item.url}}", title="{{item.verbose|title}}">{{item.name|upper}}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

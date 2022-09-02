@@ -24,9 +24,9 @@
     <div class="form-file mt-{{space}} {{f|widget_col_width}}">
         {% if show_file_label %} {{f.label_tag}} {% endif %}
         {% if f.errors %}
-            {% render_field f class+="form-control is-invalid" placeholder="{{f.label_tag}}" %}
+            {% render_field f class+="form-control is-invalid" placeholder=f.name %}
         {% else %}
-            {% render_field f class+="form-control" placeholder="{{f.label_tag}}" %}
+            {% render_field f class+="form-control" placeholder=f.name %}
         {% endif %}
         {{f.errors}}
     </div>
@@ -61,28 +61,34 @@
 {% elif f|is_field_textarea %} 
     <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
         {% if f.errors %}
-            {% render_field f class+="form-control is-invalid form-control-sm" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+            {% render_field f class+="form-control is-invalid form-control-sm" placeholder=f.name %} {{f.label_tag}}
         {% else %}
-            {% render_field f class+="form-control form-control-sm" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+            {% render_field f class+="form-control form-control-sm" placeholder=f.name %} {{f.label_tag}}
         {% endif %}
         {{f.errors}}
     </div>
 {% elif f|is_field_radio %} 
-    <fieldset class="bs_radio_field">
+    <fieldset class="bs_radio_field" title="{{f.help_text}}">
         {{f.label_tag}}
         {% if f.errors %}
             {% render_field f class+="form-radio ms-1 is-invalid" %}
         {% else %}
             {% render_field f class+="form-radio ms-1" %}
+            {% comment %} {% for r in f %}
+                <div class="form-check">
+                    <input type="radio" name="{{f.name}}" selected={{r.data.selected}} class="form-check-input" id="{{r.id_for_label}}">
+                    <label class="form-check-label" for="{{r.id_for_label}}">{{r.choice_label}}</label>
+                </div>
+            {% endfor %} {% endcomment %}
         {% endif %}
         {{f.errors}}
     </fieldset>
 {% elif f|is_field_password and show_pswrdbtn %}
     <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
         {% if f.errors %}
-            {% render_field f class+="form-control is-invalid" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+            {% render_field f class+="form-control is-invalid" placeholder=f.name %} {{f.label_tag}}
         {% else %}
-            {% render_field f class+="form-control" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+            {% render_field f class+="form-control" placeholder=f.name %} {{f.label_tag}}
         {% endif %}
         <i class="fa fa-eye pswrdShowHideIcon hide" onclick="showHidePasswordIconClick(this)" type="button" title="show/hide password"></i>
         <i class="fa fa-eye-slash pswrdShowHideIcon hide" onclick="showHidePasswordIconClick(this)" type="button" title="show/hide password"></i>
@@ -102,15 +108,15 @@
     {% if f.field.as_datalist %}
         <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
             {% if f.errors %}
-                <input id="id_{{f.name|lower}}" class="form-control is-invalid" placeholder="{{f.name}}" 
+                <input id="id_{{f.name|lower}}" class="form-control is-invalid" {{f|widget_disabled}} placeholder="{{f.name}}" 
                     type="text" list="{{f.name}}_listdata" name="{{f.name}}" value="{{f.value}}" required="{{f.required}}"> {{f.label_tag}}
             {% else %}
                 {% if f.value %}
-                    <input id="id_{{f.name|lower}}" class="form-control is-valid" placeholder="{{f.name}}" 
+                    <input id="id_{{f.name|lower}}" class="form-control is-valid" {{f|widget_disabled}} placeholder="{{f.name}}" 
                         value="{% getval_frstr f.field.as_datalist.model f.value f.field.as_datalist.field %}" type="text" 
                         list="{{f.name}}_listdata" name="{{f.name}}" required="{{f.required}}"> {{f.label_tag}}
                 {% else %}
-                    <input id="id_{{f.name|lower}}" class="form-control" type="text" placeholder="{{f.name}}"
+                    <input id="id_{{f.name|lower}}" class="form-control" type="text" {{f|widget_disabled}} placeholder="{{f.name}}"
                         list="{{f.name}}_listdata" name="{{f.name}}" required="{{f.required}}"> {{f.label_tag}}
                 {% endif %}
             {% endif %}
@@ -123,12 +129,12 @@
     {% else %}
         <div class="form-floating mt-{{space}} {{f|widget_col_width}}">
             {% if f.errors %}
-                {% render_field f class+="form-control is-invalid" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+                {% render_field f class+="form-control is-invalid" placeholder=f.name %} {{f.label_tag}}
             {% else %}
                 {% if f.value %}
-                    {% render_field f class+="form-control is-valid" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+                    {% render_field f class+="form-control is-valid" placeholder=f.name %} {{f.label_tag}}
                 {% else %}
-                    {% render_field f class+="form-control" placeholder="{{f.label_tag}}" %} {{f.label_tag}}
+                    {% render_field f class+="form-control" placeholder=f.name %} {{f.label_tag}}
                 {% endif %}
             {% endif %}
             {{f.errors}}

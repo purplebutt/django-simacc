@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.conf import settings
 from django.shortcuts import reverse
-from accounting.models import Company
+from company.models import Company
 from media.api.manager import resize_image, delete_model_image
 
 
@@ -11,6 +11,14 @@ class Profile(models.Model):
     _img_path = 'images/profile/'
     _img_def_path = 'images/default/profile.png'
     _gender = [('female', 'Female'), ('male', 'Male')]
+    _comp_level = [
+        (0, 'Temporer'),
+        (1, 'Staff'),
+        (2, 'Supervisor'),
+        (3, 'Manager'),
+        (4, 'Senior Manager'),
+        (5, 'Top Manager'),
+    ]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
     gender = models.CharField(max_length=6, choices=_gender, blank=True)
@@ -18,11 +26,14 @@ class Profile(models.Model):
     city = models.CharField(max_length=63, blank=True)
     phone = models.CharField(max_length=18, blank=True)
     job = models.CharField(max_length=63, blank=True)
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True, related_name="employees")
     dob = models.DateTimeField(verbose_name='date of birth', blank=True, null=True)
     modified = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
+    # company
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True, related_name="employees")
+    comp_stat = models.BooleanField("approved", default=False)
+    comp_level = models.SmallIntegerField("level", choices=_comp_level, default=1)
 
     def __str__(self):
         return f'{self.user.username.capitalize()} profile'

@@ -26,6 +26,7 @@ class TBListView(UserPassesTestMixin, generic.ListView):
     allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
+    side_menu_group = 'reports'
     template_name = DP / 'regular/list.html'
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE

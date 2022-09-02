@@ -65,10 +65,10 @@
                     </button>
                     <div id="mycompanyCollapse" class="collapse ps-4">
                         {% if user.profile.company %}
-                            <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:comp_update' user.profile.company.slug %}">Company Profile</a>
-                            <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:comp_emp_list' %}">Employees</a>
+                            <a class="m-1 btn btn-outline-warning" href="{% url 'company:company_update' user.profile.company.slug %}">Company Profile</a>
+                            <a class="m-1 btn btn-outline-warning" href="{% url 'company:company_emp_list' %}">Employees</a>
                         {% else %}
-                            <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:comp_add' %}">Create My Company</a>
+                            <a class="m-1 btn btn-outline-warning" href="{% url 'company:company_add' %}">Create My Company</a>
                         {% endif %}
                     </div>
                     <button class="collapse-btn ps-0 fw-bold fs-6" data-bs-toggle="collapse" data-bs-target="#othersCollapse">

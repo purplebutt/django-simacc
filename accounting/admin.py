@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import COA, COH, Company
+from .models import COA, COH
 
 
 @admin.register(COA)
@@ -13,9 +13,3 @@ class COHAdmin(admin.ModelAdmin):
     list_display = ('number', 'name', 'is_active')
     list_filter = ('group',)
     ordering = ('number',)
-
-@admin.register(Company)
-class CompanyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'address')
-    list_filter = ('name','business_type')
-    ordering = ('-created',)

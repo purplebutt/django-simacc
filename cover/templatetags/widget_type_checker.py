@@ -44,3 +44,14 @@ def widget_col_width(widget):
     if hasattr(widget.field, 'col_width'):
         col_width = "col-md-" + str(widget.field.col_width)
     return col_width
+
+@register.filter
+def widget_disabled(widget):
+    if widget.field.disabled: return "disabled"
+    return None
+
+
+@register.filter
+def widget_debugger(widget):
+    print(f'\033[33m>>>>>>>>>>>>>>>>>>>>>>>>>>>  {dir(widget)}\033[0m')
+    return widget

@@ -44,11 +44,12 @@ class JRE(AccModelBase):
     cashflow = models.ForeignKey(CCF, verbose_name="cash flow", null=True, on_delete=models.CASCADE, 
         limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
     notes = models.TextField(blank=True)
+    pair = models.OneToOneField('JRE', default=None, null=True, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='jre_authors', related_query_name='jre_author')
     edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='jre_editors', related_query_name='jre_editor')
 
     class Meta:
-        ordering = ('-date', '-group')
+        ordering = ('-date', '-number', '-group')
         verbose_name = "JRE"
         verbose_name_plural = "JRE"
 
@@ -57,23 +58,33 @@ class JRE(AccModelBase):
         batch = JRB.objects.get(number=self.batch)
         return str(self.number)
 
-    def create_pair(self, **kwargs):
-        p = type(self)()
-        p.date = self.date 
+    def set_opp_group(self, pair)->None:
+        """
+        TODO: Set opposite group
+        pair = pair account to be evaluate.
+        If pair.group = 'd' (debit) then set self.group to 'c' (credit) and vice versa
+        """
+        self.group = type(self).get_group(pair.group, mode='short', opposite=True)
+
+    def make_pair(self, target=None, mode='create'):
+        if target is None: target = type(self)()
         # p.number = self.number
-        p.batch = self.batch
-        p.ref = self.ref
-        p.description = self.description
-        p.group = self.group
-        p.image = self.image
-        p.amount = self.amount
-        p.account = self.account
-        p.segment = self.segment
-        p.cashflow = self.cashflow
-        p.notes = self.notes
-        p.author = self.author
-        p.edited_by = self.edited_by
-        return p
+
+        target.date = self.date 
+        target.batch = self.batch
+        target.ref = self.ref
+        target.description = self.description
+        target.image = self.image
+        target.amount = self.amount
+        target.notes = self.notes
+        target.edited_by = self.edited_by
+        if mode == 'create':
+            target.group = self.group
+            target.account = self.account
+            target.segment = self.segment
+            target.cashflow = self.cashflow
+            target.author = self.author
+        return target
 
     def save(self, *args, **kwargs):
         if not self.number:
@@ -92,6 +103,10 @@ class JRE(AccModelBase):
             else:
                 s = str(self.number) + str(type(self).objects.count())
                 self.slug = slugify(s)
+        # remove segment if account not Profit and Loss
+        # remove cashflow if account not CashFlow
+        if not self.account.is_pnl: self.segment = None
+        if not self.account.is_cashflow: self.cashflow = None
         super(type(self), self).save(*args, **kwargs)
 
     def save_pair(self, pair:str):
@@ -102,20 +117,32 @@ class JRE(AccModelBase):
             qschecker = COA.actives.filter(name=pair)
 
         if qschecker.exists():
-            pair_instance = self.create_pair()
+            pair_instance = self.make_pair()
             pair_instance.account = qschecker.first()
             pair_instance.group = type(self).get_group(debit_or_credit='credit', mode='short')
             self.group = type(self).get_group(mode='short')
-            if not self.account.is_pnl: self.segment = None
-            if not self.account.is_cashflow: self.cashflow = None
-            if not pair_instance.account.is_pnl: pair_instance.segment = None
-            if not pair_instance.account.is_cashflow: pair_instance.cashflow = None
-            # save debit and credit journals
-            self.save()
-            pair_instance.save()
+            # add pair and save debit and credit journals
+            pair_instance.save()        # save pair so it can be add to self
+            self.pair = pair_instance   # add pair (already save on database) to self
+            self.save()                 # self can be save now because pair already exists
+            pair_instance.pair = self   # set pair for pair_instance with value of self
+            pair_instance.save()        # re-save pair_instance
         else:
             raise ValidationError(f"No valid account found for {pair}")
         return (self.number, pair_instance.number)
+
+    def update_pair(self):
+        if self.pair:
+            pair_instance = self.make_pair(self.pair, mode='update')
+            # add pair and save debit and credit journals
+            pair_instance.pair = self           # add pair to pair_instance, this will ensure pair between journal
+            pair_instance.set_opp_group(self)   # set pair to debit if self.group is credit and vice versa
+            pair_instance.save()
+            self.save()
+        else:
+            raise ValidationError(f"No valid account found for {pair}")
+        return (self.number, pair_instance.number)
+
 
     def get_tablerow_style(self):
         if self.group == 'd': return "table-info"

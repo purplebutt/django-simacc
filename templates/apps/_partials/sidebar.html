@@ -2,80 +2,49 @@
 {% load core_tags %}
 
 <div class="nav flex-column bg-white rounded user-select-none">
-    <!--product-->
-    <div class="border px-3 py-2">
-        <a class="fs-6 sidebar-collapse-btn fw-bold text-decoration-none" 
-            type="button" data-bs-toggle="collapse" data-bs-target="#sbProdMenu">
-            <i class="d-inline-block fa fa-angle-right"></i>
-            <span class="d-inline-block">Transactions</span>
-        </a>
-        <div id="sbProdMenu" class="collapse show text-center">
-            <ul class="nav">
-                {% for tra in trans %}
-                    <li class="nav-item">
-                        {% if tra.name|is_eq:model_name %}
-                            <a class="nav-link border-bottom border-4 border-secondary pb-0 fw-bolder" href="{{tra.url}}", title="{{tra.verbose|title}}">{{tra.name|upper}}</a>
-                        {% else %}
-                            <a class="nav-link" href="{{tra.url}}", title="{{tra.verbose|title}}">{{tra.name|upper}}</a>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    <!--product end-->
+    <h5 id="page_title" class="p-2 fw-700 text-end">{{page_title}}</h5>
 
-    <!--category-->
-    <div class="border px-3 py-2">
-        <div class="d-flex justify-content-between">
-            <a class="d-inline-block fs-6 sidebar-collapse-btn fw-bold text-decoration-none" 
-                type="button" data-bs-toggle="collapse" data-bs-target="#sbCatMenu">
-                <i class="d-inline-block fa fa-angle-right"></i>
-                <span class="d-inline-block">Master</span>
-            </a>
-        </div>
-        <div id="sbCatMenu" class="collapse show px-2 text-center">
-            <ul class="nav">
-                {% for mas in master %}
-                    <li class="nav-item">
-                        {% if mas.name|is_eq:model_name %}
-                            <a class="nav-link border-bottom border-4 border-secondary pb-0 fw-bolder" href="{{mas.url}}", title="{{mas.verbose|title}}">{{mas.name|upper}}</a>
-                        {% else %}
-                            <a class="nav-link" href="{{mas.url}}", title="{{mas.verbose|title}}">{{mas.name|upper}}</a>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+    <div class="d-flex p-2 justify-content-end align-items-center gap-2 border border-2">
+        <button class="btn btn-outline-primary px-2 py-1" 
+            hx-swap="innerHTML"
+            hx-target="div#{{model_name}}Content"
+            hx-get="{{request.path}}"
+            title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+        {% if add_single_url %}
+            <button class="btn btn-outline-warning px-2 py-1" data-bs-toggle="modal" data-bs-target="#{{model_name}}AddModal"
+                hx-swap="innerHTML"
+                hx-target="#{{model_name}}AddModalContent"
+                hx-get="{{add_single_url}}"
+                title="Add single (not recommended, use 'add new' instead)" ><i class="fa fa-pencil" aria-hidden="true"></i></button>
+        {% endif %}
+        <button class="btn btn-outline-primary px-2 py-1" data-bs-toggle="modal" data-bs-target="#{{model_name}}AddModal"
+            hx-swap="innerHTML"
+            hx-target="#{{model_name}}AddModalContent"
+            hx-get="{{add_url}}"
+            title="Add new" ><i class="fa fa-plus" aria-hidden="true"></i></button>
     </div>
-    <!--category end-->
 
-    <!--size-->
-    <div class="border px-3 py-2">
-        <div class="d-flex justify-content-between">
-            <a class="fs-6 sidebar-collapse-btn fw-bold text-decoration-none"
-                type="button" data-bs-toggle="collapse" data-bs-target="#sbSizeMenu">
-                <i class="d-inline-block fa fa-angle-right"></i>
-                <span class="d-inline-block">Report</span>
-            </a>
-        </div>
-        <div id="sbSizeMenu" class="collapse show px-2 text-center">
-            <ul class="nav">
-                {% for rep in report %}
-                    <li class="nav-item">
-                        {% if rep.name|is_eq:model_name %}
-                            <a class="nav-link border-bottom border-4 border-secondary pb-0 fw-bolder" href="{{rep.url}}", title="{{rep.verbose|title}}">{{rep.name|upper}}</a>
-                        {% else %}
-                            <a class="nav-link" href="{{rep.url}}", title="{{rep.verbose|title}}">{{rep.name|upper}}</a>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    <!--size end-->
+    <form class="d-flex border-start border-end p-0 my-2 my-lg-0">
+        {% csrf_token %}
+        <input class="form-control rounded-0 " type="search" 
+            name="search_key" placeholder="Search" aria-label="Search"
+            hx-post="{{search_url}}"
+            hx-target="div#{{model_name}}Content"
+            hx-trigger="keyup changed delay:500ms"
+            hx-swap="innerHTML"/>
+        <button class="btn btn-outline-primary rounded-0 border-0 border-top 
+            border-end border-bottom"
+            hx-post="{{search_url}}"
+            hx-target="div#{{model_name}}Content"
+            hx-swap="innerHTML">
+            <i class="fa fa-magnifying-glass"></i></button>
+    </form>
 
-    <div class="px-3 py-2"> {% include '_comps/range_select.html' %} </div>
+    {% for k in side_menu.items %}
+        {% include 'apps/_comps/collapse_menu.html' with name=k.0 items=k.1 %}
+    {% endfor %}
+
+    {% comment %} <div class="px-3 py-2"> {% include '_comps/range_select.html' %} </div> {% endcomment %}
 
     <style>
         a.sidebar-collapse-btn>svg {

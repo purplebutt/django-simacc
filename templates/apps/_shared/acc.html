@@ -13,17 +13,17 @@
     <div class="container-fluid px-0">
         {% comment %} <div class="bg-lightdark mb-3 py-2">
             <div class="container">
-                <h2>SimAcc <small>online version</small></h2>
+                <h3>{{page_title}}</h3>
             </div>
         </div> {% endcomment %}
         <div class="container-fluid mt-3 mt-md-0">
             <div class="row gy-2 gx-md-4">
-                <div class="col-md-3 col-lg-2">
-                    <div class="position-sticky" style="top: 4rem">
+                <div class="col-md-3 col-lg-2 px-1">
+                    <div class="position-sticky" style="top: 3.9rem">
                       {% include "apps/_partials/sidebar.html" %}
                     </div>
                 </div>
-                <div class="col-md-9 col-lg-10">
+                <div class="col-md-9 col-lg-10 ps-1">
                     {% block acc_content %} {% endblock acc_content %}
                 </div>
             </div>

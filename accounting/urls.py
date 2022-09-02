@@ -1,6 +1,5 @@
 from django.urls import path
 from .views import utils as utl_view
-from .views import company as company_view
 from .views import coh as coh_view
 from .views import coa as coa_view
 from .views import ccf as ccf_view
@@ -15,13 +14,6 @@ app_name='accounting'
 urlpatterns = [
     #! utils
     path("utils/datalist/<str:model>/", utl_view.get_datalist, name="utils_datalist"),
-
-    #! company
-    path("company_add/", company_view.CompanyCreateView.as_view(), name="comp_add"),
-    path("company_detail/<slug:slug>/", company_view.CompanyUpdateView.as_view(), name="comp_detail"),
-    path("company_update/<slug:slug>/", company_view.CompanyUpdateView.as_view(), name="comp_update"),
-    path("company_list/", company_view.CompanyListView.as_view(), name="comp_list"),
-    path("company/employees/", company_view.CompEmpList.as_view(), name="comp_emp_list"),
 
     #! COA Header
     path("coh_add/", coh_view.COHCreateView.as_view(), name="coh_add"),

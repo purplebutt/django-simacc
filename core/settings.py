@@ -38,6 +38,7 @@ INSTALLED_APPS = [
 
     # local apps
     'cover.apps.CoverConfig',
+    'company.apps.CompanyConfig',
     'accounts.apps.AccountsConfig',
     'accounting.apps.AccountingConfig',
 ]

@@ -12,46 +12,8 @@
     {% include '_comps/_partials/mod_wrapper_lg.html' with static=1 modal_id=model_name|concat:"UpdateModal" modal_content_id=model_name|concat:"UpdateModalContent" %}
     {% include '_comps/toast_info.html' %}
 
-    <h1>{{page_title}}</h1>
-    <div class="d-flex justify-content-between">
-        <div class="d-flex my-2 my-lg-0">
-            <button class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#{{model_name}}AddModal"
-                hx-swap="innerHTML"
-                hx-target="#{{model_name}}AddModalContent"
-                hx-get="{{add_url}}"
-                ><i class="fa fa-plus-square me-2" aria-hidden="true"></i>Add New</button>
-            {% if add_single_url %}
-                <button class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#{{model_name}}AddModal"
-                    hx-swap="innerHTML"
-                    hx-target="#{{model_name}}AddModalContent"
-                    hx-get="{{add_single_url}}"
-                    ><i class="fa fa-plus-square me-2" aria-hidden="true"></i>Add Single</button>
-            {% endif %}
-            <button class="btn btn-outline-primary btn-sm" 
-                hx-swap="innerHTML"
-                hx-target="div#{{model_name}}Content"
-                hx-get="{{request.path}}"
-                ><i class="fa fa-refresh me-2" aria-hidden="true"></i>Refresh</button>
-        </div>
-        
-        <form class="d-flex my-2 my-lg-0">
-            {% csrf_token %}
-            <input class="form-control rounded-0 rounded-start border-secondary" type="search" 
-                name="search_key" placeholder="Search" aria-label="Search"
-                hx-post="{{search_url}}"
-                hx-target="div#{{model_name}}Content"
-                hx-trigger="keyup changed delay:500ms"
-                hx-swap="innerHTML"/>
-            <button class="btn btn-outline-primary rounded-0 rounded-end border-0 border-top 
-                border-end border-bottom border-secondary"
-                hx-post="{{search_url}}"
-                hx-target="div#{{model_name}}Content"
-                hx-swap="innerHTML">
-                <i class="fa fa-magnifying-glass"></i></button>
-        </form>
-    </div>
     <div id="{{model_name}}Content">
-        <table id="{{model_name}}-table" class="table table-data table-hover mt-3">
+        <table id="{{model_name}}-table" class="table table-data table-hover">
             {{table_obj}}
         </table>
         <footer class="paginator py-2 mt-3">

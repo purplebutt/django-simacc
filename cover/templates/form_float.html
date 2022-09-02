@@ -40,16 +40,16 @@
 {% endif %}
 <script>
     function numberOnly() {
-        const numberInput =  document.querySelector("input[as_money='true']");
-        if (numberInput !== null) {
-            const validateNumInput = (evt)=> {
-                if (!(evt.keyCode < 21) && !(evt.keyCode >=33 && evt.keyCode <= 40) && (evt.keyCode != 188) && 
-                    (evt.keyCode != 8) && (evt.keyCode != 46) && ((evt.keyCode < 48) || (evt.keyCode > 57))) { 
-                    evt.target.value = ""; 
-                }
-            };
-            numberInput.addEventListener('keyup', validateNumInput);
-        }
+        const createAmount =  document.querySelector("input.create-amt");
+        const updateAmount =  document.querySelector("input.update-amt");
+        const validateNumInput = (evt)=> {
+            if (!(evt.keyCode < 21) && !(evt.keyCode >=33 && evt.keyCode <= 40) && (evt.keyCode != 188) && 
+                (evt.keyCode != 8) && (evt.keyCode != 46) && ((evt.keyCode < 48) || (evt.keyCode > 57))) { 
+                evt.target.value = evt.target.value.replace(evt.key, "");
+            }
+        };
+        if (createAmount != null) { createAmount.addEventListener('keyup', validateNumInput)}
+        if (updateAmount != null) { updateAmount.addEventListener('keyup', validateNumInput)}
     }
     numberOnly();
 </script>

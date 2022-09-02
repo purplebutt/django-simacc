@@ -9,8 +9,8 @@ from django.db.models import Q, F
 from django.urls.base import reverse_lazy
 from ..models import JRE, JRB, COA, BSG, CCF
 from ..html.table import JRETable
-from ..forms import JREUpdateForm, JRECreateForm
-from ..myforms.jre import JRECreateSingleForm
+# from ..forms import JREUpdateForm, JRECreateForm
+from ..myforms.jre import JRECreateSingleForm, JRECreateForm, JREUpdateForm
 from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate
 from cover import data
@@ -65,10 +65,11 @@ class JREListView(UserPassesTestMixin, generic.ListView):
     model = JRE
     table = JRETable
     table_fields = ('date', 'number', 'batch', 'ref', 'description', 'amount', 'group', 'account', 'segment', 'cashflow')
-    table_header = ('Date', 'number', 'Batch', 'REF', 'Description', 'Amount', 'Type', 'Account', 'B.Segment', 'Cash Flow')
+    table_header = ('Date', 'number', 'Batch', 'REF', 'Description', 'Amount', 'Type', 'Account', 'B.Sgmt', 'Cash Flow')
     allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
+    side_menu_group = 'transactions'
     template_name = DP / 'regular/list.html'
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
@@ -113,7 +114,7 @@ def search(request):
     table = JRETable
     template_name = DP/"list.html"
     table_fields = ('date', 'number', 'batch', 'ref', 'description', 'amount', 'group', 'account', 'segment', 'cashflow')
-    header_text = ('Date', 'number', 'Batch', 'REF', 'Description', 'Amount', 'Type', 'Account', 'B.Segment', 'Cash Flow')
+    header_text = ('Date', 'number', 'Batch', 'REF', 'Description', 'Amount', 'Type', 'Account', 'B.Sgmt', 'Cash Flow')
     table_filters = JREListView.get_table_filters()
 
     search_key = request.POST.get('search_key') or ""

@@ -30,7 +30,7 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('gender', 'address', 'city', 'phone', 'job', 'dob',)
+        fields = ('company', 'gender', 'address', 'city', 'phone', 'job', 'dob',)
 
 class ProfileImageForm(forms.ModelForm):
     image = forms.FileField(widget=forms.FileInput())

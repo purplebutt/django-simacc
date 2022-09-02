@@ -8,7 +8,8 @@ from django.contrib.auth.models import Group, User
 from django.urls.base import reverse_lazy
 from django.db.models import Q, F
 from ..models import COH
-from ..forms import COHUpdateForm, COHCreateForm
+# from ..forms import COHUpdateForm, COHCreateForm
+from ..myforms.coh import COHCreateForm, COHUpdateForm
 from ..html.table import COHTable
 from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
 from cover.utils import htmx_refresh, DEFPATH, paginate
@@ -56,6 +57,7 @@ class COHListView(UserPassesTestMixin, generic.ListView):
     allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
+    side_menu_group = 'master'
     template_name = DP / 'regular/list.html'
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
