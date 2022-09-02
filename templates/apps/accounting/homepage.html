@@ -1,0 +1,15 @@
+{% extends 'apps/accounting/_layout/acc.html' %}
+
+{% load core_tags %}
+{% load core_filters %}
+
+
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block acc_content %}
+    <div id="accountingContent"> 
+        <h3>Welcome to Accounting Module</h3>
+        <a href="{% url 'accounting:coa_list' %}">Go..</a>
+        <p>{% lorem 1 b random %}</p>
+    </div>
+{% endblock acc_content %}

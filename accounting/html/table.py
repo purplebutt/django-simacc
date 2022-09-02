@@ -7,8 +7,8 @@ class COHTable(base.Table):
     model = COH
     number = base.TableRowHeader(html_class="border")
     name = base.TableRowLink(
-        hx_target=f'{model.__name__.lower()}UpdateModalContent',
-        modal_target=f'{model.__name__.lower()}UpdateModal',
+        hx_target='UpdateModalContent',
+        modal_target='UpdateModal',
         html_class='text-decoration-none',
     )
     report = base.TableRowCell(
@@ -33,8 +33,8 @@ class COATable(base.Table):
     is_active = base.TableRowCell(html_class="border", mask=[(True, "Yes"), (False, "No")])
     is_cashflow = base.TableRowCell(html_class="border", mask=[(True, "Yes"), (False, "No")])
     name = base.TableRowLink(
-        hx_target=f'{model.__name__.lower()}UpdateModalContent',
-        modal_target=f'{model.__name__.lower()}UpdateModal',
+        hx_target='UpdateModalContent',
+        modal_target='UpdateModal',
         html_class='text-decoration-none'
     )
     debit = base.TableRowCell(html_class="border text-end", val_type="money")
@@ -55,8 +55,8 @@ class CCFTable(base.Table):
     activity = base.TableRowCell(mask=CCF._activities, html_class="border")
     is_active = base.TableRowCell(html_class="border")
     name = base.TableRowLink(
-        hx_target=f'{model.__name__.lower()}UpdateModalContent',
-        modal_target=f'{model.__name__.lower()}UpdateModal',
+        hx_target='UpdateModalContent',
+        modal_target='UpdateModal',
         html_class='text-decoration-none'
     )
 
@@ -73,8 +73,8 @@ class BSGTable(base.Table):
     group = base.TableRowHeader(html_class="border")
     is_active = base.TableRowCell(html_class="border")
     name = base.TableRowLink(
-        hx_target=f'{model.__name__.lower()}UpdateModalContent',
-        modal_target=f'{model.__name__.lower()}UpdateModal',
+        hx_target='UpdateModalContent',
+        modal_target='UpdateModal',
         html_class='text-decoration-none'
     )
 
@@ -94,8 +94,8 @@ class JRBTable(base.Table):
     balance = base.TableRowCell(html_class="border text-end", val_type="money")
     entries = base.TableRowCell(html_class="border text-end", val_type="money")
     number = base.TableRowLink(
-        hx_target=f'{model.__name__.lower()}UpdateModalContent',
-        modal_target=f'{model.__name__.lower()}UpdateModal',
+        hx_target='UpdateModalContent',
+        modal_target='UpdateModal',
         html_class='text-decoration-none'
     )
 
@@ -110,8 +110,8 @@ class JRETable(base.Table):
     model = JRE
     date = base.TableRowCell(html_class="border", css_style="font-size:small")
     number = base.TableRowLink(
-        hx_target=f'{model.__name__.lower()}UpdateModalContent',
-        modal_target=f'{model.__name__.lower()}UpdateModal',
+        hx_target='UpdateModalContent',
+        modal_target='UpdateModal',
         html_class='text-decoration-none'
     )
     batch = base.TableRowCell(html_class="border", css_style="font-size:small")
@@ -141,8 +141,8 @@ class TBTable(base.Table):
     is_active = base.TableRowCell(html_class="border", mask=[(True, "Yes"), (False, "No")])
     is_cashflow = base.TableRowCell(html_class="border", mask=[(True, "Yes"), (False, "No")])
     name = base.TableRowLink(
-        hx_target=f'{model_name}UpdateModalContent',
-        modal_target=f'{model_name}UpdateModal',
+        hx_target='UpdateModalContent',
+        modal_target='UpdateModal',
         html_class='text-decoration-none'
     )
     debit = base.TableRowCell(html_class="border text-end", val_type="money")

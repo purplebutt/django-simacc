@@ -70,7 +70,7 @@ class JREListView(UserPassesTestMixin, generic.ListView):
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     side_menu_group = 'transactions'
-    template_name = DP / 'regular/list.html'
+    template_name = DP / 'no_htmx/list.html'
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func
@@ -112,7 +112,8 @@ class JREListView(UserPassesTestMixin, generic.ListView):
 def search(request):
     model = JRE
     table = JRETable
-    template_name = DP/"list.html"
+    page_title = PAGE_TITLE
+    template_name = DP/"list_search.html"
     table_fields = ('date', 'number', 'batch', 'ref', 'description', 'amount', 'group', 'account', 'segment', 'cashflow')
     header_text = ('Date', 'number', 'Batch', 'REF', 'Description', 'Amount', 'Type', 'Account', 'B.Sgmt', 'Cash Flow')
     table_filters = JREListView.get_table_filters()
@@ -128,5 +129,5 @@ def search(request):
         filter_q = filter_q|Q(ref__icontains=search_key)|Q(description__icontains=search_key)
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
-                        table_fields=table_fields, header_text=header_text, template_name=template_name)
+                        table_fields=table_fields, header_text=header_text, template_name=template_name, page_title=page_title)
     return response

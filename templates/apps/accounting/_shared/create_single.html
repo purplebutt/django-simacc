@@ -26,12 +26,16 @@
                 {% if is_user_allowed %}
                     {% form_float_cbleft form %}
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <input type="reset" class="btn btn-secondary btn-reset" value="Reset" disabled>
-                        <button type="button" class="btn btn-primary btn-submit" disabled
+                        <button class="btn btn-secondary btn-reset me-auto" type="reset" value="Reset" disabled 
+                            title="Reset" tabindex=-1><i class="fa fa-refresh" aria-hidden="true"></i></button>
+                        <button type="button" class="btn btn-danger" title="Cancel" data-bs-dismiss="modal">
+                            <i class="fa fa-rotate-left" aria-hidden="true"></i></button>
+                        <button type="button" class="btn btn-primary btn-submit" title="Save" disabled
                             hx-swap="innerHTML"
                             hx-post="{{add_single_url}}"
-                            hx-target="#{{model_name}}AddModalContent">Add</button>
+                            hx-target="#AddModalContent">
+                            <i class="fa fa-floppy-disk" aria-hidden="true"></i></button>
+                        </button>
                     </div>
                     <script type="text/javascript">
                         function lockCreateButton() {

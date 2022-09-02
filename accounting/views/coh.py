@@ -58,7 +58,7 @@ class COHListView(UserPassesTestMixin, generic.ListView):
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     side_menu_group = 'master'
-    template_name = DP / 'regular/list.html'
+    template_name = DP / 'no_htmx/list.html'
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func
@@ -85,10 +85,11 @@ class COHListView(UserPassesTestMixin, generic.ListView):
 def search(request):
     model = COH
     table = COHTable
+    page_title = PAGE_TITLE
     table_fields = ('number', 'name', 'report', 'group')
     header_text = ('Code', 'Header Name', 'Report', 'Account Group')
     table_filters = COHListView.get_table_filters()
-    template_name = DP/"list.html"
+    template_name = DP/"list_search.html"
 
     search_key = request.POST.get('search_key') or ""
     if search_key.isnumeric():
@@ -97,5 +98,5 @@ def search(request):
         filter_q = Q(name__icontains=search_key)
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
-                        table_fields=table_fields, header_text=header_text, template_name=template_name)
+                        table_fields=table_fields, header_text=header_text, template_name=template_name, page_title=page_title)
     return response

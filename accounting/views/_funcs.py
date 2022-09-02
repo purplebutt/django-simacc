@@ -129,7 +129,7 @@ def f_get_context_data(self, *args, **kwargs):
         context[type(self).context_object_name] = paginate(page, context[type(self).context_object_name], paginateBy=per_page)
         context[type(self).table_object_name] = type(self).table(context[type(self).context_object_name], type(self).table_fields, 
             table_name=type(self).model.__name__.lower(),
-            htmx_target=f"div#{type(self).model.__name__.lower()}Content",
+            htmx_target=f"div#dataTableContent",
             header_text=type(self).table_header, 
             filter_data = type(self).get_table_filters() if hasattr(type(self), 'get_table_filters') else None,
             ignore_query=("follow_sort",),
@@ -183,6 +183,7 @@ def f_search(request, **kwargs):
     # read data from kwargs dictionary
     model = kwargs["model"]
     model_name = "model_name" 
+    page_title = kwargs["page_title"]
     table = kwargs["table"]
     table_fields = kwargs["table_fields"]
     table_filters = kwargs["table_filters"]
@@ -203,12 +204,20 @@ def f_search(request, **kwargs):
         context = {obj_name: model.objects.all()}
 
     context.setdefault(model_name, model.__name__.lower())
+    context["page_title"] = page_title
+    context['search_url'] = request.get_full_path()
+    context["side_menu"] = {
+        'reports': data.sidebar("report"),
+        'master': data.sidebar("master"),
+        'transactions': data.sidebar("trans")
+    }
     # context[model_name] = model.__name__.lower()
     context[obj_name] = context[obj_name].filter(filter_q)
     context[obj_name] = paginate(page, context[obj_name], paginateBy=per_page)
     context[tbl_name] = table(context[obj_name], table_fields, 
         table_name=model.__name__.lower(),
-        htmx_target=f"div#{model.__name__.lower()}Content",
+        # htmx_target=f"div#{model.__name__.lower()}Content",
+        htmx_target=f"div#dataTableContent",
         header_text=header_text, 
         filter_data=table_filters,
         ignore_query=("follow_sort",),

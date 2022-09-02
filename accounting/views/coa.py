@@ -56,7 +56,7 @@ class COAListView(UserPassesTestMixin, generic.ListView):
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     side_menu_group = 'master'
-    template_name = DP / 'regular/list.html'
+    template_name = DP / 'no_htmx/list.html'
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func
@@ -73,6 +73,7 @@ class COAListView(UserPassesTestMixin, generic.ListView):
         }
 
     def filter_context_data(self, **kwargs):
+        from time import sleep
         context = super().get_context_data(**kwargs)
         if len(self.request.GET) > 0:
             for k, v in self.request.GET.items():
@@ -91,10 +92,11 @@ class COAListView(UserPassesTestMixin, generic.ListView):
 def search(request):
     model = COA
     table = COATable
+    page_title = PAGE_TITLE
     table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'is_active')
     header_text = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Active')
     table_filters = COAListView.get_table_filters()
-    template_name = DP/"list.html"
+    template_name = DP/"list_search.html"
 
     search_key = request.POST.get('search_key') or ""
 
@@ -105,5 +107,5 @@ def search(request):
 
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
-                        table_fields=table_fields, header_text=header_text, template_name=template_name)
+                        table_fields=table_fields, header_text=header_text, template_name=template_name, page_title=page_title)
     return response

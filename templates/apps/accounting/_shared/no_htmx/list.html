@@ -1,0 +1,21 @@
+{% extends 'apps/accounting/_layout/acc_sidebar.html' %}
+
+{% load core_tags %}
+{% load core_filters %}
+
+
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block acc_sidebar_content %}
+    <div id="dataTableContent">
+        <table id="{{model_name}}-table" class="table table-data table-hover">
+            {{table_obj}}
+        </table>
+        <footer class="paginator py-2 mt-3">
+            {% htmx_paginator 'div#dataTableContent' objects request %}
+        </footer>
+        {% with "div#dataTableContent" as htmx_target %}
+            {% include 'apps/accounting/_comps/table_refresher.html' with ref_id='table-refresher' htmx_swap='innerHTML' %}
+        {% endwith %}
+    </div>
+{% endblock acc_sidebar_content %}

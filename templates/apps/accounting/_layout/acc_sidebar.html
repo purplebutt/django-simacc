@@ -10,12 +10,11 @@
     {% include 'account/_partials/mod_wrapper.html' with modal_id="changePasswordModal" modal_content_id="changePasswordModalContent" %}
     {% include 'account/_partials/mod_wrapper.html' with modal_id="resetPasswordModal" modal_content_id="resetPasswordModalContent" %}
     {% include 'account/_partials/mod_wrapper.html' with modal_id="updatePictureModal" modal_content_id="updatePictureModalContent" %}
+
+    {% include '_comps/_partials/mod_wrapper_lg.html' with static=1 modal_id="AddModal" modal_content_id="AddModalContent" %}
+    {% include '_comps/_partials/mod_wrapper_lg.html' with static=1 modal_id="UpdateModal" modal_content_id="UpdateModalContent" %}
+    {% include '_comps/toast_info.html' %}
     <div class="container-fluid px-0">
-        {% comment %} <div class="bg-lightdark mb-3 py-2">
-            <div class="container">
-                <h3>{{page_title}}</h3>
-            </div>
-        </div> {% endcomment %}
         <div class="container-fluid mt-3 mt-md-0">
             <div class="row gy-2 gx-md-4">
                 <div class="col-md-3 col-lg-2 px-1">
@@ -24,7 +23,7 @@
                     </div>
                 </div>
                 <div class="col-md-9 col-lg-10 ps-1">
-                    {% block acc_content %} {% endblock acc_content %}
+                    {% block acc_sidebar_content %} {% endblock acc_sidebar_content %}
                 </div>
             </div>
         </div>

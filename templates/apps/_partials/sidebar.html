@@ -1,41 +1,41 @@
 {% load core_filters %}
 {% load core_tags %}
 
-<div class="nav flex-column bg-white rounded user-select-none">
+<div id="sidebar_menu" class="nav flex-column rounded user-select-none">
     <h5 id="page_title" class="p-2 fw-700 text-end">{{page_title}}</h5>
 
     <div class="d-flex p-2 justify-content-end align-items-center gap-2 border border-2">
         <button class="btn btn-outline-primary px-2 py-1" 
             hx-swap="innerHTML"
-            hx-target="div#{{model_name}}Content"
+            hx-target="div#dataTableContent"
             hx-get="{{request.path}}"
             title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></button>
         {% if add_single_url %}
-            <button class="btn btn-outline-warning px-2 py-1" data-bs-toggle="modal" data-bs-target="#{{model_name}}AddModal"
+            <button class="btn btn-outline-warning px-2 py-1" data-bs-toggle="modal" data-bs-target="#AddModal"
                 hx-swap="innerHTML"
-                hx-target="#{{model_name}}AddModalContent"
+                hx-target="#AddModalContent"
                 hx-get="{{add_single_url}}"
                 title="Add single (not recommended, use 'add new' instead)" ><i class="fa fa-pencil" aria-hidden="true"></i></button>
         {% endif %}
-        <button class="btn btn-outline-primary px-2 py-1" data-bs-toggle="modal" data-bs-target="#{{model_name}}AddModal"
+        <button class="btn btn-outline-primary px-2 py-1" data-bs-toggle="modal" data-bs-target="#AddModal"
             hx-swap="innerHTML"
-            hx-target="#{{model_name}}AddModalContent"
+            hx-target="#AddModalContent"
             hx-get="{{add_url}}"
             title="Add new" ><i class="fa fa-plus" aria-hidden="true"></i></button>
     </div>
 
-    <form class="d-flex border-start border-end p-0 my-2 my-lg-0">
+    <form class="d-flex p-0 my-2 my-lg-0">
         {% csrf_token %}
         <input class="form-control rounded-0 " type="search" 
             name="search_key" placeholder="Search" aria-label="Search"
             hx-post="{{search_url}}"
-            hx-target="div#{{model_name}}Content"
+            hx-target="div#dataTableContent"
             hx-trigger="keyup changed delay:500ms"
             hx-swap="innerHTML"/>
         <button class="btn btn-outline-primary rounded-0 border-0 border-top 
             border-end border-bottom"
             hx-post="{{search_url}}"
-            hx-target="div#{{model_name}}Content"
+            hx-target="div#dataTableContent"
             hx-swap="innerHTML">
             <i class="fa fa-magnifying-glass"></i></button>
     </form>

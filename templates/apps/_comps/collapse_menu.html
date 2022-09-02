@@ -20,11 +20,15 @@
             {% for item in items %}
                 <li class="nav-item">
                     {% if item.name|is_eq:model_name %}
-                        <a class="fw-bolder border-bottom border-3 border-primary text-decoration-none m-1 fs-6" 
-                            href="{{item.url}}", title="{{item.verbose|title}}">{{item.name|upper}}</a>
+                        <a class="fw-bolder border-bottom border-3 border-primary text-decoration-none m-1 fs-6" type="button" 
+                            hx-swap="innerHTML"
+                            hx-target="div#dataTableContent"
+                            hx-get="{{item.url}}", title="{{item.verbose|title}}">{{item.name|upper}}</a>
                     {% else %}
-                        <a class="text-decoration-none m-1 fs-6 text-secondary" 
-                            href="{{item.url}}", title="{{item.verbose|title}}">{{item.name|upper}}</a>
+                        <a class="text-decoration-none m-1 fs-6 text-secondary" type="button"
+                            hx-swap="innerHTML"
+                            hx-target="div#dataTableContent"
+                            hx-get="{{item.url}}", title="{{item.verbose|title}}">{{item.name|upper}}</a>
                     {% endif %}
                 </li>
             {% endfor %}

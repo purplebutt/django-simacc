@@ -1,4 +1,5 @@
 from django.urls import path
+from .views import index
 from .views import utils as utl_view
 from .views import coh as coh_view
 from .views import coa as coa_view
@@ -12,6 +13,9 @@ from .views import reports as rep_view
 app_name='accounting'
 
 urlpatterns = [
+    #! index
+    path("", index.homepage, name="index"),
+
     #! utils
     path("utils/datalist/<str:model>/", utl_view.get_datalist, name="utils_datalist"),
 
