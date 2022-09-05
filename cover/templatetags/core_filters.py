@@ -31,11 +31,6 @@ def iftrue(condition, value:str|int=None):
     return condition if bool(condition) else value
 
 @register.filter
-def iftf(condition, retval:str, split_char:str=";"):
-    t, f = retval.split(split_char)
-    return t if bool(condition) else f
-
-@register.filter
 def concat(value:str, other:str):
     return value + other
 

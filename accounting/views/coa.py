@@ -9,10 +9,9 @@ from django.db.models import Q, F
 from django.urls.base import reverse_lazy
 from ..models import COA, COH
 from ..html.table import COATable
-# from ..forms import COAUpdateForm, COACreateForm
 from ..myforms.coa import COACreateForm, COAUpdateForm
-from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate
+from ._funcs import f_form_valid, f_test_func, x_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from cover.utils import DEFPATH, paginate, htmx_redirect
 from cover import data
 
 
@@ -90,6 +89,14 @@ class COAListView(UserPassesTestMixin, generic.ListView):
 
 @login_required
 def search(request):
+    # checks user permission
+    # return Response Error 403 if user dont have permission
+    if not x_test_func(request):
+        if request.htmx:
+            err_msg = f"You are not authorized to view or modify data."
+            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
+        return redirect("cover:error403", msg=err_msg)
+
     model = COA
     table = COATable
     page_title = PAGE_TITLE
@@ -104,7 +111,6 @@ def search(request):
         filter_q = Q(name__icontains=search_key)
     else:
         filter_q = Q(number__contains=search_key)
-
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
                         table_fields=table_fields, header_text=header_text, template_name=template_name, page_title=page_title)

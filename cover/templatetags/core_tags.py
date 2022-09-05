@@ -202,3 +202,8 @@ def getval_frstr(model_name:str, key:int|str, field:str=None):
         return getattr(model.actives.get(pk=int(key)), field)
     except:
         return key
+
+@register.simple_tag
+def iftf(condition, iftrue:str='true', iffalse:str='false'):
+    return iftrue if bool(condition) else iffalse
+

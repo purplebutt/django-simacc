@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.urls import reverse
+from django.http.response import HttpResponse
 
 def paginate(page, querySet:object, paginateBy:int=5):
     paginator = Paginator(querySet, paginateBy)
@@ -103,12 +104,21 @@ class DEFPATH():
     def __truediv__(self, other:str):
         return self.base + "/" + other 
 
-
-def has_attribute(obj, attribute:str):
-    attributes = filter(lambda i: not i.startswith("__"), dir(type(obj)))
-    return attribute in attributes
-
 def auto_number_generator(incrementor:int=1)->int:
     from datetime import datetime
     d = datetime.now().strftime("%y%m%d") + "{:0>4}".format(incrementor)
     return int(d)
+
+def save_url_query(url_query:str):
+    #   url contains "/" character, but this character
+    #   will cause an error when use as argument on url path 
+    #   so we can convert "/" to other character and revert it back later
+    if "/" in url_query:
+        return url_query.replace("/", "%~%")
+    else:
+        return url_query.replace("%~%", "/")
+
+def not_implemented_yet(request, reason:str="this feature is not implemented yet"):
+    if request.htmx:
+        return htmx_redirect(HttpResponse(status=403), reverse("cover:error403", kwargs={'msg':reason.title()}))
+    return redirect("cover:error403", msg=reason.title())

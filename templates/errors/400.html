@@ -1,0 +1,22 @@
+{% extends 'err_base.html' %}
+
+
+{% block page_title %}400 Bad Request{% endblock page_title %}
+{% block err_base_content %}
+    <h3 class="text-danger">Bad Request (400 error)</h3>
+    <div class="text-secondary text-center border-bottom">
+        {% if reason %}
+            Reason:
+            <h5 class="border-bottom text-danger fw-bold mb-3 pb-2"> {{reason}} </h5>
+        {% endif %}
+        <h6 class="permission-info text-start text-small">
+            Url <b>'{{url}}'</b> that you've just requested with <b>{{method}}</b> method should not be requested that way.
+            <hr>
+            Contact system administrator for more info.
+        </h6>
+    </div>
+    <div class="pt-3">
+        <a type="button" onclick="history.back()" class="btn btn-primary mt-3">
+            <i class="fa fa-rotate-left me-1"></i>Go back</a>
+    </div>
+{% endblock err_base_content %}

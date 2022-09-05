@@ -30,3 +30,25 @@ export function htmxEventListenerInit() {
     htmxBeforeSwap();
     // htmxConfigRequest();
 }
+
+
+function htmxSpinnerAnimate() {
+    const triggers = document.querySelectorAll("button.htmx-trigger, a.htmx-trigger");
+
+    function t_onclick(t) {
+        const caller = t.target;
+        const targets = document.querySelectorAll(caller.getAttribute('htmx-target'));
+        const spinners = document.querySelectorAll(caller.getAttribute('htmx-spinner'));
+        targets.forEach(t => {
+            t.classList.add('d-none');
+        });
+        spinners.forEach(s => {
+            s.classList.remove('d-none');
+        });
+        console.log(triggers);
+    }
+
+    triggers.forEach(t => {
+        t.addEventListener('click', t_onclick);
+    });
+}

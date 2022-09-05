@@ -27,7 +27,7 @@ class TBListView(UserPassesTestMixin, generic.ListView):
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     side_menu_group = 'reports'
-    template_name = DP / 'regular/list.html'
+    template_name = DP / 'no_htmx/list.html'
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func

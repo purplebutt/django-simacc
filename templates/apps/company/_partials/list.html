@@ -1,0 +1,60 @@
+{% load core_filters %}
+
+<div id="alert-info" hx-swap-oob="true">
+    {% if user.profile.company %}
+        {% if not user.profile.comp_stat %}
+            <div class="alert alert-warning alert-dismissible fade show my-2">
+                <button class="btn btn-close" data-bs-dismiss="alert"></button>
+                You've already applied to <b>{{user.profile.company|title}}</b>, but still not approved yet.<br>
+                If you've picked wrong company, you can cancel it.
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-warning alert-dismissible fade show my-2">
+            <button class="btn btn-close" data-bs-dismiss="alert"></button>
+            You can only have one company for one account!. Make sure you apply to your company.
+        </div>
+    {% endif %}
+</div>
+
+
+<table id="companyListTable" class="table table-striped mt-1">
+    <thead>
+    <tr class="bg-dark text-light">
+        <th scope="col">Number</th>
+        <th scope="col">Companies</th>
+        <th scope="col">Address</th>
+        <th scope="col">Join</th>
+    </tr>
+    </thead>
+    <tbody id="dataTableContent">
+    {% for c in objects %}
+        <tr>
+            <td>{{c.number}}</td>
+            <td><a href="{{c.get_absolute_url}}">{{c.name}}</a></td>
+            <td>{{c.address}}</td>
+            <td>
+                {% if user.profile.company %}
+                    {% if user.profile.comp_stat %}
+                        {% if user.profile.company.number|is_eq:c.number %}
+                            Joined..
+                        {% endif %}
+                    {% else %}
+                        {% if user.profile.company.number|is_eq:c.number %}
+                            <a class="btn btn-warning" title="Cancel apply"
+                            hx-get="{% url 'company:company_apply' c.slug %}"
+                            hx-target="table#companyListTable"
+                            hx-swap="outerHTML"><i class="fa fa-remove" aria-hidden="true"></i></a>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    <a class="btn btn-info" title="Apply"
+                    hx-get="{% url 'company:company_apply' c.slug %}"
+                    hx-target="table#companyListTable"
+                    hx-swap="outerHTML"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

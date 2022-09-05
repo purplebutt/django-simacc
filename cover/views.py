@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from cover.utils import save_url_query
 from . import data as dt
 
 
@@ -34,5 +35,17 @@ def htmx_modal_error(request):
     ctx["error"] = queries
     return render(request, template_name="errors/htmx_modal_err.html", context=ctx)
 
-def error_forbidden(request):
-    return render(request, template_name="errors/403.html")
+def error_forbidden(request, msg:str):
+    ctx = {}
+    ctx['reason'] = msg
+    return render(request, template_name="errors/403.html", context=ctx)
+
+def error_bad_request(request, method:str, url:str, msg:str):
+    ctx = {}
+    ctx['method'] = method
+    ctx['url'] = save_url_query(url)
+    ctx['reason'] = msg
+    return render(request, template_name="errors/400.html", context=ctx)
+
+def error_not_allowed(request, allowed, msg):
+    return render(request, template_name="errors/405.html")

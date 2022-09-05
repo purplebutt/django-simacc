@@ -1,0 +1,11 @@
+{% extends '_shared/base.html' %}
+
+
+{% block page_title %} {{page_title}} {% endblock page_title %}
+
+{% block base_content %}
+    <div class="d-flex justify-content-around align-items-center flex-column vh-100">
+        {% block centered_content %}{% endblock centered_content %}
+        {% include '_comps/footer.html' %}
+    </div>
+{% endblock base_content %}

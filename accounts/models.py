@@ -31,7 +31,7 @@ class Profile(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     # company
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True, related_name="employees")
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True, related_name="employees", related_query_name="employee")
     comp_stat = models.BooleanField("approved", default=False)
     comp_level = models.SmallIntegerField("level", choices=_comp_level, default=1)
 

@@ -27,7 +27,7 @@
                         <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i> Transactions
                     </button>
                     <div id="transactionsCollapse" class="collapse ps-4">
-                        <a class="m-1 btn btn-outline-warning" href="#">Accounting</a>
+                        <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:index' %}">Accounting</a>
                         <a class="m-1 btn btn-outline-warning" href="#">Purchasing</a>
                         <a class="m-1 btn btn-outline-warning" href="#">Selling</a>
                         <a class="m-1 btn btn-outline-warning" href="#">Inventory</a>
@@ -40,8 +40,8 @@
                     <div id="masterDataCollapse" class="collapse ps-4">
                         <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:coh_list' %}">COA Header</a>
                         <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:coa_list' %}">Chart Of Account</a>
-                        <a class="m-1 btn btn-outline-warning" href="#">Chart Of Cash Flow</a>
-                        <a class="m-1 btn btn-outline-warning" href="#">Business Segment</a>
+                        <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:ccf_list' %}">Chart Of Cash Flow</a>
+                        <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:bsg_list' %}">Business Segment</a>
                         <a class="m-1 btn btn-outline-warning" href="#">Customer</a>
                         <a class="m-1 btn btn-outline-warning" href="#">Vendor</a>
                         <a class="m-1 btn btn-outline-warning" href="#">Inventory</a>
@@ -51,7 +51,7 @@
                         <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i> Reports
                     </button>
                     <div id="reportCollapse" class="collapse ps-4">
-                        <a class="m-1 btn btn-outline-warning" href="#">Trial Balance</a>
+                        <a class="m-1 btn btn-outline-warning" href="{% url 'accounting:report_tb' %}">Trial Balance</a>
                         <a class="m-1 btn btn-outline-warning" href="#">Income Statement</a>
                         <a class="m-1 btn btn-outline-warning" href="#">Equity Statement</a>
                         <a class="m-1 btn btn-outline-warning" href="#">Balance Sheet</a>
@@ -64,11 +64,12 @@
                         <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i> My Company
                     </button>
                     <div id="mycompanyCollapse" class="collapse ps-4">
-                        {% if user.profile.company %}
-                            <a class="m-1 btn btn-outline-warning" href="{% url 'company:company_update' user.profile.company.slug %}">Company Profile</a>
+                        {% if user.comp_author or user.profile.company %}
                             <a class="m-1 btn btn-outline-warning" href="{% url 'company:company_emp_list' %}">Employees</a>
+                            <a class="m-1 btn btn-outline-warning" href="{% url 'company:my_company' %}">My Company</a>
                         {% else %}
                             <a class="m-1 btn btn-outline-warning" href="{% url 'company:company_add' %}">Create My Company</a>
+                            <a class="m-1 btn btn-outline-warning" href="{% url 'company:company_list' %}">Join a Company</a>
                         {% endif %}
                     </div>
                     <button class="collapse-btn ps-0 fw-bold fs-6" data-bs-toggle="collapse" data-bs-target="#othersCollapse">

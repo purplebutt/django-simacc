@@ -57,7 +57,7 @@
                     </div>
                     <script>
                         function lockForm(){
-                            const inputs = document.querySelectorAll("input,textarea,select");
+                            const inputs = document.querySelectorAll("input:not([type=search]),textarea,select");
                             inputs.forEach(i => { i.setAttribute('disabled', null); });
                         }
                         lockForm()

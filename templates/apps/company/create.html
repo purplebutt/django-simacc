@@ -1,17 +1,53 @@
-{% extends 'apps/_shared/acc.html' %}
+{% extends '_shared/base.html' %}
 {% load core_tags %}
 
 
-{% block page_tittle %} New Company {% endblock page_tittle %}
+{% block page_title %} Add New Company {% endblock page_title %}
 
-{% block acc_content %}
-    <form method="POST" class="row g-2" action="{{request.path}}">
-        {% csrf_token %}
-        <h1>Create My Company</h1>
-        {% form_float form %}
-        <div class="border-top mt-3 pt-3">
-            <input class="btn btn-primary me-2" type="Submit" value="Add">
-            <a type="button" onclick="history.back()" class="btn btn-info ms-2">Back</a>
+{% block base_content %}
+    <div class="container">
+        <div class="py-1 d-flex flex-column justify-content-between align-items-center">
+            <div class="mt-2"> {% brand 1 50 %} </div>
+            <h4 class="mt-2">Add new company</h4>
+            <p>Hi <b class="text-danger">{{user|capfirst}}</b>, fill in to create your company now</p>
+            <form method="POST" action={{request.path}} class="row g-2">
+                {% csrf_token %}
+                {% form_float form 2 %}
+                <div class="text-center mt-2 border-top pt-3">
+                    <a type='button' onclick='history.back()' class='btn btn-secondary'>
+                        <i class='fa fa-rotate-left me-1'></i>Go back</a>
+                    <button id="btnProfileUpdate" type="submit" class="mx-2 btn btn-primary">
+                        <i class="fa fa-save me-1" aria-hidden="true"></i>Save</button>
+                    <button id="btnLockUnlock" onclick="lockUnlockInput()" type="button" class="btn btn-warning">
+                        <i class="fa fa-unlock me-2"></i>Unlock</button>
+                </div>
+            </form>
         </div>
-    </form>
-{% endblock acc_content %}
+        {% include '_comps/footer.html' %}
+    </div>
+    <script type="text/javascript">
+        function lockFormInput(){
+            const btnLockUnlock = document.getElementById("btnLockUnlock");
+            const inputs = document.querySelectorAll("input,textarea,select,#btnProfileUpdate");
+            inputs.forEach(i => {
+                i.setAttribute('disabled', null);
+                btnLockUnlock.innerHTML="<i class='fa fa-unlock me-2'></i>Unlock"
+            });
+        }
+        function lockUnlockInput(){
+            const btnLockUnlock = document.getElementById("btnLockUnlock");
+            const inputs = document.querySelectorAll("input,textarea,select,#btnProfileUpdate");
+            inputs.forEach(i => {
+                if (i.hasAttribute('disabled')){
+                    i.removeAttribute('disabled');
+                    btnLockUnlock.innerHTML="<i class='fa fa-lock me-2'></i>Lock"
+                }
+                else {
+                    i.setAttribute('disabled', null);
+                    btnLockUnlock.innerHTML="<i class='fa fa-unlock me-2'></i>Unlock"
+                }
+            });
+        }
+        lockFormInput() // call lockFormInput() to lock form by default
+    </script>
+{% endblock base_content %}

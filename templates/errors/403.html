@@ -3,12 +3,13 @@
 
 {% block page_title %}403 Forbidden{% endblock page_title %}
 {% block err_base_content %}
-    <h1 class="text-danger">Forbidden (403 error)</h1>
+    <h3 class="text-danger">Forbidden (403 error)</h3>
     <div class="text-secondary text-center border-bottom">
-        <h5 class="border-bottom my-3 pb-2">
-            You do not have enough permission<i class="fa fa-ban ms-2"></i>
-        </h5>
-        <h6 class="permission-info text-start">
+        {% if reason %}
+            Reason:
+            <h5 class="border-bottom text-danger fw-bold mb-3 pb-2"> {{reason}} </h5>
+        {% endif %}
+        <h6 class="permission-info text-start text-small">
             {% if request.user.groups.all %}
                 Your account ({{request.user|title}}) have the following permissions :
                 <ul class="mt-3">
@@ -18,8 +19,9 @@
                 </ul>
             {% else %}
                 Your account ({{request.user|title}}) is a regular account without any permissions<br>
-                If you need any permissions, please contact system administrator.
             {% endif %}
+            <hr>
+            If you need any permissions, please contact system administrator.
         </h6>
     </div>
     <div class="pt-3">

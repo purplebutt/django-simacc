@@ -1,0 +1,28 @@
+{% if request.htmxs_toast_simple %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090">
+        <div id="htmxToast{{request.htmxs_data.id}}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">...</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var simpleHtmxResponseToast = ()=> {
+            //let htmx_data = JSON.parse(document.querySelector('script#htmx_data').textContent);
+            let htmx_data = JSON.parse(document.querySelector('script#htmx_data.msg').textContent);
+            // show toast message
+            let toastTemplate = document.querySelector('div#htmxToast'+htmx_data.id);
+            let toastBody = document.querySelector('div#htmxToast'+htmx_data.id+'>div.toast-body');
+            let msg = htmx_data.msg;
+            if (msg.length > 0) {
+                //msg = msg.substring(1, msg.length-1);
+                toastBody.innerText = msg;
+                new bootstrap.Toast(toastTemplate).show();
+            }
+        }
+        simpleHtmxResponseToast();
+    </script>
+{% endif %}
+
+<script id="htmx_data" hx-swap-oob="true" type="application/json">{{request.htmxs_data}}</script>

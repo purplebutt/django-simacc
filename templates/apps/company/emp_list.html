@@ -1,0 +1,46 @@
+{% extends '_shared/base.html' %}
+{% load core_tags %}
+{% load core_filters %}
+
+
+{% block page_title %} {{user.profile.company}}'s employees {% endblock page_title %}
+
+{% block base_content %}
+    <div class="container">
+        <div class="pt-1 mb-5 d-flex flex-column justify-content-between align-items-center">
+            <div class="mt-2"> {% brand 1 40 %} </div>
+            <h4 class="my-4">{{user.profile.company|title}}'s employees</h4>
+            <div id="ajax-alert-info"></div>
+            <div id="employeeList" class="row gap-3">
+                {% for e in objects %}
+                    <div class="card col" style="min-width:200px">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{% iftf e.first_name e.first_name|title e.username|title %}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{e.email}}</h6>
+                            <img src="{{e.profile.image.url}}" class="img-thumbnail rounded" style="max-width:100px" alt="{{e}}">
+                            <p>Status: {{e.profile.comp_stat}}</p>
+                            {% if e.pk is user.profile.company.author.pk %}
+                                Creator
+                            {% else %}
+                                {% if user.profile.comp_level > 3 %}
+                                    {% if e.profile.comp_stat %}
+                                        <a class="card-link d-block text-decoration-none text-danger" type="button"
+                                            hx-get="{% url 'company:company_emp_remove' e.profile.slug %}"
+                                            hx-target="div#employeeList"
+                                            hx-swap="innerHTML"><i class="fa fa-remove me-2" aria-hidden="true"></i>Remove</a>
+                                    {% else %}
+                                        <a class="card-link d-block text-decoration-none text-success" type="button"
+                                            hx-get="{% url 'company:company_emp_approve' e.profile.slug %}"
+                                            hx-target="div#employeeList"
+                                            hx-swap="innerHTML"><i class="fa fa-check me-2" aria-hidden="true"></i>Approve</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% include '_comps/footer.html' %}
+    </div>
+{% endblock base_content %}

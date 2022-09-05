@@ -3,6 +3,7 @@ from django.http import HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render
 from django.db.models.base import ModelBase
 from ..models import *
+from company.models import Company
 
 def get_datalist(request, model):
     model_name = model
@@ -25,7 +26,10 @@ def get_datalist(request, model):
         else:
             if field:=request.GET.get('field'):
                 dl = mdl.actives.values_list(field)
-                dl = set(map(lambda i: i[0], dl))
+                if request.GET.get('upper'):
+                    dl = set(map(lambda i: str(i[0]).upper(), dl))
+                else:
+                    dl = set(map(lambda i: i[0], dl))
                 context = {'datalist':dl}
             else:
                 if hasattr(mdl.objects.first(), 'number'):

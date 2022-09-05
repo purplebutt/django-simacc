@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.views.generic import CreateView, UpdateView, ListView
 from django.db.models import F
 from ..models import COA, JRE
-from cover.utils import htmx_refresh, htmx_trigger, has_attribute, paginate
+from cover.utils import htmx_refresh, htmx_trigger, paginate
 from cover import data
 
 
@@ -15,21 +15,35 @@ def f_user_ingroup(self):
         if ingroup:= self.request.user.groups.filter(name=group).exists(): break
     return ingroup
 
+def x_test_func(request):
+    user = request.user
+    if user.is_authenticated:
+        have_company = user.profile.company
+        is_approved = user.profile.comp_stat
+        is_valid_employee = have_company and is_approved
+        return is_valid_employee
+    else:
+        return False
 
 def f_test_func(self):
-    return self.request.user.is_authenticated
+    return x_test_func(self.request)
+    # user = self.request.user
+    # have_company = user.profile.company
+    # is_approved = user.profile.comp_stat
+    # is_valid_employee = have_company and is_approved
+    # return user.is_authenticated and is_valid_employee
 
 
 def f_get(self, *args, **kwargs):
     # checks if user have permission to update or modify data
-    err_info = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
+    htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
     if f_user_ingroup(self):
         if isinstance(self, ListView):
             if self.request.htmx: self.template_name = type(self).htmx_template   # change to htmx template
         return super(type(self), self).get(self.request, *args, **kwargs)
     else:
-        if not self.request.htmx: return redirect('cover:error403')
-        else: return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
+        if not self.request.htmx: return redirect('cover:error403', msg=htmx_err['msg'])
+        else: return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
 
 
 def f_post(self, *args, **kwargs):
@@ -100,7 +114,7 @@ def f_get_context_data(self, *args, **kwargs):
         page = self.request.GET.get('page') or 1
         per_page = self.request.GET.get('per_page') or 10
 
-        if has_attribute(self, "filter_context_data"):
+        if hasattr(self, "filter_context_data"):
             context = self.filter_context_data(**self.kwargs)
         else:
             context = super(type(self), self).get_context_data(*args, **kwargs)
@@ -175,7 +189,7 @@ def f_search(request, **kwargs):
         if request.user.groups.filter(name=group).exists(): 
             ingroup = True; break
     if not ingroup:
-        if not self.request.htmx: return redirect('cover:error403')
+        if not self.request.htmx: return redirect('cover:error403', msg=err_info['msg'])
         else: return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
 
     obj_name = "objects" 
