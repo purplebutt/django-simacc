@@ -67,6 +67,14 @@ class JRECreateSingleForm(forms.ModelForm):
     date = forms.DateField()
     batch = forms.CharField()   # use datalist
     ref = forms.CharField()
+    _form_info = forms.CharField(required=False, disabled=True,
+        widget=forms.TextInput(attrs={'header':'Double entry form is better',
+                                      'body':'Single entry form will record only one entry. We recommended you to use double entry form instead',
+                                      'border_color':'border-danger',
+                                      'color':'alert-danger',
+                                      'footer':'Happy work :)',
+                                      'footer_pos': 'float-end' })
+    )
     description = forms.CharField(widget=forms.Textarea)
     group = forms.ChoiceField(choices=JRE._type, widget=forms.RadioSelect, label="Type")
     amount = forms.CharField(validators=[JRE.amount_validator], 
@@ -93,7 +101,7 @@ class JRECreateSingleForm(forms.ModelForm):
 
     class Meta:
         model = JRE
-        fields = ('date', 'batch', 'ref', 'description', 'group', 'amount', 'account', 'segment', 'cashflow', 'notes')
+        fields = ('date', 'batch', 'ref', '_form_info', 'description', 'group', 'amount', 'account', 'segment', 'cashflow', 'notes')
 
 class JREUpdateForm(forms.ModelForm):
     clean = jre_clean

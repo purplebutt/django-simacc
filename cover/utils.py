@@ -1,6 +1,8 @@
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.urls import reverse
 from django.http.response import HttpResponse
+from django.shortcuts import redirect
+
 
 def paginate(page, querySet:object, paginateBy:int=5):
     paginator = Paginator(querySet, paginateBy)

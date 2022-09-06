@@ -18,6 +18,8 @@ class Company(AccModelBase):
         ('ys','Yayasan'),
         ('ot','Lainnya'),
     ]
+    _valid_config_keys = ('closed_period', 'current_period')
+
     name = models.CharField(max_length=255, unique=True)
     number = models.CharField(verbose_name="tax number", default="000.000.000", unique=True, max_length=30)
     legal = models.CharField(max_length=3, choices=_legal, default='ot')
@@ -28,6 +30,7 @@ class Company(AccModelBase):
     phone = models.CharField(max_length=30, blank=True)
     email = models.EmailField(max_length=64, unique=True)
     desc = models.TextField(blank=True)
+    config = models.JSONField(default=dict)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
     author = models.OneToOneField(User, on_delete=models.RESTRICT, related_name='comp_author', related_query_name='comp_author')
     edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='comp_editors', related_query_name='comp_editor')
@@ -73,11 +76,17 @@ class Company(AccModelBase):
         l = filter(lambda l: l[0]==self.legal, type(self)._legal)
         return tuple(l)[0][1]
 
+    def save_config(self, config:dict):
+        for valkey in type(self)._valid_config_keys:
+            config.setdefault(valkey, self.config.get(valkey))
+        self.config = config
+        super(type(self), self).save()
 
-class Config(AccModelBase):
-    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='config', related_query_name='config')
-    acc_period_current = models.DateField("accounting period", default=timezone.now)
-    acc_period_closed = models.DateField("closed accounting period", default=timezone.now)
 
-    def __str__(self):
-        return f'{self.company.name} config'
+# class Config(AccModelBase):
+#     company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='config', related_query_name='config')
+#     acc_period_current = models.DateField("accounting period", default=timezone.now)
+#     acc_period_closed = models.DateField("closed accounting period", default=timezone.now)
+
+#     def __str__(self):
+#         return f'{self.company.name} config'

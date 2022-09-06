@@ -22,6 +22,14 @@ class JRE(AccModelBase):
                 f"Max value: 99,999,999,999,999"
             ) 
 
+
+    def date_validator(value):
+        today = timezone.now().date()
+        if value > today:
+            raise ValidationError(
+                f"Invalid value: {value} should be a date <= today"
+            )
+
     # class fields
     _img_path = 'images/jre/'
     _img_def_path = 'images/default/jre.png'
@@ -31,7 +39,7 @@ class JRE(AccModelBase):
     ]
 
     # database fields
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(default=timezone.now, validators=[date_validator])
     number = models.PositiveBigIntegerField()
     batch = models.ForeignKey(JRB, verbose_name='batch', on_delete=models.CASCADE, limit_choices_to={'is_active':True}, related_name='journals', related_query_name='journal')
     ref = models.CharField(max_length=50)
@@ -143,6 +151,8 @@ class JRE(AccModelBase):
             raise ValidationError(f"No valid account found for {pair}")
         return (self.number, pair_instance.number)
 
+    def get_delete_url(self):
+        return reverse(f"accounting:{type(self).__name__.lower()}_delete", kwargs={'slug':self.slug})
 
     def get_tablerow_style(self):
         if self.group == 'd': return "table-info"

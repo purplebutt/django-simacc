@@ -1,6 +1,7 @@
 from django.http.response import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
+from django.views import View
 from django.views.generic import CreateView, UpdateView, ListView
 from django.db.models import F
 from ..models import COA, JRE
@@ -15,23 +16,16 @@ def f_user_ingroup(self):
         if ingroup:= self.request.user.groups.filter(name=group).exists(): break
     return ingroup
 
-def x_test_func(request):
-    user = request.user
+
+def f_test_func(self):
+    if isinstance(self, View): user = self.request.user     # if t_test_func is calling by views.generic
+    else: user = self.user      # if t_test_func is not called by views.generic
     if user.is_authenticated:
         have_company = user.profile.company
         is_approved = user.profile.comp_stat
         is_valid_employee = have_company and is_approved
-        return is_valid_employee
-    else:
-        return False
-
-def f_test_func(self):
-    return x_test_func(self.request)
-    # user = self.request.user
-    # have_company = user.profile.company
-    # is_approved = user.profile.comp_stat
-    # is_valid_employee = have_company and is_approved
-    # return user.is_authenticated and is_valid_employee
+        return user.is_authenticated and is_valid_employee
+    else: return False
 
 
 def f_get(self, *args, **kwargs):

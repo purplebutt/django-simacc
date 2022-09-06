@@ -5,13 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin 
 from django.urls.base import reverse_lazy, reverse
 from django.contrib.auth.models import User, Group
+from django.utils.safestring import mark_safe
 from django.db.models import Q
 from ..models import Company
-from ..myforms.company import CompanyCreateForm
+from ..myforms.company import CompanyEditForm, ConfigEditForm
 from cover.utils import htmx_refresh, htmx_redirect, DEFPATH, save_url_query, not_implemented_yet
 from cover import data
 from ._funcs import f_test_func
-import json
 
 
 DP = DEFPATH('apps/company/')
@@ -36,7 +36,7 @@ class MyCompany(UserPassesTestMixin, generic.DetailView):
 
 class CompanyCreateView(UserPassesTestMixin, generic.CreateView):
     model = Company
-    form_class = CompanyCreateForm
+    form_class = CompanyEditForm
     template_name = DP / 'create.html'
     allowed_group = 'company_admin'
     success_url = reverse_lazy("company:my_company")
@@ -58,7 +58,7 @@ class CompanyCreateView(UserPassesTestMixin, generic.CreateView):
 
 class CompanyUpdateView(UserPassesTestMixin, generic.UpdateView):
     model = Company
-    form_class = CompanyCreateForm
+    form_class = CompanyEditForm
     template_name = DP / 'update.html'
     allowed_group = 'company_admin'
     success_url = reverse_lazy("company:my_company") 
@@ -112,16 +112,24 @@ class EmployeeListView(UserPassesTestMixin, generic.ListView):
         return super(type(self), self).get(request, *args, **kwargs)
 
 
-class CompEmpList(generic.ListView):
-    model = User
-    context_object_name = 'objects'
-    template_name = DP / 'employees/list.html'
+class ConfigCreateView(UserPassesTestMixin, generic.View):
+    form_class = ConfigEditForm
+    template_name = DP/'create.html'
+    form_class = ConfigEditForm
+    test_func = f_test_func
+    context_object_name = 'form'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["objects"] = User.objects.filter(profile__company=self.request.user.profile.company)
-        context["company"] = self.request.user.profile.company
-        return context
+    def get(self, request, *args, **kwargs):
+        ctx = {}
+        ctx[type(self).context_object_name] = type(self).form_class()
+        return render(request, template_name=type(self).template_name, context=ctx)
+
+    def post(self, request, *args, **kwargs):
+        config_data = dict(request.POST)
+        company = get_object_or_404(Company, pk=config_data['company'][0])
+        company.save_config(config_data)
+        #@ fixthis
+        return not_implemented_yet(request)
 
 
 @login_required
@@ -150,6 +158,8 @@ def apply(request, slug):
     if not request.htmx: return redirect("company:company_list")
     return render(request, template_name=DP/'_partials/list.html', context={'objects':Company.objects.all()})
 
+def empGroups(request, slug):
+    return not_implemented_yet(request)
 
 @login_required
 def search(request):
@@ -179,14 +189,16 @@ def empApprove(request, slug):
         ctx = {}
         ctx['objects'] = User.objects.filter(profile__company=company).all()
         if request.method == "GET":
-            ctx["ajax_confirm_approval"] = f"Are you sure you want to approve {applicant} application as an employee at {company}?"
             ctx["target"] = applicant
+            ctx["mode"] = f"approve"
+            ctx["question"] = mark_safe(f"Are you sure you want to add <b>{applicant.username.title()}</b> as employee on <b>{company.name.title()}</b>?")
+            return render(request, template_name=DP/"_partials/emp_list_confirm.html", context=ctx)
         else:
             # give approval
             applicant.profile.comp_stat = True
             applicant.profile.save()
-            ctx["ajax_msg"] = f"{applicant} have been added to {company}"
-            notif_msg = f"You have been approved as employee on {company}"
+            ctx["ajax_msg"] = f"{applicant.username.title()} have been added to {company.name.title()}"
+            notif_msg = f"You have been approved as employee on {company.name.title()}"
             add_company_notification(applicant, approvor, message=notif_msg, reason="...")
         if request.htmx: return render(request, template_name=DP/'_partials/emp_list.html', context=ctx)
         else: return render(request, template_name=DP/'list.html', context=ctx)
@@ -214,14 +226,16 @@ def empRemove(request, slug):
             ctx["company"] = company
             # remove user from the company
             if request.method == "GET":
-                ctx["ajax_confirm_removal"] = f"Are you sure to remove {applicant} from {company}?"
                 ctx["target"] = applicant
+                ctx["mode"] = f"remove"
+                ctx["question"] = mark_safe(f"Are you sure you want to remove <b>{applicant.username.title()}</b> from <b>{company.name.title()}</b>?")
+                return render(request, template_name=DP/"_partials/emp_list_confirm.html", context=ctx)
             else:
                 applicant.profile.company = None      # update user profile to remove company
                 applicant.profile.comp_stat = False   # update user profile to set company status to false
                 applicant.profile.save()  # make persistent on database
-                ctx["ajax_msg"] = f"{applicant} have been removed from {company}"
-                notif_msg = f"You have been removed from the company"
+                ctx["ajax_msg"] = f"{applicant.username.title()} have been removed from {company.name.title()}"
+                notif_msg = f"You have been removed from {company.name.title()}"
                 add_company_notification(applicant, approvor, message=notif_msg, reason="...")
             return render(request, template_name=DP/"_partials/emp_list.html", context=ctx)
     else:

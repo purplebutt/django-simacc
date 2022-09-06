@@ -1,0 +1,25 @@
+{% load core_filters %}
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title user-select-none">Confirm journal deletion</h5>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal" data-bs-target="#modalConfirmation" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <p class="my-1 fs-6 user-select-none">{{question}}</p>
+    </div>
+    <div class="alert alert-danger alert-dismissible mx-2 show fade shadow">
+        <div class="container">Please understand that data you deleted will never be recovered.</div>
+        <button class="btn btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" 
+            data-bs-target="#modalConfirmation"><i class="fa fa-x me-1" aria-hidden="true"></i>No</button>
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
+            data-bs-target="#modalConfirmation"
+            hx-target="#dataTableContent"
+            hx-swap="innerHTML"
+            hx-post="{% url 'accounting:jre_delete' object.slug %}"
+            ><i class="fa fa-check me-1" aria-hidden="true"></i>Yes</button>
+    </div>
+</div>

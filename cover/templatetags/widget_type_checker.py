@@ -4,6 +4,10 @@ from django import template
 register = template.Library()
 
 @register.filter
+def is_field_form_info(widget):
+    return widget.name == '_form_info'
+
+@register.filter
 def is_field_password(widget):
     widget_type = widget.widget_type
     return widget_type == "password"
@@ -49,7 +53,6 @@ def widget_col_width(widget):
 def widget_disabled(widget):
     if widget.field.disabled: return "disabled"
     return None
-
 
 @register.filter
 def widget_debugger(widget):

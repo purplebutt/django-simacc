@@ -59,6 +59,7 @@ urlpatterns = [
     path("jre_add_single/", jre_view.JRECreateSingle.as_view(), name="jre_add_single"),
     path("jre_detail/<slug:slug>/", jre_view.JREUpdateView.as_view(), name="jre_detail"),
     path("jre_update/<slug:slug>/", jre_view.JREUpdateView.as_view(), name="jre_update"),
+    path("jre_delete/<slug:slug>/", jre_view.jre_delete, name="jre_delete"),
     path("jre_list/", jre_view.JREListView.as_view(), name="jre_list"),
     path("jre_search/", jre_view.search, name="jre_search"),
 

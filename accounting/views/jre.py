@@ -12,7 +12,7 @@ from ..html.table import JRETable
 # from ..forms import JREUpdateForm, JRECreateForm
 from ..myforms.jre import JRECreateSingleForm, JRECreateForm, JREUpdateForm
 from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate
+from cover.utils import DEFPATH, paginate, not_implemented_yet
 from cover import data
 
 
@@ -109,7 +109,47 @@ class JREListView(UserPassesTestMixin, generic.ListView):
 
 
 @login_required
+def jre_delete(request, slug):
+    # checks user permission
+    # return Response Error 403 if user dont have permission
+    if not f_test_func(request):
+        if request.htmx:
+            err_msg = f"You are not authorized to delete data."
+            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
+        return redirect("cover:error403", msg=err_msg)
+
+    target_entry = get_object_or_404(JRE, slug=slug)
+    pair_entry = get_object_or_404(JRE, pair=target_entry)
+    # check if transaction still on open accounting period
+    # closed accounting period journals can not be edited or deleted
+    # on_open_accounting_period(request, transaction) 
+
+    ctx = {}
+    ctx['object'] = target_entry
+    ctx['pair'] = pair_entry
+
+    if request.method == "GET":
+        ctx['question'] = f"Are you sure to delete both {target_entry.slug} and {pair_entry.slug} journal?"
+        return render(request, template_name=DP/'delete_confirm.html', context=ctx)
+    else:
+        pair_entry.delete()
+        target_entry.delete()
+        return redirect("accounting:jre_list")
+
+
+def on_open_accounting_period(request, transaction):
+    return not_implemented_yet(request)    
+
+@login_required
 def search(request):
+    # checks user permission
+    # return Response Error 403 if user dont have permission
+    if not f_test_func(request):
+        if request.htmx:
+            err_msg = f"You are not authorized to view or modify data."
+            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
+        return redirect("cover:error403", msg=err_msg)
+
     model = JRE
     table = JRETable
     page_title = PAGE_TITLE

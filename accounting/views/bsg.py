@@ -84,6 +84,14 @@ class BSGListView(UserPassesTestMixin, generic.ListView):
 
 @login_required
 def search(request):
+    # checks user permission
+    # return Response Error 403 if user dont have permission
+    if not f_test_func(request):
+        if request.htmx:
+            err_msg = f"You are not authorized to view or modify data."
+            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
+        return redirect("cover:error403", msg=err_msg)
+
     model = BSG
     table = BSGTable
     page_title = PAGE_TITLE

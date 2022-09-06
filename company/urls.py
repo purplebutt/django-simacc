@@ -13,6 +13,10 @@ urlpatterns = [
     path("employees/", comp_view.EmployeeListView.as_view(), name="company_emp_list"),
     path("employees/remove/<slug:slug>/", comp_view.empRemove, name="company_emp_remove"),
     path("employees/approve/<slug:slug>/", comp_view.empApprove, name="company_emp_approve"),
+    path("employees/edit_group/<slug:slug>/", comp_view.empGroups, name="company_emp_groups"),
     path("apply/<slug:slug>/", comp_view.apply, name="company_apply"),
     path("search/", comp_view.search, name="company_search"),
+
+    #! config
+    path("config/add", comp_view.ConfigCreateView.as_view(), name="config_add"),
 ]

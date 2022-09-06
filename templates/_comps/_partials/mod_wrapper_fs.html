@@ -1,0 +1,10 @@
+<div
+    {% if static %}
+        data-bs-backdrop="static"
+        data-bs-keyboard="true"
+    {% endif %}
+    class="modal fade"
+    id="{{modal_id}}"
+    tabindex="-1">
+    <div id="{{modal_content_id}}" class="modal-dialog modal-fullscreen"></div>
+</div>

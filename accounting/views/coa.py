@@ -10,7 +10,7 @@ from django.urls.base import reverse_lazy
 from ..models import COA, COH
 from ..html.table import COATable
 from ..myforms.coa import COACreateForm, COAUpdateForm
-from ._funcs import f_form_valid, f_test_func, x_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate, htmx_redirect
 from cover import data
 
@@ -91,7 +91,7 @@ class COAListView(UserPassesTestMixin, generic.ListView):
 def search(request):
     # checks user permission
     # return Response Error 403 if user dont have permission
-    if not x_test_func(request):
+    if not f_test_func(request):
         if request.htmx:
             err_msg = f"You are not authorized to view or modify data."
             return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))

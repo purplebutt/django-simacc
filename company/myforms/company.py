@@ -2,7 +2,7 @@ from django import forms
 from ..models import Company
 
 
-class CompanyCreateForm(forms.ModelForm):
+class CompanyEditForm(forms.ModelForm):
     name = forms.CharField(widget=forms.Textarea(attrs={'style':'height:70px;'}))
     address = forms.CharField(widget=forms.Textarea(attrs={'style':'height:70px;'}))
     number = forms.CharField()
@@ -30,4 +30,13 @@ class CompanyCreateForm(forms.ModelForm):
 
     class Meta:
         model = Company
-        fields = ('name', 'address', 'number', 'legal', 'business_type', 'city', 'country', 'phone', 'email', 'desc')
+        fields = ('name', 'address', 'number', 'legal', 'business_type', 'city', 'country', 'phone', 'email', 'config', 'desc')
+
+
+class ConfigEditForm(forms.Form):
+    closed_period = forms.DateField(help_text="End date of closed period", label="close period")
+    current_period = forms.DateField(help_text="Current period", label="current period")
+    company = forms.ChoiceField(choices=Company.objects.values_list('id', 'name'))
+
+    class Meta:
+        fields = ('closed_period', 'current_period')

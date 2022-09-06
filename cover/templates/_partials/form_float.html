@@ -4,7 +4,20 @@
 {% load core_filters %}
 
 
-{% if f|is_field_checkbox %}
+{% if f|is_field_form_info %}
+    <div class="alert alert-dismissible {{f.field.widget.attrs.border_color}} {{f.field.widget.attrs.color}}" role="alert">
+        {% if f.field.widget.attrs.header %}
+            <h6 class="alert-heading fw-bold user-select-none">{{f.field.widget.attrs.header}}</h6>
+            <hr class="my-0">
+        {% endif %}
+        <p class="mb-1">{{f.field.widget.attrs.body}}</p>
+        {% if f.field.widget.attrs.footer %}
+            <hr class="my-0">
+            <small class="alert-footer {{f.field.widget.attrs.footer_pos}}">{{f.field.widget.attrs.footer}}</small>
+        {% endif %}
+        <button class="btn btn-close btn-sm" data-bs-dismiss="alert" tabindex=-1></button>
+    </div>
+{% elif f|is_field_checkbox %}
     {% if checkbox_left %}
         <fieldset class="d-flex flex-row align-items-center">
             {% render_field f class+="form-check-input ms-2 my-0" %}
