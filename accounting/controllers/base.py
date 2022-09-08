@@ -57,6 +57,9 @@ class AccModelBase(models.Model):
     def get_update_url(self):
         return reverse(f'{type(self).app_name}:{type(self).__name__.lower()}_update', kwargs={'slug': self.slug})
 
+    def get_detail_url(self):
+        return reverse(f'{type(self).app_name}:{type(self).__name__.lower()}_detail', kwargs={'slug': self.slug})
+
     def get_tablerow_style(self): pass
 
     # class methods

@@ -11,45 +11,56 @@ from ..models import COH
 # from ..forms import COHUpdateForm, COHCreateForm
 from ..myforms.coh import COHCreateForm, COHUpdateForm
 from ..html.table import COHTable
-from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import htmx_refresh, DEFPATH, paginate
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from cover.utils import htmx_refresh, DEFPATH, paginate, HtmxRedirectorMixin, AllowedGroupsMixin
 from cover import data
 
 
 DP = DEFPATH('apps/accounting/_shared')
-PAGE_TITLE = "Chart Of Account Header"
+PAGE_TITLE = "Account Header"
 
 
-class COHCreateView(UserPassesTestMixin, generic.CreateView):
+class COHCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
     model = COH
     page_title = PAGE_TITLE
-    template_name = DP / 'create.html'
+    htmx_template = DP / 'create.html'
+    htmx_only = True 
+    # htmx_redirector_msg = f'Bad Request - Can not create new COH this way!'
     form_class = COHCreateForm
     success_url = reverse_lazy("accounting:coh_list")
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
-    get = f_get
+    test_func = f_test_func
+    # post = f_post
+    # get = f_get
 
-    def test_func(self):
-        return self.request.user.is_authenticated
 
-class COHUpdateView(UserPassesTestMixin, generic.UpdateView):
+class COHDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
     model = COH
     page_title = PAGE_TITLE
-    template_name = DP / 'update.html'
+    htmx_template = DP / 'detail.html'
+    htmx_only = True
+    allowed_groups = ('accounting_viewer',)
+    get_context_data = f_get_context_data
+    test_func = f_test_func
+
+
+class COHUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
+    model = COH
+    page_title = PAGE_TITLE
+    htmx_template = DP / 'update.html'
+    htmx_only = True
     form_class = COHUpdateForm
     success_url = reverse_lazy("accounting:coh_list") 
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
+    test_func = f_test_func
+    # post = f_post
 
-    def test_func(self):
-        return self.request.user.is_authenticated
 
-class COHListView(UserPassesTestMixin, generic.ListView):
+class COHListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
     model = COH
     table = COHTable
     table_fields = ('number', 'name', 'report', 'group')
@@ -62,8 +73,9 @@ class COHListView(UserPassesTestMixin, generic.ListView):
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func
-    get = f_get
-    get_context_data = f_get_context_data
+    get_context_data = f_get_list_context_data
+    # get_context_data = f_get_context_data
+    # get = f_get
 
     @classmethod
     def get_table_filters(cls):

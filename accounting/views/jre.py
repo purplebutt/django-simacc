@@ -11,8 +11,8 @@ from ..models import JRE, JRB, COA, BSG, CCF
 from ..html.table import JRETable
 # from ..forms import JREUpdateForm, JRECreateForm
 from ..myforms.jre import JRECreateSingleForm, JRECreateForm, JREUpdateForm
-from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate, not_implemented_yet
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin, not_implemented_yet
 from cover import data
 
 
@@ -20,48 +20,57 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Journal Entry"
 
 
-class JRECreateView(UserPassesTestMixin, generic.CreateView):
+class JRECreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
     model = JRE
     page_title = PAGE_TITLE
-    template_name = DP / 'create.html'
+    htmx_template = DP / 'create.html'
+    htmx_only = True
     form_class = JRECreateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
-    get = f_get
     test_func = f_test_func
+    # post = f_post
+    # get = f_get
 
 
-class JRECreateSingle(UserPassesTestMixin, generic.CreateView):
+class JRECreateSingle(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
     model = JRE
     page_title = PAGE_TITLE
-    template_name = DP / 'create_single.html'
+    htmx_template = DP / 'create_single.html'
+    htmx_only = True
     form_class = JRECreateSingleForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
-    get = f_get
     test_func = f_test_func
 
 
-class JREUpdateView(UserPassesTestMixin, generic.UpdateView):
+class JREDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
     model = JRE
     page_title = PAGE_TITLE
-    template_name = DP / 'update.html'
+    template_name = DP / 'detail.html'
+    allowed_groups = ('accounting_viewer',)
+    get_context_data = f_get_context_data
+    test_func = f_test_func
+
+
+class JREUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
+    model = JRE
+    page_title = PAGE_TITLE
+    htmx_template = DP / 'update.html'
+    htmx_only = True
     form_class = JREUpdateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list") 
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
     test_func = f_test_func
 
 
-class JREListView(UserPassesTestMixin, generic.ListView):
+class JREListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
     model = JRE
     table = JRETable
     table_fields = ('date', 'number', 'batch', 'ref', 'description', 'amount', 'group', 'account', 'segment', 'cashflow')
@@ -74,8 +83,7 @@ class JREListView(UserPassesTestMixin, generic.ListView):
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func
-    get = f_get
-    get_context_data = f_get_context_data
+    get_context_data = f_get_list_context_data
 
     @classmethod
     def get_table_filters(cls):

@@ -14,14 +14,14 @@
         {% if mode|is_eq:'remove' %}
             <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
                 data-bs-target="#modalConfirmation"
-                hx-target="div#employeeList"
+                hx-target="div#sidebarContent"
                 hx-swap="innerHTML"
                 hx-post="{% url 'company:company_emp_remove' target.profile.slug %}"
                 ><i class="fa fa-check me-1" aria-hidden="true"></i>Yes</button>
         {% else %}
             <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
                 data-bs-target="#modalConfirmation"
-                hx-target="div#employeeList"
+                hx-target="div#sidebarContent"
                 hx-swap="innerHTML"
                 hx-post="{% url 'company:company_emp_approve' target.profile.slug %}"
                 ><i class="fa fa-check me-1" aria-hidden="true"></i>Yes</button>

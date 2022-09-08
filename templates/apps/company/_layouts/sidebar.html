@@ -1,0 +1,38 @@
+{% extends '_shared/base.html' %}
+
+
+{% block page_title %} {{page_title}} {% endblock page_title %}
+
+{% block base_content %}
+    {% include '_comps/nav_top.html' %}
+    <aside class="sidebar">
+        <div class="sidebar p-3">
+            {% block sidebar_content %}{% endblock sidebar_content %}
+        </div>
+    </aside>
+    <div class="container-fluid main-content">
+        {% block main_content %}{% endblock main_content %}
+    </div>
+
+    <style>
+        .sidebar {
+            position: fixed;
+            width: 15vw;
+            height: 100vh;
+            left: 0px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            border: 2px;
+            border-color: red;
+            background-color: #eebbcc;
+        }
+        .main-content {
+            position: fixed;
+            width: 85vw;
+            left: 15vw;
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+    </style>
+{% endblock base_content %}

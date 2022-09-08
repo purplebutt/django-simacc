@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.urls import reverse
 from django.http.response import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
 
 
 def paginate(page, querySet:object, paginateBy:int=5):
@@ -54,6 +54,76 @@ def url_query_add(url:str, **kwargs):
         base += start + k + "=" + v
         start = "&"
     return base
+
+
+# mixins
+class HtmxRedirectorMixin:
+    """
+        Redirect view to use htmx_template instead of template_name if request comes from htmx
+
+        OPTIONAL INFERIOR/CHILD CLASS ATTRIBUTES:
+        >> htmx_only -> if child class implement this and has value of 1/True then non htmx request will return 403 error,
+                        otherwise non htmx request will return with original 'template_name'
+        >> htmx_redirector_msg:str -> Error message to be display on 403 page error
+
+        REQUIRED INFERIOR/CHILD CLASS ATTRIBUTES (child class should implement this!):
+        >> htmx_template:str -> htmx template to be use if request is htmx
+    """
+    def get(self, request, *args, **kwargs):
+        if self.request.htmx:
+            self.template_name = type(self).htmx_template
+        else:
+            if hasattr(type(self), 'htmx_only') and type(self).htmx_only:
+                if hasattr(type(self), 'htmx_redirector_msg'):
+                    err_msg = type(self).htmx_redirector_msg
+                else:
+                    err_msg = "This page should be requested from htmx!"
+                return redirect("cover:error403", msg=err_msg)
+        return super().get(request, *args, **kwargs)
+    
+    def post(self, *args, **kwargs):
+        if self.template_name is None: self.template_name = type(self).htmx_template
+        return super().post(*args, **kwargs)
+
+
+class AllowedGroupsMixin:
+    """ 
+        Checks if current logged user groups contains all groups defined in 'allowed_groups' field
+        If current logged user have all the permission then user passed, otherwise return error 403
+        This mixin do a verification on both 'get' and 'post' method.
+
+        OPTIONAL INFERIOR/CHILD CLASS ATTRIBUTES:
+        >> groups_permission_error:dict -> {'title':'Error Title', 'head':'Error Head', 'msg','Error Message'}
+
+        REQUIRED INFERIOR/CHILD CLASS ATTRIBUTES (child class should implement this!):
+        >> allowed_groups:tuple|list|set -> iterator contains groups to be allowed
+    """
+    def get(self, request, *args, **kwargs):
+        for group in type(self).allowed_groups:
+            if ingroup:= self.request.user.groups.filter(name=group).exists(): break
+        if not ingroup:
+            htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data."}
+            if hasattr(type(self), 'groups_permission_error'): htmx_err = type(self).groups_permission_error
+            if self.request.htmx_target and "modal" in self.request.htmx_target.lower():
+                return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
+            else:
+                return redirect('cover:error403', msg=htmx_err['msg'])
+        else:
+            return super().get(request, *args, **kwargs)
+    
+    def post(self, *args, **kwargs): 
+        for group in type(self).allowed_groups:
+            if ingroup:= self.request.user.groups.filter(name=group).exists(): break
+        if not ingroup:
+            htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data."}
+            if hasattr(type(self), 'groups_permission_error'): htmx_err = type(self).groups_permission_error
+            if self.request.htmx_target and "modal" in self.request.htmx_target.lower():
+                return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
+            else:
+                return redirect('cover:error403', msg=htmx_err['msg'])
+        else:
+            return super().post(*args, **kwargs)
+
 
 # htmx response header
 def htmx_redirect(response, to:str):

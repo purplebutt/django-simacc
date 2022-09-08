@@ -18,7 +18,7 @@ class UserUpdateForm(forms.ModelForm):
 
 class ProfileUpdateForm(forms.ModelForm):
     gender = forms.ChoiceField(choices=Profile._gender, required=False)
-    phone = forms.CharField(required=False, widget=forms.NumberInput())
+    phone = forms.CharField(required=False)
     address = forms.CharField(required=False, widget=forms.Textarea(attrs={'style':'height:90px'}))
     job = forms.CharField(required=False, widget=forms.Textarea(attrs={'style':'height:90px'}))
     city = forms.CharField(required=False)

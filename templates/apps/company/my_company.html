@@ -1,38 +1,43 @@
-{% extends 'apps/company/_layouts/centered.html' %}
+{% extends '_shared/sidebar.html' %}
+
 {% load humanize %}
 {% load core_tags %}
 
 
-{% block centered_content %}
-    <div class="d-flex flex-column align-items-center py-2">
-        <h6 class="fw-bolder">Your company info</h6>
-        <h3 class="fw-bolder mt-2">{{object.name}}</h3>
-        <ul class="fw-bolder list-unstyled border-top pt-2">
-            <li>
-                <i class="fa fa-envelope me-2" aria-hidden="true"></i>{{object.email}} &nbsp;&nbsp;
-                <i class="fa fa-phone me-2" aria-hidden="true"></i>{{object.phone}}
-            </li>
-            <li><i class="fa fa-home me-2" aria-hidden="true"></i>{{object.address}}</li>
-            {% if user.profile.comp_stat %}
-                <li>Tax number: {{object.number}}</li>
-                <li>Legal: {{object.get_legal_display}}</li>
-                <li>Business Type: {{object.business_type|title}}</li>
-                <li>Created on: {{object.created}} <small>(on our server time)</small></li>
-                <li>City: {{object.city|title}} &nbsp;&nbsp; Country: {{object.country|title}}</li>
-                <li>Status: {% iftf user.profile.comp_stat 'Approved' 'Pending' %} &nbsp;&nbsp; Level: {{user.profile.get_comp_level_display|title}} &nbsp;&nbsp; Country: {{object.country|title}}</li>
-            {% else %}
-                <div class="alert alert-warning alert-dismissible fade show shadow mt-3" role="alert">
-                    You already have applied to this company but still not approved yet by company admin.<br>
-                    Contact your company admin to get approve asap.
-                    <button type="button" class="btn-close auto-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
-            {% if object.desc %} <p>About: {{object.desc}}</p> {% endif %}
-        </ul>
+{% block page_title %} {{object.name}} details{% endblock page_title %}
+
+{% block side_menu %}
+    <div class="flex-column rounded ps-1 py-2">
+        <div type="button">
+            <a class="dropdown-item fw-bold strecthed-link" 
+                hx-get="{% url 'company:company_update' object.slug %}"
+                hx-swap="innerHTML"
+                hx-target="#sidebarContent"><i class="fa fa-building" aria-hidden="true"></i>Manage Company</a>
+        </div>
+        <div type="button">
+            <a class="dropdown-item fw-bold" 
+                hx-get="{% url 'company:company_emp_list' %}"
+                hx-swap="innerHTML"
+                hx-target="#sidebarContent"><i class="fa fa-users" aria-hidden="true"></i>Manage Employees</a>
+        </div>
     </div>
-    <div class="d-flex gap-3">
-        <a type='button' onclick='history.back()' class='btn btn-sm btn-secondary'> <i class='fa fa-rotate-left me-2'></i>Go back</a>
-        <a type='button' href="{% url 'accounts:myprofile' %}" class='btn btn-sm btn-primary'> <i class='fa fa-user me-2'></i>My Profile</a>
-        <a type='button' href="{% url 'company:company_update' user.profile.company.slug %}" class='btn btn-sm btn-primary'> <i class='fa fa-edit me-2'></i>Modify</a>
+{% endblock side_menu %}
+
+{% block sidebar_content %}
+    {% include '_comps/_partials/mod_center_wrapper.html' with modal_id="modalConfirmation" modal_content_id="modalConfirmationContent" %}
+    <div id="sidebarContent" class="my-2 me-2 border p-4 rounded shadow">
+        <h3 class="fw-bolder mb-0">{{object.name|title}}</h3>
+        <small class="text-danger text-opacity-75">registered on: <strong>{{object.created|date:'j F, Y'}}</small></strong>&nbsp;&nbsp;
+        <small class='text-danger text-opacity-75'>business type: <strong>{{object.business_type}}</strong></small>&nbsp;&nbsp;
+        <small class='text-danger text-opacity-75'>legal type: <strong>{{object.get_legal_display}}</strong></small>&nbsp;&nbsp;
+        <hr class='my-1'>
+        <p class="my-2">{{object.desc}}</p>
+        <span class='d-block'><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;<strong>{{object.email}}</strong></span>
+        <span class='d-block'><i class="fa fa-home" aria-hidden="true"></i>&nbsp;<strong>{{object.address|capfirst}}</strong></span>
+        <span class='d-block'><i class="fa fa-building" aria-hidden="true"></i>&nbsp;<strong>{{object.city|title}}</strong></span>
+        <span class='d-block'><i class="fa fa-id-card" aria-hidden="true"></i>&nbsp;<strong>{{object.number}}</strong></span>
+        <span class='d-block'><i class="fa fa-phone" aria-hidden="true"></i>&nbsp;<strong>{{object.phone}}</strong></span>
+        <span class='d-block'>Number of employees: <strong>{{object.get_employees.count}}</strong></span>
+        <span class='d-block'>Pending employees: <strong>{{object.get_pending_employees.count}}</strong></span>
     </div>
-{% endblock centered_content %}
+{% endblock sidebar_content %}

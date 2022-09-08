@@ -1,0 +1,24 @@
+{% load core_tags %}
+
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title user-select-none" id="staticBackdropLabel">
+            <i class="fa fa-gear me-2" aria-hidden="true"></i>Modify Company Configurations</h5>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <h6 class="my-2">Your company: <b>{{company|title}}</b></h6>
+        <form class="pt-2 border-top" method="POST" novalidate action="{% url 'company:company_config' %}">
+            {% csrf_token %}
+            {% form_float form %}
+            <div class="text-center mt-2 border-top pt-3">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" data-bs-target="#modalCompConfig">
+                    <i class="fa fa-arrow-circle-left me-1" aria-hidden="true"></i>Cancel</button>
+                <button type="submit" class="mx-2 btn btn-primary">
+                    <i class="fa fa-save me-3" aria-hidden="true"></i>Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+

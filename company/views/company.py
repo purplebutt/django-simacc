@@ -115,21 +115,41 @@ class EmployeeListView(UserPassesTestMixin, generic.ListView):
 class ConfigCreateView(UserPassesTestMixin, generic.View):
     form_class = ConfigEditForm
     template_name = DP/'create.html'
+    htmx_template = DP/'_partials/create.html'
     form_class = ConfigEditForm
     test_func = f_test_func
     context_object_name = 'form'
 
     def get(self, request, *args, **kwargs):
-        ctx = {}
-        ctx[type(self).context_object_name] = type(self).form_class()
-        return render(request, template_name=type(self).template_name, context=ctx)
+        company = request.user.profile.company
+        ctx = {'company': company}
+
+        config_data = {}
+        if isinstance(company.config, str): 
+            config_data = dict()
+        else:
+            c = {}
+            for k, v in company.config.items():
+                c[k] = v[0] if isinstance(v, list) else v
+            config_data = c 
+
+        form_instance = type(self).form_class(config_data)
+        ctx[type(self).context_object_name] = form_instance
+
+        if self.request.htmx:
+            return render(request, template_name=type(self).htmx_template, context=ctx)
+        else:
+            return render(request, template_name=type(self).template_name, context=ctx)
 
     def post(self, request, *args, **kwargs):
-        config_data = dict(request.POST)
-        company = get_object_or_404(Company, pk=config_data['company'][0])
-        company.save_config(config_data)
-        #@ fixthis
-        return not_implemented_yet(request)
+        frm_instance = type(self).form_class(request.POST)
+        if frm_instance.is_valid():
+            company = request.user.profile.company
+            company.save_config(dict(request.POST))
+        if self.request.htmx:
+            return htmx_redirect(HttpResponse(status=204), reverse('company:my_company'))
+        else:
+            return redirect('company:my_company')
 
 
 @login_required
@@ -160,6 +180,7 @@ def apply(request, slug):
 
 def empGroups(request, slug):
     return not_implemented_yet(request)
+
 
 @login_required
 def search(request):

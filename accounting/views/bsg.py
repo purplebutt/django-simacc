@@ -9,10 +9,9 @@ from django.db.models import Q, F
 from django.urls.base import reverse_lazy
 from ..models import BSG
 from ..html.table import BSGTable
-# from ..forms import BSGUpdateForm, BSGCreateForm
 from ..myforms.bsg import BSGUpdateForm, BSGCreateForm
-from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from cover.utils import DEFPATH, paginate, HtmxRedirectorMixin, AllowedGroupsMixin
 from cover import data
 
 
@@ -20,48 +19,65 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Business Segment"
 
 
-class BSGCreateView(UserPassesTestMixin, generic.CreateView):
+class BSGCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
     model = BSG
     page_title = PAGE_TITLE
-    template_name = DP / 'create.html'
+    # template_name = DP / 'create.html'
+    htmx_template = DP / 'create.html'
+    htmx_only = True
+    groups_permission_error = {'title':'error 403, Forbidden', 'head':'Forbidden', 'msg':'Required accounting_staff permission to add new Business Segment.'}
+    htmx_redirector_msg = "This page should be requested by htmx!"
     form_class = BSGCreateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
-    get = f_get
     test_func = f_test_func
+    # post = f_post
+    # get = f_get
 
 
-class BSGUpdateView(UserPassesTestMixin, generic.UpdateView):
+class BSGDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
     model = BSG
     page_title = PAGE_TITLE
-    template_name = DP / 'update.html'
+    htmx_template = DP / 'detail.html'
+    htmx_only = True
+    allowed_groups = ('accounting_viewer',)
+    get_context_data = f_get_context_data
+    test_func = f_test_func
+    # post = f_post
+
+
+class BSGUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
+    model = BSG
+    page_title = PAGE_TITLE
+    htmx_template = DP / 'update.html'
+    htmx_only = True
     form_class = BSGUpdateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list") 
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
     test_func = f_test_func
+    # post = f_post
 
 
-class BSGListView(UserPassesTestMixin, generic.ListView):
+class BSGListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
     model = BSG
     table = BSGTable
     table_fields = ('number', 'name', 'group', 'is_active')
     table_header = ('Code', 'Business', 'Type', 'Active')
+    template_name = DP / 'no_htmx/list.html'
+    htmx_template = DP / 'list.html'
     allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     side_menu_group = 'master'
-    template_name = DP / 'no_htmx/list.html'
-    htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func
-    get = f_get
-    get_context_data = f_get_context_data
+    get_context_data = f_get_list_context_data
+    # get_context_data = f_get_context_data
+    # get = f_get
 
     @classmethod
     def get_table_filters(cls):

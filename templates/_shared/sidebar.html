@@ -12,27 +12,20 @@
     {% include 'account/_partials/mod_wrapper.html' with modal_id="updatePictureModal" modal_content_id="updatePictureModalContent" %}
 
     {% include '_comps/_partials/mod_wrapper_lg.html' with static=1 modal_id="AddModal" modal_content_id="AddModalContent" %}
-    {% include '_comps/_partials/mod_wrapper_lg.html' with static=1 modal_id="DetailModal" modal_content_id="DetailModalContent" %}
     {% include '_comps/_partials/mod_wrapper_lg.html' with static=1 modal_id="UpdateModal" modal_content_id="UpdateModalContent" %}
     {% include '_comps/_partials/mod_center_wrapper.html' with static=1 modal_id="DeleteModal" modal_content_id="DeleteModalContent" %}
     {% include '_comps/toast_info.html' %}
-    <div class="container-fluid px-0">
-        <div class="container-fluid mt-3 mt-md-0">
-            <div class="row gy-2 gx-md-4">
-                <div class="col-md-3 col-lg-2 px-1">
-                    <div class="position-sticky" style="top: 3.9rem">
-                      {% include "apps/_partials/sidebar.html" %}
-                    </div>
-                    <div class="fixed-bottom p-2">
-                        <a class="fs-6 fw-bolder text-decoration-none" href="{% url 'company:my_company' %}">{{user.profile.company|title}}</a>
-                    </div>
-                </div>
-                <div class="col-md-9 col-lg-10 ps-1">
-                    {% block acc_sidebar_content %} {% endblock acc_sidebar_content %}
+    <div class="container-fluid mb-4 px-0">
+        <div class="row gy-1 gx-md-4">
+            <div class="col-md-3 col-lg-2 pe-0">
+                <div class="position-sticky" style="top: 3.9rem">
+                    {% block side_menu %}{% endblock side_menu %}
                 </div>
             </div>
+            <div class="col-md-9 col-lg-10 ps-1">
+                {% block sidebar_content %} {% endblock sidebar_content %}
+            </div>
         </div>
-        {% scroll_up %}
         {% notification messages %}
     </div>
     {% include '_comps/footer.html' %}

@@ -76,17 +76,35 @@ class Company(AccModelBase):
         l = filter(lambda l: l[0]==self.legal, type(self)._legal)
         return tuple(l)[0][1]
 
+    def get_employees(self):
+        employees = User.objects.filter(profile__company=self)
+        return employees
+
+    def get_pending_employees(self):
+        employees = User.objects.filter(profile__company=self, profile__comp_stat=False)
+        return employees
+
     def save_config(self, config:dict):
-        for valkey in type(self)._valid_config_keys:
-            config.setdefault(valkey, self.config.get(valkey))
-        self.config = config
+        if isinstance(config, dict):
+            self.config = config
+        else:
+            self.config = dict()
         super(type(self), self).save()
 
+    def get_closed_period(self):
+        dt = self.config.get('closed_period')
+        if isinstance(dt, list): dt=dt.pop()
+        dt = timezone.datetime.fromisoformat(dt)
+        return dt
+        
+    def get_current_period_start(self):
+        dt = self.config.get('current_period_start')
+        if isinstance(dt, list): dt=dt.pop()
+        dt = timezone.datetime.fromisoformat(dt)
+        return dt
 
-# class Config(AccModelBase):
-#     company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='config', related_query_name='config')
-#     acc_period_current = models.DateField("accounting period", default=timezone.now)
-#     acc_period_closed = models.DateField("closed accounting period", default=timezone.now)
-
-#     def __str__(self):
-#         return f'{self.company.name} config'
+    def get_current_period_end(self):
+        dt = self.config.get('current_period_end')
+        if isinstance(dt, list): dt=dt.pop()
+        dt = timezone.datetime.fromisoformat(dt)
+        return dt

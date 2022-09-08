@@ -10,8 +10,8 @@ from django.urls.base import reverse_lazy
 from ..models import COA, COH
 from ..html.table import COATable
 from ..myforms.coa import COACreateForm, COAUpdateForm
-from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate, htmx_redirect
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from cover.utils import DEFPATH, paginate, htmx_redirect, HtmxRedirectorMixin, AllowedGroupsMixin
 from cover import data
 
 
@@ -19,48 +19,60 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Chart Of Account"
 
 
-class COACreateView(UserPassesTestMixin, generic.CreateView):
+class COACreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
     model = COA
     page_title = PAGE_TITLE
-    template_name = DP / 'create.html'
+    htmx_template = DP / 'create.html'
+    htmx_only = True
     form_class = COACreateForm
     success_url = reverse_lazy("accounting:coa_list")
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
-    get = f_get
+    test_func = f_test_func
+    # post = f_post
+    # get = f_get
+
+
+class COADetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
+    model = COA
+    page_title = PAGE_TITLE
+    htmx_template = DP / 'detail.html'
+    htmx_only = True
+    allowed_groups = ('accounting_viewer',)
     test_func = f_test_func
 
 
-class COAUpdateView(UserPassesTestMixin, generic.UpdateView):
+class COAUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
     model = COA
     page_title = PAGE_TITLE
-    template_name = DP / 'update.html'
+    htmx_template = DP / 'update.html'
+    htmx_only = True
     form_class = COAUpdateForm
     success_url = reverse_lazy("accounting:coa_list") 
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
     test_func = f_test_func
+    # post = f_post
 
 
-class COAListView(UserPassesTestMixin, generic.ListView):
+class COAListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
     model = COA
     table = COATable
     table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'is_active')
     table_header = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Active')
-    allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     side_menu_group = 'master'
+    page_title = PAGE_TITLE
+    allowed_groups = ('accounting_viewer',)
     template_name = DP / 'no_htmx/list.html'
     htmx_template = DP / 'list.html'
-    page_title = PAGE_TITLE
     test_func = f_test_func
-    get = f_get
-    get_context_data = f_get_context_data
+    get_context_data = f_get_list_context_data
+    # get_context_data = f_get_context_data
+    # get = f_get
 
     @classmethod
     def get_table_filters(cls):

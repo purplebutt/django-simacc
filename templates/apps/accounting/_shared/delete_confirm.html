@@ -1,16 +1,31 @@
 {% load core_filters %}
+{% load humanize %}
 
 <div class="modal-content">
     <div class="modal-header">
-        <h5 class="modal-title user-select-none">Confirm journal deletion</h5>
+        <h5 class="modal-title user-select-none"><i class="fa fa-trash me-2" aria-hidden="true"></i>Confirm journal deletion</h5>
         <button type="button" class="btn btn-close" data-bs-dismiss="modal" data-bs-target="#modalConfirmation" aria-label="Close"></button>
     </div>
     <div class="modal-body">
         <p class="my-1 fs-6 user-select-none">{{question}}</p>
-    </div>
-    <div class="alert alert-danger alert-dismissible mx-2 show fade shadow">
-        <div class="container">Please understand that data you deleted will never be recovered.</div>
-        <button class="btn btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert alert-danger alert-dismissible show fade shadow">
+            <div>Please understand that data you deleted will never be recovered.</div>
+            <button class="btn btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <a class="text-secondary fw-bold" type="button" href="#journalMoreInfo" data-bs-toggle="collapse"
+            aria-expanded="false" aria-controls="journalMoreInfo"> More Info</a>
+        <div id="journalMoreInfo" class="collapse">
+            Batch Number: <b>{{object.batch}}</b><br>
+            {% if object.group|is_eq:"d" %}
+                Debited Account : <b>{{object.account}}</b><br>
+                Credited Account : <b>{{pair.account}}</b><br>
+            {% else %}
+                Debited Account : <b>{{pair.account}}</b><br>
+                Credited Account : <b>{{object.account}}</b><br>
+            {% endif %}
+            Amount: <b>{{object.amount|intcomma}}</b>
+        </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" 

@@ -11,8 +11,8 @@ from ..models import JRB
 from ..html.table import JRBTable
 # from ..forms import JRBUpdateForm, JRBCreateForm
 from ..myforms.jrb import JRBCreateForm, JRBUpdateForm
-from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin
 from cover import data
 
 
@@ -20,34 +20,46 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Journal Batch"
 
 
-class JRBCreateView(UserPassesTestMixin, generic.CreateView):
+class JRBCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
     model = JRB
     page_title = PAGE_TITLE
-    template_name = DP / 'create.html'
+    htmx_template = DP / 'create.html'
+    htmx_only = True
     form_class = JRBCreateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
-    get = f_get
+    test_func = f_test_func
+    # post = f_post
+    # get = f_get
+
+
+class JRBDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
+    model = JRB
+    page_title = PAGE_TITLE
+    htmx_template = DP / 'detail.html'
+    htmx_only = True
+    allowed_groups = ('accounting_viewer',)
+    get_context_data = f_get_context_data
     test_func = f_test_func
 
 
-class JRBUpdateView(UserPassesTestMixin, generic.UpdateView):
+class JRBUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
     model = JRB
     page_title = PAGE_TITLE
-    template_name = DP / 'update.html'
+    htmx_template = DP / 'update.html'
+    htmx_only = True
     form_class = JRBUpdateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list") 
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
     test_func = f_test_func
+    # post = f_post
 
 
-class JRBListView(UserPassesTestMixin, generic.ListView):
+class JRBListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
     model = JRB
     table = JRBTable
     table_fields = ('created', 'number', 'description', 'group', 'is_active', 'balance', 'entries')
@@ -60,8 +72,10 @@ class JRBListView(UserPassesTestMixin, generic.ListView):
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func
-    get = f_get
-    get_context_data = f_get_context_data
+    get_context_data = f_get_list_context_data
+    # get_context_data = f_get_context_data
+    # get = f_get
+
 
     @classmethod
     def get_table_filters(cls):

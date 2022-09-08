@@ -9,10 +9,9 @@ from django.db.models import Q, F
 from django.urls.base import reverse_lazy
 from ..models import CCF
 from ..html.table import CCFTable
-# from ..forms import CCFUpdateForm, CCFCreateForm
 from ..myforms.ccf import CCFCreateForm, CCFUpdateForm
-from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin
 from cover import data
 
 
@@ -20,34 +19,45 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Chart Of Cash Flow"
 
 
-class CCFCreateView(UserPassesTestMixin, generic.CreateView):
+class CCFCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
     model = CCF
     page_title = PAGE_TITLE
-    template_name = DP / 'create.html'
+    htmx_template = DP / 'create.html'
+    htmx_only = True
     form_class = CCFCreateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
-    get = f_get
+    test_func = f_test_func
+    # post = f_post
+    # get = f_get
+
+
+class CCFDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
+    model = CCF
+    page_title = PAGE_TITLE
+    htmx_template = DP / 'detail.html'
+    htmx_only = True
+    allowed_groups = ('accounting_viewer',)
     test_func = f_test_func
 
 
-class CCFUpdateView(UserPassesTestMixin, generic.UpdateView):
+class CCFUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
     model = CCF
     page_title = PAGE_TITLE
-    template_name = DP / 'update.html'
+    htmx_template = DP / 'update.html'
+    htmx_only = True
     form_class = CCFUpdateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list") 
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
-    post = f_post
     test_func = f_test_func
+    # post = f_post
 
 
-class CCFListView(UserPassesTestMixin, generic.ListView):
+class CCFListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
     model = CCF
     table = CCFTable
     table_fields = ('number', 'name', 'flow', 'activity', 'is_active')
@@ -60,8 +70,9 @@ class CCFListView(UserPassesTestMixin, generic.ListView):
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func
-    get = f_get
-    get_context_data = f_get_context_data
+    get_context_data = f_get_list_context_data
+    # get_context_data = f_get_context_data
+    # get = f_get
 
     @classmethod
     def get_table_filters(cls):

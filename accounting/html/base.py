@@ -40,6 +40,7 @@ class TableRowLink:
         self.kwargs = kwargs
 
     def html_tag(self, model, field): 
+        url_link = model.get_detail_url() if self.kwargs.get('detail_link') else model.get_update_url()
         return f"""<td class='{self.kwargs.get('html_class')}'>
             <a 
                 class='{self.kwargs.get('html_class')}'
@@ -48,7 +49,7 @@ class TableRowLink:
                 data-bs-target='#{self.kwargs.get('modal_target')}'
                 hx-swap='innerHTML'
                 hx-target='#{self.kwargs.get('hx_target')}'
-                hx-get='{model.get_update_url()}'>{str(model.__getattribute__(field))}
+                hx-get='{url_link}'>{str(model.__getattribute__(field))}
             </a></td>"""
 
 
@@ -63,13 +64,13 @@ class TableHead:
         self.target = instance
 
     def html_tag(self):
-        # head = f"<thead id='id_{self.target.model.first().__class__.__name__}' class='{self.kwargs.get('thead_class')}'>"
         head = f"<thead id='id_{self.target.table_name}' class='{self.kwargs.get('thead_class')}'>"
         if 'header_text' not in self.target.__attributes__:
             self.target.header_text = self.target.fields
         for i, t in zip(self.target.fields, self.target.header_text): 
+            head_css_class = self.kwargs.get('html_class').get(i) or self.kwargs.get('html_class').get('_default_css_class')
             if 'filter_data' in self.kwargs and self.kwargs.get('filter_data') and i in self.kwargs.get('filter_data').keys():
-                head += f"""<th scope='col' class="{self.kwargs.get('html_class')}">
+                head += f"""<th scope='col' class="{head_css_class}">
                     <a style='color:inherit' class='text-decoration-none' type='button'
                         hx-swap='innerHTML'
                         hx-target='{self.target.htmx_target}'
@@ -98,7 +99,7 @@ class TableHead:
                             </li>"""
                 head += "</ul></th>"
             else:
-                head += f"""<th class='{self.kwargs.get('html_class')}' scope='col'>
+                head += f"""<th class='{head_css_class}' scope='col'>
                         <a style='color:inherit' class='text-decoration-none' type='button'
                             hx-swap='innerHTML'
                             hx-target='{self.target.htmx_target}'

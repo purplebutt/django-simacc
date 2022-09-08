@@ -1,0 +1,44 @@
+{% extends 'apps/company/_layouts/centered.html' %}
+{% load humanize %}
+{% load core_tags %}
+
+
+{% block centered_content %}
+    <div class="d-flex flex-column align-items-center py-2">
+        <h6 class="fw-bolder">Your company info</h6>
+        <h3 class="fw-bolder mt-2">{{object.name}}</h3>
+        <ul class="fw-bolder list-unstyled border-top pt-2">
+            <li>
+                <i class="fa fa-envelope me-2" aria-hidden="true"></i>{{object.email}} &nbsp;&nbsp;
+                <i class="fa fa-phone me-2" aria-hidden="true"></i>{{object.phone}}
+            </li>
+            <li><i class="fa fa-home me-2" aria-hidden="true"></i>{{object.address}}</li>
+            {% if user.profile.comp_stat %}
+                <li>Tax number: {{object.number}}</li>
+                <li>Legal: {{object.get_legal_display}}</li>
+                <li>Business Type: {{object.business_type|title}}</li>
+                <li>Created on: {{object.created}} <small>(on our server time)</small></li>
+                <li>City: {{object.city|title}} &nbsp;&nbsp; Country: {{object.country|title}}</li>
+                <li>Status: {% iftf user.profile.comp_stat 'Approved' 'Pending' %} &nbsp;&nbsp; Level: {{user.profile.get_comp_level_display|title}} &nbsp;&nbsp; Country: {{object.country|title}}</li>
+                <ul class="list-unstyled mt-3">
+                    <h6 class="fw-bold border-bottom mb-1">Configurations</h6>
+                    <li class="ms-2">Closed Period: {{object.get_closed_period|date:"j F, Y"}}</li>
+                    <li class="ms-2">Current Period: {{object.get_current_period_start|date:"j F, Y"}} to {{object.get_current_period_end|date:"j F, Y"}}</li>
+                </ul>
+            {% else %}
+                <div class="alert alert-warning alert-dismissible fade show shadow mt-3" role="alert">
+                    You already have applied to this company but still not approved yet by company admin.<br>
+                    Contact your company admin to get approve asap.
+                    <button type="button" class="btn-close auto-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+            {% if object.desc %} <p>About: {{object.desc}}</p> {% endif %}
+        </ul>
+    </div>
+    <div class="d-flex gap-3">
+        <a type='button' onclick='history.back()' class='btn btn-secondary'> <i class='fa fa-rotate-left me-2'></i>Go back</a>
+        <a type='button' href="{% url 'accounts:myprofile' %}" class='btn btn-primary'> <i class='fa fa-user me-2'></i>My Profile</a>
+        <a type='button' href="{% url 'company:company_update' user.profile.company.slug %}" class='btn btn-primary'> <i class='fa fa-building me-2'></i>Manage Company</a>
+        <a type='button' href="{% url 'company:company_emp_list' %}" class='btn btn-primary'> <i class='fa fa-users me-2'></i>Manage Employees</a>
+    </div>
+{% endblock centered_content %}

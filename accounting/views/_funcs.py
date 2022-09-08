@@ -10,6 +10,8 @@ from cover import data
 
 
 # functions for class compositions
+
+#@ deprecated - function (like search function) problably still need this
 def f_user_ingroup(self):
     ingroup = False
     for group in type(self).allowed_groups:
@@ -27,7 +29,7 @@ def f_test_func(self):
         return user.is_authenticated and is_valid_employee
     else: return False
 
-
+#@ deprecated
 def f_get(self, *args, **kwargs):
     # checks if user have permission to update or modify data
     htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
@@ -39,7 +41,7 @@ def f_get(self, *args, **kwargs):
         if not self.request.htmx: return redirect('cover:error403', msg=htmx_err['msg'])
         else: return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
 
-
+#@ deprecated
 def f_post(self, *args, **kwargs):
     # checks if user have permission to update or modify data
     err_info = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
@@ -90,8 +92,8 @@ def f_form_valid(self, form):
                 msg = f"Created successfully! ({obj_instance})"
             self.request.htmx_closemodal = True
             self.request.htmx_message = msg
-            response = render(self.request, template_name=type(self).template_name, context=self.get_context_data())
-            response = htmx_trigger(response, "refresh_table")
+            response = render(self.request, template_name=self.template_name, context=self.get_context_data())
+            # response = htmx_trigger(response, "refresh_table")
             return response
         else:
             response = HttpResponse(status="204")
@@ -103,7 +105,68 @@ def f_form_valid(self, form):
             return response
 
 
+def f_standard_context(self, context, include_sidebar=True):
+    # general data
+    context.setdefault("model_name", type(self).model.__name__.lower())
+    context["page_title"] = type(self).page_title
+    context["add_url"] = type(self).model.get_add_url()
+    if hasattr(type(self).model, 'get_add_single_url'): context["add_single_url"] = type(self).model.get_add_single_url()
+
+    if include_sidebar:
+        # sidebar data
+        context["side_menu_group"] = type(self).side_menu_group
+        context["side_menu"] = {
+            'reports': data.sidebar("report"),
+            'master': data.sidebar("master"),
+            'transactions': data.sidebar("trans")
+        }
+    return context
+
+
+def f_get_list_context_data(self, *args, **kwargs):
+    page = self.request.GET.get('page') or 1
+    per_page = self.request.GET.get('per_page') or 10
+
+    if hasattr(self, "filter_context_data"): context = self.filter_context_data(**self.kwargs)
+    else: context = super(type(self), self).get_context_data(*args, **kwargs)
+
+    # sort queryset data
+    if sortby:=self.request.GET.get("sortby"):
+        sort_mode = self.request.session.get(f"{type(self).__name__}_sortmode") or "desc"
+        if self.request.GET.get("follow_sort"):
+            if sort_mode == "asc":
+                context[type(self).context_object_name] = context[type(self).context_object_name].order_by(F(sortby).desc())
+            else:
+                context[type(self).context_object_name] = context[type(self).context_object_name].order_by(F(sortby).asc())
+        else:
+            context[type(self).context_object_name] = context[type(self).context_object_name].order_by(F(sortby).__getattribute__(sort_mode)())
+            # update _sortmode session only if request not perform by paginator
+            if sort_mode == "asc": self.request.session[f"{type(self).__name__}_sortmode"] = "desc"
+            else: self.request.session[f"{type(self).__name__}_sortmode"] = "asc"
+
+    context = f_standard_context(self, context)     # combined with standard context
+    context.setdefault("search_url", type(self).model.get_search_url())
+    context[type(self).context_object_name] = paginate(page, context[type(self).context_object_name], paginateBy=per_page)
+    context[type(self).table_object_name] = type(self).table(context[type(self).context_object_name], type(self).table_fields, 
+        table_name=type(self).model.__name__.lower(),
+        htmx_target=f"div#dataTableContent",
+        header_text=type(self).table_header, 
+        filter_data = type(self).get_table_filters() if hasattr(type(self), 'get_table_filters') else None,
+        ignore_query=("follow_sort",),
+        request=self.request)
+    return context
+
+
 def f_get_context_data(self, *args, **kwargs):
+    context = super(type(self), self).get_context_data(*args, **kwargs)
+    context["is_user_allowed"] = f_user_ingroup(self)
+    # general data
+    context = f_standard_context(self, context, include_sidebar=False)
+    return context
+
+
+#@ delete this backup code
+def f_get_context_data_bak(self, *args, **kwargs):
     if isinstance(self, ListView):
         page = self.request.GET.get('page') or 1
         per_page = self.request.GET.get('per_page') or 10
@@ -153,25 +216,6 @@ def f_get_context_data(self, *args, **kwargs):
         context["add_url"] = type(self).model.get_add_url()
         if hasattr(type(self).model, 'get_add_single_url'): context["add_single_url"] = type(self).model.get_add_single_url()
         return context
-
-
-def f_standard_context(self, context):
-    # general data
-    # context["model_name"] = type(self).model.__name__.lower()
-    context.setdefault("model_name", type(self).model.__name__.lower())
-    context["page_title"] = type(self).page_title
-    context["add_url"] = type(self).model.get_add_url()
-    if hasattr(type(self).model, 'get_add_single_url'): context["add_single_url"] = type(self).model.get_add_single_url()
-
-    # sidebar data
-    context["side_menu_group"] = type(self).side_menu_group
-    context["side_menu"] = {
-        'reports': data.sidebar("report"),
-        'master': data.sidebar("master"),
-        'transactions': data.sidebar("trans")
-    }
-
-    return context
 
 
 def f_search(request, **kwargs):

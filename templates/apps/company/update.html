@@ -7,10 +7,25 @@
 {% block base_content %}
     {% notification messages %}
     <div class="container">
+        {% include '_comps/_partials/mod_center_wrapper.html' with modal_id="modalCompConfig" modal_content_id="modalCompConfigContent" %}
         <div class="py-1 d-flex flex-column justify-content-between align-items-center">
-            <div class="mt-2"> {% brand 1 50 %} </div>
             <h4 class="mt-2">Edit your company</h4>
             <p>Hi <b class="text-danger">{{user|capfirst}}</b>, fill in to update your company</p>
+            
+            <div class="container alert alert-secondary alert-dismissible show fade shadow mb-4 company-config">
+                <a class="d-block text-decoration-none text-danger" id="btnConfiguration" type="button" 
+                    data-bs-toggle="modal" data-bs-target="#modalCompConfig" title="Modify configurations"
+                    hx-get="{% url 'company:company_config' %}"
+                    hx-swap="innerHTML"
+                    hx-target="#modalCompConfigContent"
+                    class="float-start btn btn-primary">
+                    <i class="fa fa-gear me-1" aria-hidden="true"></i>Config</a>
+                <div>
+                    <code> {{object.config}} </code>
+                </div>
+                <button class="btn btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
             <form method="POST" action={{request.path}} class="row g-2">
                 {% csrf_token %}
                 {% form_float form 2 %}
@@ -24,7 +39,6 @@
                 </div>
             </form>
         </div>
-        {% include '_comps/footer.html' %}
     </div>
     <script type="text/javascript">
         function lockFormInput(){

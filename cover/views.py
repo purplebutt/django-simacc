@@ -38,14 +38,14 @@ def htmx_modal_error(request):
 def error_forbidden(request, msg:str):
     ctx = {}
     ctx['reason'] = msg
-    return render(request, template_name="errors/403.html", context=ctx)
+    return render(request, template_name="errors/403.html", context=ctx, status=403)
 
 def error_bad_request(request, method:str, url:str, msg:str):
     ctx = {}
     ctx['method'] = method
     ctx['url'] = save_url_query(url)
     ctx['reason'] = msg
-    return render(request, template_name="errors/400.html", context=ctx)
+    return render(request, template_name="errors/400.html", context=ctx, status=400)
 
 def error_not_allowed(request, allowed, msg):
-    return render(request, template_name="errors/405.html")
+    return render(request, template_name="errors/405.html", status=405)

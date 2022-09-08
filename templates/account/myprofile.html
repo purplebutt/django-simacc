@@ -37,7 +37,8 @@
                     {% else %}
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
                             You don't have company yet.<br>
-                            <a href="{% url 'company:company_add' %}">Create a new one</a> or <a href="">Join to an existed company</a>
+                            <a href="{% url 'company:company_add' %}">Create a new one</a> or 
+                            <a href="{% url 'company:company_list' %}">Join to an existed company</a>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}

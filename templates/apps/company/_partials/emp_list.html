@@ -1,43 +1,48 @@
 {% load core_tags %}
 
-{% for e in objects %}
-    <div class="card col" style="min-width:200px">
-        <div class="card-body text-center">
-            <h5 class="card-title">{% iftf e.first_name e.first_name|title e.username|title %}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{{e.email}}</h6>
-            <img src="{{e.profile.image.url}}" class="img-thumbnail rounded" style="max-width:100px" alt="{{e}}">
-            <p class="my-0">Status: {{e.profile.comp_stat}}</p>
-            {% if e.pk is user.profile.company.author.pk %}
-                Creator
-            {% else %}
-                {% if user.profile.comp_level > 3 %}
-                    {% if e.profile.comp_stat %}
-                        <a class="card-link d-block text-decoration-none text-danger" type="button"
-                            hx-get="{% url 'company:company_emp_remove' e.profile.slug %}"
-                            data-bs-target="#modalConfirmation" data-bs-toggle="modal"
-                            hx-target="#modalConfirmationContent"
-                            hx-swap="innerHTML"><i class="fa fa-remove me-2" aria-hidden="true"></i>Remove</a>
+
+<div class="container">
+    <div class="row">
+        {% for e in objects %}
+            <div class="card col m-2" style="min-width:200px">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{% iftf e.first_name e.first_name|title e.username|title %}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{e.email}}</h6>
+                    <img src="{{e.profile.image.url}}" class="img-thumbnail rounded" style="max-width:100px" alt="{{e}}">
+                    <p class="my-0">Status: {{e.profile.comp_stat}}</p>
+                    {% if e.pk is user.profile.company.author.pk %}
+                        Creator
                     {% else %}
-                        <a class="card-link d-block text-decoration-none text-success" type="button"
-                            hx-get="{% url 'company:company_emp_approve' e.profile.slug %}"
-                            data-bs-target="#modalConfirmation" data-bs-toggle="modal"
-                            hx-target="#modalConfirmationContent"
-                            hx-swap="innerHTML"><i class="fa fa-check me-2" aria-hidden="true"></i>Approve</a>
+                        {% if user.profile.comp_level > 3 %}
+                            {% if e.profile.comp_stat %}
+                                <a class="card-link d-block text-decoration-none text-danger" type="button"
+                                    hx-get="{% url 'company:company_emp_remove' e.profile.slug %}"
+                                    data-bs-target="#modalConfirmation" data-bs-toggle="modal"
+                                    hx-target="#modalConfirmationContent"
+                                    hx-swap="innerHTML"><i class="fa fa-remove me-2" aria-hidden="true"></i>Remove</a>
+                            {% else %}
+                                <a class="card-link d-block text-decoration-none text-success" type="button"
+                                    hx-get="{% url 'company:company_emp_approve' e.profile.slug %}"
+                                    data-bs-target="#modalConfirmation" data-bs-toggle="modal"
+                                    hx-target="#modalConfirmationContent"
+                                    hx-swap="innerHTML"><i class="fa fa-check me-2" aria-hidden="true"></i>Approve</a>
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
-                {% endif %}
-            {% endif %}
-            {% if user.profile.comp_level > 3 and e.profile.comp_stat %}
-                <p class="my-0">
-                    <a class="card-link d-block text-decoration-none text-success" type="button"
-                        hx-get="{% url 'company:company_emp_groups' e.profile.slug %}"
-                        hx-target="div#employeeList"
-                        hx-swap="innerHTML"><i class="fa fa-edit me-2" aria-hidden="true"></i>Edit Group</a>
-                    <a href="{% url 'company:company_emp_groups' e.profile.slug %}">edit</a>
-                </p>
-            {% endif %}
-        </div>
+                    {% if user.profile.comp_level > 3 and e.profile.comp_stat %}
+                        <p class="my-0">
+                            <a class="card-link d-block text-decoration-none text-success" type="button"
+                                hx-get="{% url 'company:company_emp_groups' e.profile.slug %}"
+                                hx-target="div#employeeList"
+                                hx-swap="innerHTML"><i class="fa fa-edit me-2" aria-hidden="true"></i>Edit Group</a>
+                            <a href="{% url 'company:company_emp_groups' e.profile.slug %}">edit</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
     </div>
-{% endfor %}
+</div>
 
 {% if ajax_msg %}
     <div id="ajax-alert-info" hx-swap-oob="true" class="d-flex flex-column align-items-center justify-content-center 

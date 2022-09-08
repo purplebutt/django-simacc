@@ -18,5 +18,5 @@ urlpatterns = [
     path("search/", comp_view.search, name="company_search"),
 
     #! config
-    path("config/add", comp_view.ConfigCreateView.as_view(), name="config_add"),
+    path("config/add", comp_view.ConfigCreateView.as_view(), name="company_config"),
 ]
