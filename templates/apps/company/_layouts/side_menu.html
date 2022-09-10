@@ -1,0 +1,20 @@
+<div class="flex-column rounded ps-1 py-2">
+    <div type="button">
+        <a class="fs-6 dropdown-item fw-bold strecthed-link" 
+            hx-get="{% url 'company:my_company' %}"
+            hx-swap="innerHTML"
+            hx-target="#sidebarContent">My Company</a>
+    </div>
+    <div type="button">
+        <a class="fs-6 dropdown-item fw-bold strecthed-link" 
+            hx-get="{% url 'company:company_update' user.profile.company.slug %}"
+            hx-swap="innerHTML"
+            hx-target="#sidebarContent">Manage Company</a>
+    </div>
+    <div type="button">
+        <a class="fs-6 dropdown-item fw-bold" 
+            hx-get="{% url 'company:company_emp_list' %}"
+            hx-swap="innerHTML"
+            hx-target="#sidebarContent">Manage Employees</a>
+    </div>
+</div>

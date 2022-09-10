@@ -57,9 +57,9 @@ class Company(AccModelBase):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
-        self.business_type = self.business_type.lower()
-        self.city = self.city.lower()
-        self.country = self.country.lower()
+        self.business_type = self.business_type.title()
+        self.city = self.city.title()
+        self.country = self.country.title()
         if not self.pk:      # if company is newly created
             self.author = self.edited_by
             super(type(self), self).save(*args, **kwargs)

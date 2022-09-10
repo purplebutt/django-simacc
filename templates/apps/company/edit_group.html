@@ -1,0 +1,24 @@
+{% load core_tags %}
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">Edit user group for {{form.username.value|title}}</h5>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+    </div>
+    <div class="modal-body">
+        <form class="form">
+            {% form_float form %}
+            <div class="mt-3 d-flex flex-row justify-content-center align-items-center modal-buttons">
+                <button class="btn btn-outline-danger me-1" type="button" data-bs-toggle="modal" data-bs-target="#modalConfirmation">
+                    <i class="fa fa-arrow-circle-left me-1" aria-hidden="true"></i>Cancel</button>
+                <button class="btn btn-primary ms-1" type="button"
+                    hx-post="{% url 'company:company_emp_groups' object.pk %}"
+                    hx-swap="innerHTML"
+                    hx-target="#modalConfirmationContent">
+                    <i class="fa fa-save me-3" aria-hidden="true"></i>Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+

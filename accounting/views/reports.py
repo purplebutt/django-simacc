@@ -9,8 +9,8 @@ from django.db.models import Q, F
 from django.urls.base import reverse_lazy
 from ..models import COA, COH
 from ..html.table import TBTable
-from ._funcs import f_form_valid, f_test_func, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from cover.utils import DEFPATH, paginate, HtmxRedirectorMixin, AllowedGroupsMixin
 from cover import data
 
 
@@ -18,7 +18,7 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Trial Balance"
 
 
-class TBListView(UserPassesTestMixin, generic.ListView):
+class TBListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
     model = COA
     table = TBTable
     table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'debit', 'credit', 'balance', 'is_active')
@@ -31,8 +31,9 @@ class TBListView(UserPassesTestMixin, generic.ListView):
     htmx_template = DP / 'list.html'
     page_title = PAGE_TITLE
     test_func = f_test_func
-    get = f_get
-    get_context_data = f_get_context_data
+    # get = f_get
+    # get_context_data = f_get_context_data
+    get_context_data = f_get_list_context_data
 
     @classmethod
     def get_table_filters(cls):
@@ -72,21 +73,21 @@ def tb_search(request):
         return redirect("cover:error403", msg=err_msg)
 
     model = COA
-    table = COATable
+    table = TBTable
+    page_title = PAGE_TITLE
+    template_name = DP/"list_search.html"
     querymanager = 'trialbalance'
     table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'debit', 'credit', 'balance', 'is_active')
     header_text = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Debit', 'Credit', 'Balance', 'Active')
     table_filters = TBListView.get_table_filters()
-    template_name = DP/"list.html"
 
-    search_key = request.POST.get('search_key') or ""
+    search_key = request.GET.get('search_key') or ""
 
     if not search_key.isnumeric():
         filter_q = Q(name__icontains=search_key)
     else:
         filter_q = Q(number__contains=search_key)
 
-
-    response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
-                        table_fields=table_fields, header_text=header_text, template_name=template_name, querymanager=querymanager)
+    response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, table_fields=table_fields, 
+        header_text=header_text, template_name=template_name, page_title=page_title, querymanager=querymanager)
     return response

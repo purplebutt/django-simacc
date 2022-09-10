@@ -15,7 +15,9 @@
 {% endwith %}
 
 
-<div id="sidebar_menu" hx-swap-oob="true" class="nav flex-column rounded user-select-none d-print-none">
+{% include 'apps/_partials/sidebar.html' with attrs="hx-swap-oob='true'" %}
+
+{% comment %} <div id="sidebar_menu" hx-swap-oob="true" class="nav flex-column rounded user-select-none d-print-none">
     <h5 id="page_title" class="p-2 fw-700 text-end">{{page_title}}</h5>
 
     <div class="d-flex p-2 justify-content-end align-items-center gap-2 border border-2">
@@ -58,8 +60,6 @@
         {% include 'apps/_comps/collapse_menu.html' with name=k.0 items=k.1 %}
     {% endfor %}
 
-    {% comment %} <div class="px-3 py-2"> {% include '_comps/range_select.html' %} </div> {% endcomment %}
-
     <style>
         a.sidebar-collapse-btn>svg {
             transition: all .3s ease;
@@ -70,4 +70,4 @@
             transform: rotate(0deg);
         }
     </style>
-</div>
+</div> {% endcomment %}

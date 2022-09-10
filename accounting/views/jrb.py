@@ -9,7 +9,6 @@ from django.db.models import Q, F
 from django.urls.base import reverse_lazy
 from ..models import JRB
 from ..html.table import JRBTable
-# from ..forms import JRBUpdateForm, JRBCreateForm
 from ..myforms.jrb import JRBCreateForm, JRBUpdateForm
 from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin
@@ -114,7 +113,7 @@ def search(request):
     table_filters = JRBListView.get_table_filters()
     template_name = DP/"list_search.html"
 
-    search_key = request.POST.get('search_key') or ""
+    search_key = request.GET.get('search_key') or ""
 
     if search_key.isnumeric():
         filter_q = Q(created__contains=search_key)

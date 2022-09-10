@@ -114,7 +114,7 @@ def search(request):
     table_filters = CCFListView.get_table_filters()
     template_name = DP/"list_search.html"
 
-    search_key = request.POST.get('search_key') or ""
+    search_key = request.GET.get('search_key') or ""
     if not search_key.isnumeric():
         filter_q = Q(name__icontains=search_key)
     else:

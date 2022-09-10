@@ -8,8 +8,12 @@ from django.contrib.auth.models import User, Group
 from django.utils.safestring import mark_safe
 from django.db.models import Q
 from ..models import Company
-from ..myforms.company import CompanyEditForm, ConfigEditForm
-from cover.utils import htmx_refresh, htmx_redirect, DEFPATH, save_url_query, not_implemented_yet
+from ..myforms.company import CompanyEditForm, ConfigEditForm, UserEditGroupForm
+from cover.utils import (
+    not_implemented_yet, DEFPATH, save_url_query,
+    htmx_refresh, htmx_redirect, 
+    AllowedGroupsMixin, HaveAndMyCompanyMixin, HaveCompanyMixin, NoCompanyMixin, HtmxRedirectorMixin
+)
 from cover import data
 from ._funcs import f_test_func
 
@@ -17,37 +21,23 @@ from ._funcs import f_test_func
 DP = DEFPATH('apps/company/')
 
 
-class MyCompany(UserPassesTestMixin, generic.DetailView):
+class MyCompany(HaveCompanyMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
     model = Company
     template_name = DP / 'my_company.html'
+    htmx_template = DP / '_partials/my_company.html'
     test_func = f_test_func
     context_object_name = 'object'
 
-    def get_object(self):
-        comp = Company.objects.filter(author=self.request.user)
-        if comp.exists(): return comp.first()
-        return self.request.user.profile.company
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["alert"] = {'id': 'alert_id', 'msg':'this is an alert message'}
-        return context
+    def get_object(self): return self.request.user.profile.company
 
 
-class CompanyCreateView(UserPassesTestMixin, generic.CreateView):
+class CompanyCreateView(NoCompanyMixin, UserPassesTestMixin, generic.CreateView):
     model = Company
     form_class = CompanyEditForm
     template_name = DP / 'create.html'
-    allowed_group = 'company_admin'
+    allowed_groups = ('company_admin',)
     success_url = reverse_lazy("company:my_company")
     test_func = f_test_func
-
-    def get(self, request, *args, **kwargs):
-        if comp:=self.request.user.profile.company:
-            err_msg = f"You already have a company {comp}. Only one company allowed for each users."
-            return redirect('cover:error403', msg=err_msg)
-        else:
-            return super(type(self), self).get(request, *args, **kwargs)
 
     def form_valid(self, form):
         obj_instance = form.save(commit=False)
@@ -56,32 +46,16 @@ class CompanyCreateView(UserPassesTestMixin, generic.CreateView):
         return redirect(type(self).success_url)
 
 
-class CompanyUpdateView(UserPassesTestMixin, generic.UpdateView):
+class CompanyUpdateView(AllowedGroupsMixin, HaveAndMyCompanyMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
     model = Company
     form_class = CompanyEditForm
-    template_name = DP / 'update.html'
-    allowed_group = 'company_admin'
+    htmx_template = DP / 'update.html'
+    allowed_groups = ('company_admin',)
     success_url = reverse_lazy("company:my_company") 
     test_func = f_test_func
 
-    def get(self, request, *args, **kwargs):
-        my_comp = self.request.user.profile.company
-        view_obj = self.get_object() 
-        # view_obj is gathered from generic.UpdateView() is not comes from database
-        # that's why 'my_comp is view_obj' will always return False
-        # so instead of using 'is', use '==' sign to check equallity.
-        if my_comp != view_obj:
-            err_msg = f"Your company is {my_comp}, but you are trying to access {view_obj} which is not yours."
-            return redirect("cover:error403", msg=err_msg)
-        elif request.user.profile.comp_level < 4:
-            err_msg = f"""Your are a {request.user.profile.get_comp_level_display()} at {request.user.profile.company}, 
-                       and did not have permission to modify company informations"""
-            return redirect("cover:error403", msg=err_msg)
-        else:
-            return super(type(self), self).get(request, *args, **kwargs)
 
-
-class CompanyListView(UserPassesTestMixin, generic.ListView):
+class CompanyListView(NoCompanyMixin, UserPassesTestMixin, generic.ListView):
     model = Company
     context_object_name = 'objects'
     template_name = DP / 'list.html'
@@ -93,37 +67,37 @@ class CompanyListView(UserPassesTestMixin, generic.ListView):
         return ctx
 
 
-class EmployeeListView(UserPassesTestMixin, generic.ListView):
+class EmployeeListView(HaveCompanyMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
     model = User
     context_object_name = 'objects'
     template_name = DP / 'emp_list.html'
+    htmx_template = DP / '_partials/emp_list.html'
     test_func = f_test_func
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["objects"] = ctx["objects"].filter(profile__company=self.request.user.profile.company)
+        search_key = self.request.GET.get("search_key") or ""
+        qs_criteria = Q(profile__company=self.request.user.profile.company)&(
+            Q(first_name__icontains=search_key)|Q(username__icontains=search_key)|Q(last_name__icontains=search_key))
+        ctx = {}
+        ctx["user_is_admin"] = self.request.user.groups.filter(name='company_admin').exists()
+        ctx[type(self).context_object_name] = User.objects.filter(qs_criteria)
+        if self.request.htmx_target == "employeesList": self.template_name = DP/'_partials/emp_list_search.html'
         return ctx
     
-    def get(self, request, *args, **kwargs):
-        if self.request.htmx: 
-            type(self).template_name = DP/'_partials/emp_list.html'
-        else:
-            type(self).template_name = DP/'emp_list.html'
-        return super(type(self), self).get(request, *args, **kwargs)
 
-
-class ConfigCreateView(UserPassesTestMixin, generic.View):
+class ConfigCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.View):
     form_class = ConfigEditForm
     template_name = DP/'create.html'
     htmx_template = DP/'_partials/create.html'
+    allowed_groups = ('company_admin',)
     form_class = ConfigEditForm
     test_func = f_test_func
     context_object_name = 'form'
+    http_method_names = ['get', 'post']
 
     def get(self, request, *args, **kwargs):
         company = request.user.profile.company
         ctx = {'company': company}
-
         config_data = {}
         if isinstance(company.config, str): 
             config_data = dict()
@@ -135,11 +109,7 @@ class ConfigCreateView(UserPassesTestMixin, generic.View):
 
         form_instance = type(self).form_class(config_data)
         ctx[type(self).context_object_name] = form_instance
-
-        if self.request.htmx:
-            return render(request, template_name=type(self).htmx_template, context=ctx)
-        else:
-            return render(request, template_name=type(self).template_name, context=ctx)
+        return render(request, template_name=self.template_name, context=ctx)
 
     def post(self, request, *args, **kwargs):
         frm_instance = type(self).form_class(request.POST)
@@ -150,6 +120,23 @@ class ConfigCreateView(UserPassesTestMixin, generic.View):
             return htmx_redirect(HttpResponse(status=204), reverse('company:my_company'))
         else:
             return redirect('company:my_company')
+
+
+class EmployeeEditGroup(HtmxRedirectorMixin, generic.UpdateView):
+    model = User
+    form_class = UserEditGroupForm
+    template_name = DP / 'edit_group.html'
+    htmx_template = DP / 'edit_group.html'
+    success_url = reverse_lazy("company:company_emp_list")
+    allowed_groups = ('company_admin',)
+    test_func = f_test_func
+
+    def form_valid(self, form, *args, **kwargs):
+        frm_instance = form.save(commit=True)
+
+        if self.request.htmx:
+            return htmx_refresh(HttpResponse(status=204))
+        return redirect(self.success_url)
 
 
 @login_required
@@ -177,9 +164,6 @@ def apply(request, slug):
         request.user.profile.save()
     if not request.htmx: return redirect("company:company_list")
     return render(request, template_name=DP/'_partials/list.html', context={'objects':Company.objects.all()})
-
-def empGroups(request, slug):
-    return not_implemented_yet(request)
 
 
 @login_required

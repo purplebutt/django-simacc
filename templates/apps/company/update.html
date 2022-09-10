@@ -1,37 +1,28 @@
-{% extends '_shared/base.html' %}
 {% load core_tags %}
 
-
-{% block title_content %} Update Company {% endblock title_content %}
-
-{% block base_content %}
-    {% notification messages %}
+{% block sidebar_content %}
     <div class="container">
         {% include '_comps/_partials/mod_center_wrapper.html' with modal_id="modalCompConfig" modal_content_id="modalCompConfigContent" %}
         <div class="py-1 d-flex flex-column justify-content-between align-items-center">
-            <h4 class="mt-2">Edit your company</h4>
-            <p>Hi <b class="text-danger">{{user|capfirst}}</b>, fill in to update your company</p>
+            <h6 class="fw-bold">Hi <b class="text-danger">{{user|capfirst}}</b>, fill in to update your company</h6>
             
-            <div class="container alert alert-secondary alert-dismissible show fade shadow mb-4 company-config">
-                <a class="d-block text-decoration-none text-danger" id="btnConfiguration" type="button" 
+            <a class="d-block-inline me-auto text-decoration-none text-danger sidebar-collapse-btn collapsed" type="button" 
+                data-bs-toggle="collapse" data-bs-target="#companyConfigCollapse" title="Show configurations">
+                <i class="fa fa-angle-right me-1" aria-hidden="true"></i>Config</a>
+            <div class="collapse border p-2 bg-danger bg-opacity-25 shadow" id="companyConfigCollapse">
+                {{object.config}} 
+                <a class="d-block me-auto text-decoration-none text-danger" id="btnConfiguration" type="button" 
                     data-bs-toggle="modal" data-bs-target="#modalCompConfig" title="Modify configurations"
                     hx-get="{% url 'company:company_config' %}"
                     hx-swap="innerHTML"
-                    hx-target="#modalCompConfigContent"
-                    class="float-start btn btn-primary">
-                    <i class="fa fa-gear me-1" aria-hidden="true"></i>Config</a>
-                <div>
-                    <code> {{object.config}} </code>
-                </div>
-                <button class="btn btn-close" data-bs-dismiss="alert"></button>
+                    hx-target="#modalCompConfigContent">
+                    <i class="fa fa-gear me-1" aria-hidden="true"></i>Edit Configurations</a>
             </div>
 
             <form method="POST" action={{request.path}} class="row g-2">
                 {% csrf_token %}
                 {% form_float form 2 %}
                 <div class="text-center mt-2 border-top pt-3">
-                    <a type='button' onclick='history.back()' class='btn btn-secondary'>
-                        <i class='fa fa-rotate-left me-1'></i>Go back</a>
                     <button id="btnProfileUpdate" type="submit" class="mx-2 btn btn-primary">
                         <i class="fa fa-save me-1" aria-hidden="true"></i>Update</button>
                     <button id="btnLockUnlock" onclick="lockUnlockInput()" type="button" class="btn btn-warning">
@@ -65,4 +56,4 @@
         }
         lockFormInput() // call lockFormInput() to lock form by default
     </script>
-{% endblock base_content %}
+{% endblock sidebar_content %}

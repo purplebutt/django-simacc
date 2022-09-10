@@ -4,17 +4,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 
 
-def paginate(page, querySet:object, paginateBy:int=5):
-    paginator = Paginator(querySet, paginateBy)
-    try:
-        page_obj = paginator.page(page)
-    except PageNotAnInteger or InvalidPage:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
-    return page_obj
-
-
+# urls
 def url_query_parse(url:str, keys:tuple=None, **kwargs):
     base = url if url.startswith('/') else reverse(url)
     if len(kwargs) > 0: base+="?"
@@ -69,28 +59,39 @@ class HtmxRedirectorMixin:
         REQUIRED INFERIOR/CHILD CLASS ATTRIBUTES (child class should implement this!):
         >> htmx_template:str -> htmx template to be use if request is htmx
     """
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
+        if self.template_name is None: self.template_name = type(self).htmx_template
         if self.request.htmx:
             self.template_name = type(self).htmx_template
         else:
             if hasattr(type(self), 'htmx_only') and type(self).htmx_only:
-                if hasattr(type(self), 'htmx_redirector_msg'):
-                    err_msg = type(self).htmx_redirector_msg
-                else:
-                    err_msg = "This page should be requested from htmx!"
+                if hasattr(type(self), 'htmx_redirector_msg'): err_msg = type(self).htmx_redirector_msg
+                else: err_msg = "This page should be requested from htmx!"
                 return redirect("cover:error403", msg=err_msg)
-        return super().get(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
+
+    # def get(self, request, *args, **kwargs):
+    #     if self.request.htmx:
+    #         self.template_name = type(self).htmx_template
+    #     else:
+    #         if hasattr(type(self), 'htmx_only') and type(self).htmx_only:
+    #             if hasattr(type(self), 'htmx_redirector_msg'):
+    #                 err_msg = type(self).htmx_redirector_msg
+    #             else:
+    #                 err_msg = "This page should be requested from htmx!"
+    #             return redirect("cover:error403", msg=err_msg)
+    #     return super().get(request, *args, **kwargs)
     
-    def post(self, *args, **kwargs):
-        if self.template_name is None: self.template_name = type(self).htmx_template
-        return super().post(*args, **kwargs)
+    # def post(self, *args, **kwargs):
+    #     if self.template_name is None: self.template_name = type(self).htmx_template
+    #     return super().post(*args, **kwargs)
 
 
 class AllowedGroupsMixin:
     """ 
         Checks if current logged user groups contains all groups defined in 'allowed_groups' field
         If current logged user have all the permission then user passed, otherwise return error 403
-        This mixin do a verification on both 'get' and 'post' method.
+        This mixin do a verification .
 
         OPTIONAL INFERIOR/CHILD CLASS ATTRIBUTES:
         >> groups_permission_error:dict -> {'title':'Error Title', 'head':'Error Head', 'msg','Error Message'}
@@ -98,31 +99,102 @@ class AllowedGroupsMixin:
         REQUIRED INFERIOR/CHILD CLASS ATTRIBUTES (child class should implement this!):
         >> allowed_groups:tuple|list|set -> iterator contains groups to be allowed
     """
-    def get(self, request, *args, **kwargs):
+
+    def dispatch(self, request, *args, **kwargs):
         for group in type(self).allowed_groups:
             if ingroup:= self.request.user.groups.filter(name=group).exists(): break
         if not ingroup:
             htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data."}
             if hasattr(type(self), 'groups_permission_error'): htmx_err = type(self).groups_permission_error
-            if self.request.htmx_target and "modal" in self.request.htmx_target.lower():
-                return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
-            else:
-                return redirect('cover:error403', msg=htmx_err['msg'])
-        else:
-            return super().get(request, *args, **kwargs)
+            if self.request.htmx:
+                if "modal" in self.request.htmx_target.lower():
+                    return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
+                else:
+                    return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
+            return redirect('cover:error403', msg=htmx_err['msg'])
+        return super().dispatch(request, *args, **kwargs)
+        # return super().get(request, *args, **kwargs)
+
+    # def get(self, request, *args, **kwargs):
+        for group in type(self).allowed_groups:
+            if ingroup:= self.request.user.groups.filter(name=group).exists(): break
+        if not ingroup:
+            htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data."}
+            if hasattr(type(self), 'groups_permission_error'): htmx_err = type(self).groups_permission_error
+            if self.request.htmx:
+                if "modal" in self.request.htmx_target.lower():
+                    return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
+                else:
+                    return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
+            return redirect('cover:error403', msg=htmx_err['msg'])
+        return super().get(request, *args, **kwargs)
     
-    def post(self, *args, **kwargs): 
+    # def post(self, *args, **kwargs): 
         for group in type(self).allowed_groups:
             if ingroup:= self.request.user.groups.filter(name=group).exists(): break
         if not ingroup:
             htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data."}
             if hasattr(type(self), 'groups_permission_error'): htmx_err = type(self).groups_permission_error
-            if self.request.htmx_target and "modal" in self.request.htmx_target.lower():
+            if self.request.htmx:
+                if "modal" in self.request.htmx_target.lower():
+                    return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
+                else:
+                    return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
+            return redirect('cover:error403', msg=htmx_err['msg'])
+        return super().post(*args, **kwargs)
+
+
+class NoCompanyMixin:
+    def dispatch(self, request, *args, **kwargs):
+        htmx_err = {"title":"Forbidden", "head":"Forbidden"}
+        if comp:=self.request.user.profile.company:
+            htmx_err["msg"] = f"You already have a company ({comp}). This request can only be perform when you have no company."
+            if self.request.htmx:
+                if "modal" in self.request.htmx_target.lower():
+                    return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
+                else:
+                    return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
+            return redirect('cover:error403', msg=htmx_err["msg"])
+        return super().dispatch(request, *args, **kwargs)
+
+
+class HaveCompanyMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.profile.company:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            htmx_err = {"title":"Forbidden", "head":"Forbidden"}
+            htmx_err["msg"] = f"You dont have company yet. This request can only be perform if you have a company."
+            if self.request.htmx:
+                if "modal" in self.request.htmx_target.lower():
+                    return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
+                else:
+                    return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
+        return redirect('cover:error403', msg=htmx_err["msg"])
+
+
+class HaveAndMyCompanyMixin:
+    """
+        Return error if current logged user have no company or have company but trying to access other company
+    """
+    def dispatch(self, request, *args, **kwargs):
+        my_comp = self.request.user.profile.company
+        view_obj = self.get_object() 
+        # view_obj is gathered from generic.UpdateView() is not comes from database
+        # that's why 'my_comp is view_obj' will always return False
+        # so instead of using 'is', use '==' sign to check equallity.
+        htmx_err = {"title":"Forbidden", "head":"Forbidden"}
+        htmx_err["msg"] = f"You dont have company yet. This request can only be perform if you have a company."
+        if self.request.user.profile.company:
+            if my_comp != view_obj: 
+                htmx_err["msg"] = f"Your company is {my_comp}, but you are trying to access {view_obj} which is not yours."
+            else: return super().dispatch(request, *args, **kwargs)
+        if self.request.htmx:
+            if "modal" in self.request.htmx_target.lower():
                 return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
             else:
-                return redirect('cover:error403', msg=htmx_err['msg'])
-        else:
-            return super().post(*args, **kwargs)
+                return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
+        return redirect('cover:error403', msg=htmx_err["msg"])
 
 
 # htmx response header
@@ -170,11 +242,21 @@ def htmx_trigger_af_swap(response, target_event:str):
     response.headers['HX-Trigger-After-Swap'] = target_event
     return response
 
+
+# others
+def paginate(page, querySet:object, paginateBy:int=5):
+    paginator = Paginator(querySet, paginateBy)
+    try:
+        page_obj = paginator.page(page)
+    except PageNotAnInteger or InvalidPage:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return page_obj
+
 class DEFPATH():
-    def __init__(self, base:str):
-        self.base = base
-    def __truediv__(self, other:str):
-        return self.base + "/" + other 
+    def __init__(self, base:str): self.base = base
+    def __truediv__(self, other:str): return self.base + "/" + other 
 
 def auto_number_generator(incrementor:int=1)->int:
     from datetime import datetime

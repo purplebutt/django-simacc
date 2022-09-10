@@ -9,10 +9,10 @@ from django.db.models import Q, F
 from django.urls.base import reverse_lazy
 from ..models import JRE, JRB, COA, BSG, CCF
 from ..html.table import JRETable
-# from ..forms import JREUpdateForm, JRECreateForm
 from ..myforms.jre import JRECreateSingleForm, JRECreateForm, JREUpdateForm
 from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin, not_implemented_yet
+from cover.decorators import htmx_only, have_company_and_approved, require_groups
 from cover import data
 
 
@@ -52,6 +52,7 @@ class JREDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     model = JRE
     page_title = PAGE_TITLE
     template_name = DP / 'detail.html'
+    htmx_template = DP / 'detail.html'
     allowed_groups = ('accounting_viewer',)
     get_context_data = f_get_context_data
     test_func = f_test_func
@@ -117,15 +118,9 @@ class JREListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
 
 
 @login_required
+@have_company_and_approved
+@require_groups(groups=("accounting_staff",), error_msg="You are not allowed to perform journal deletion")
 def jre_delete(request, slug):
-    # checks user permission
-    # return Response Error 403 if user dont have permission
-    if not f_test_func(request):
-        if request.htmx:
-            err_msg = f"You are not authorized to delete data."
-            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
-        return redirect("cover:error403", msg=err_msg)
-
     target_entry = get_object_or_404(JRE, slug=slug)
     pair_entry = get_object_or_404(JRE, pair=target_entry)
     # check if transaction still on open accounting period
@@ -148,16 +143,11 @@ def jre_delete(request, slug):
 def on_open_accounting_period(request, transaction):
     return not_implemented_yet(request)    
 
-@login_required
-def search(request):
-    # checks user permission
-    # return Response Error 403 if user dont have permission
-    if not f_test_func(request):
-        if request.htmx:
-            err_msg = f"You are not authorized to view or modify data."
-            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
-        return redirect("cover:error403", msg=err_msg)
 
+@login_required
+@have_company_and_approved
+@htmx_only()
+def search(request):
     model = JRE
     table = JRETable
     page_title = PAGE_TITLE
@@ -166,7 +156,7 @@ def search(request):
     header_text = ('Date', 'number', 'Batch', 'REF', 'Description', 'Amount', 'Type', 'Account', 'B.Sgmt', 'Cash Flow')
     table_filters = JREListView.get_table_filters()
 
-    search_key = request.POST.get('search_key') or ""
+    search_key = request.GET.get('search_key') or ""
     batch = JRB.objects.filter(number__contains=search_key)
     filter_q = Q()
     if batch.exists(): filter_q = Q(batch=batch.first())

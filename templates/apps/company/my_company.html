@@ -1,31 +1,19 @@
-{% extends '_shared/sidebar.html' %}
+{% extends 'apps/company/_layouts/sidebar.html' %}
 
 {% load humanize %}
 {% load core_tags %}
 
 
-{% block page_title %} {{object.name}} details{% endblock page_title %}
+{% block page_title %} {{page_title}} {% endblock page_title %}
 
 {% block side_menu %}
-    <div class="flex-column rounded ps-1 py-2">
-        <div type="button">
-            <a class="dropdown-item fw-bold strecthed-link" 
-                hx-get="{% url 'company:company_update' object.slug %}"
-                hx-swap="innerHTML"
-                hx-target="#sidebarContent"><i class="fa fa-building" aria-hidden="true"></i>Manage Company</a>
-        </div>
-        <div type="button">
-            <a class="dropdown-item fw-bold" 
-                hx-get="{% url 'company:company_emp_list' %}"
-                hx-swap="innerHTML"
-                hx-target="#sidebarContent"><i class="fa fa-users" aria-hidden="true"></i>Manage Employees</a>
-        </div>
-    </div>
+    {% include 'apps/company/_layouts/side_menu.html' %}
 {% endblock side_menu %}
 
 {% block sidebar_content %}
     {% include '_comps/_partials/mod_center_wrapper.html' with modal_id="modalConfirmation" modal_content_id="modalConfirmationContent" %}
-    <div id="sidebarContent" class="my-2 me-2 border p-4 rounded shadow">
+    <div id="sidebarContent" class="my-2 pe-2 border p-4 rounded shadow">
+        <small>Timezone: {{TIME_ZONE}}</small>
         <h3 class="fw-bolder mb-0">{{object.name|title}}</h3>
         <small class="text-danger text-opacity-75">registered on: <strong>{{object.created|date:'j F, Y'}}</small></strong>&nbsp;&nbsp;
         <small class='text-danger text-opacity-75'>business type: <strong>{{object.business_type}}</strong></small>&nbsp;&nbsp;

@@ -1,5 +1,6 @@
 from django import forms
 from ..models import Company
+from django.contrib.auth.models import User, Group
 
 
 class CompanyEditForm(forms.ModelForm):
@@ -40,3 +41,14 @@ class ConfigEditForm(forms.Form):
 
     class Meta:
         fields = ('closed_period', 'current_period')
+
+
+class UserEditGroupForm(forms.ModelForm):
+    username = forms.CharField(disabled=True)
+    first_name = forms.CharField(disabled=True)
+    last_name = forms.CharField(disabled=True)
+    groups = forms.ModelMultipleChoiceField(Group.objects, widget=forms.SelectMultiple(attrs={'style':'height:130px'}))
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'groups')

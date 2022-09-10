@@ -14,8 +14,6 @@
                 {% csrf_token %}
                 {% form_float form 2 %}
                 <div class="text-center mt-2 border-top pt-3">
-                    <a type='button' onclick='history.back()' class='btn btn-secondary'>
-                        <i class='fa fa-rotate-left me-1'></i>Go back</a>
                     <button id="btnProfileUpdate" type="submit" class="mx-2 btn btn-primary">
                         <i class="fa fa-save me-1" aria-hidden="true"></i>Save</button>
                     <button id="btnLockUnlock" onclick="lockUnlockInput()" type="button" class="btn btn-warning">

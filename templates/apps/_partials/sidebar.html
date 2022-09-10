@@ -2,7 +2,7 @@
 {% load core_tags %}
 
 
-<div id="sidebar_menu" class="nav flex-column rounded user-select-none d-print-none">
+<div id="sidebar_menu" class="nav flex-column rounded user-select-none d-print-none" {{attrs}}>
     <h5 id="page_title" class="p-2 fw-700 text-end">{{page_title}}</h5>
 
     <div class="d-flex p-2 justify-content-end align-items-center gap-2 border border-2">
@@ -25,18 +25,19 @@
             title="Add new" ><i class="fa fa-plus" aria-hidden="true"></i></button>
     </div>
     <form class="d-flex p-0 my-2 my-lg-0">
-        {% csrf_token %}
         <input class="form-control rounded-0 " type="search" 
             name="search_key" placeholder="Search" aria-label="Search"
-            hx-post="{{search_url}}"
+            hx-get="{{search_url}}"
             hx-target="div#dataTableContent"
             hx-trigger="keyup changed delay:500ms"
+            {% comment %} hx-push-url="true" {% endcomment %}
             hx-swap="innerHTML"/>
-        <button class="btn btn-outline-primary rounded-0 border-0 border-top 
-            border-end border-bottom"
-            hx-post="{{search_url}}"
+        <button class="btn btn-outline-primary rounded-0 border-0 border-top border-end border-bottom"
+            hx-get="{{search_url}}"
             hx-target="div#dataTableContent"
-            hx-swap="innerHTML">
+            {% comment %} hx-push-url="true" {% endcomment %}
+            hx-swap="innerHTML"
+            hx-include="input[name=search_key]">
             <i class="fa fa-magnifying-glass"></i></button>
     </form>
 

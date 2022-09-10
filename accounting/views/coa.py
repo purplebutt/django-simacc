@@ -104,8 +104,8 @@ def search(request):
     # checks user permission
     # return Response Error 403 if user dont have permission
     if not f_test_func(request):
+        err_msg = f"You are not authorized to view or modify data."
         if request.htmx:
-            err_msg = f"You are not authorized to view or modify data."
             return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
         return redirect("cover:error403", msg=err_msg)
 
@@ -117,7 +117,7 @@ def search(request):
     table_filters = COAListView.get_table_filters()
     template_name = DP/"list_search.html"
 
-    search_key = request.POST.get('search_key') or ""
+    search_key = request.GET.get('search_key') or ""
 
     if not search_key.isnumeric():
         filter_q = Q(name__icontains=search_key)

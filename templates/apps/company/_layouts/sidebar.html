@@ -1,38 +1,32 @@
 {% extends '_shared/base.html' %}
+{% load core_tags %}
 
-
-{% block page_title %} {{page_title}} {% endblock page_title %}
 
 {% block base_content %}
     {% include '_comps/nav_top.html' %}
-    <aside class="sidebar">
-        <div class="sidebar p-3">
-            {% block sidebar_content %}{% endblock sidebar_content %}
-        </div>
-    </aside>
-    <div class="container-fluid main-content">
-        {% block main_content %}{% endblock main_content %}
-    </div>
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="signupModal" modal_content_id="signupModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="loginModal" modal_content_id="loginModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="logoutModal" modal_content_id="logoutModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="changePasswordModal" modal_content_id="changePasswordModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="resetPasswordModal" modal_content_id="resetPasswordModalContent" %}
+    {% include 'account/_partials/mod_wrapper.html' with modal_id="updatePictureModal" modal_content_id="updatePictureModalContent" %}
+    {% include '_comps/toast_info.html' %}
 
-    <style>
-        .sidebar {
-            position: fixed;
-            width: 15vw;
-            height: 100vh;
-            left: 0px;
-            overflow-x: hidden;
-            overflow-y: auto;
-            border: 2px;
-            border-color: red;
-            background-color: #eebbcc;
-        }
-        .main-content {
-            position: fixed;
-            width: 85vw;
-            left: 15vw;
-            height: 100vh;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-    </style>
+    <div class="container-fluid px-0">
+        <div class="container-fluid mt-3 mt-md-0">
+            <div class="row gy-2 gx-md-4">
+                <div class="col-md-3 col-lg-2 px-1">
+                    <div class="position-sticky" style="top: 3.9rem">
+                        {% block side_menu %}{% endblock side_menu %}
+                    </div>
+                </div>
+                <div class="col-md-9 col-lg-10 ps-1">
+                    {% block sidebar_content %} {% endblock sidebar_content %}
+                </div>
+            </div>
+        </div>
+        {% scroll_up %}
+        {% notification messages %}
+    </div>
+    {% include '_comps/footer.html' %}
 {% endblock base_content %}

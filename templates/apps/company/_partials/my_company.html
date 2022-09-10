@@ -1,0 +1,17 @@
+{% load humanize %}
+{% load core_tags %}
+
+
+<h3 class="fw-bolder mb-0">{{object.name|title}}</h3>
+<small class="text-danger text-opacity-75">registered on: <strong>{{object.created|date:'j F, Y'}}</small></strong>&nbsp;&nbsp;
+<small class='text-danger text-opacity-75'>business type: <strong>{{object.business_type}}</strong></small>&nbsp;&nbsp;
+<small class='text-danger text-opacity-75'>legal type: <strong>{{object.get_legal_display}}</strong></small>&nbsp;&nbsp;
+<hr class='my-1'>
+<p class="my-2">{{object.desc}}</p>
+<span class='d-block'><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;<strong>{{object.email}}</strong></span>
+<span class='d-block'><i class="fa fa-home" aria-hidden="true"></i>&nbsp;<strong>{{object.address|capfirst}}</strong></span>
+<span class='d-block'><i class="fa fa-building" aria-hidden="true"></i>&nbsp;<strong>{{object.city|title}}</strong></span>
+<span class='d-block'><i class="fa fa-id-card" aria-hidden="true"></i>&nbsp;<strong>{{object.number}}</strong></span>
+<span class='d-block'><i class="fa fa-phone" aria-hidden="true"></i>&nbsp;<strong>{{object.phone}}</strong></span>
+<span class='d-block'>Number of employees: <strong>{{object.get_employees.count}}</strong></span>
+<span class='d-block'>Pending employees: <strong>{{object.get_pending_employees.count}}</strong></span>

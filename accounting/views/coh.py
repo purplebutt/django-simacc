@@ -8,7 +8,6 @@ from django.contrib.auth.models import Group, User
 from django.urls.base import reverse_lazy
 from django.db.models import Q, F
 from ..models import COH
-# from ..forms import COHUpdateForm, COHCreateForm
 from ..myforms.coh import COHCreateForm, COHUpdateForm
 from ..html.table import COHTable
 from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
@@ -111,7 +110,7 @@ def search(request):
     table_filters = COHListView.get_table_filters()
     template_name = DP/"list_search.html"
 
-    search_key = request.POST.get('search_key') or ""
+    search_key = request.GET.get('search_key') or ""
     if search_key.isnumeric():
         filter_q = Q(number__contains=search_key)
     else:

@@ -147,7 +147,7 @@ class JRETable(base.Table):
     batch = base.TableRowLink(
         hx_target='DetailModalContent',
         modal_target='DetailModal',
-        html_class='text-decoration-none fw-bold text-secondary',
+        html_class='text-decoration-none fw-bold text-secondary d-none d-lg-table-cell',
         detail_link=True
     )
     # batch = base.TableRowCell(html_class="border d-none d-lg-table-cell", css_style="font-size:small")

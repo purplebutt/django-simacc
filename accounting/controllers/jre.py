@@ -22,7 +22,6 @@ class JRE(AccModelBase):
                 f"Max value: 99,999,999,999,999"
             ) 
 
-
     def date_validator(value):
         today = timezone.now().date()
         if value > today:
