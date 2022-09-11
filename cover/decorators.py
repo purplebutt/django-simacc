@@ -1,8 +1,39 @@
-from django.shortcuts import reverse, redirect
+from django.shortcuts import reverse, redirect, get_object_or_404
 from django.http import HttpResponse
 from cover.utils import htmx_redirect
 
 
+def on_open_acc_period(*args, **kwargs):
+    """
+        Checks if current transaction date is on open accounting period, if yes allow the operations otherwise return error 
+        required keyword args:
+            klass > model class to be evaluate 
+            field > field name to be evaluate on queryset
+        optional keyword args:
+            error_msg:str > optional error message to be display on error page
+    """
+    def inner_func(func):
+        # validate args and kwargs
+        klass = kwargs.setdefault("klass", None)
+        field = kwargs.setdefault("field", "date")
+        err_msg = kwargs.setdefault("error_msg", None)
+        def core_func(*args, **kwargs):
+            target_entry = get_object_or_404(klass, slug=kwargs['slug'])
+            nonlocal err_msg
+            if err_msg is None: err_msg="Accounting period closed, can not modify this data."
+            request, *_ = args
+            company = request.user.profile.company
+            journal_date = getattr(target_entry, field)
+            closed_period = company.get_closed_period().date()
+            if journal_date <= closed_period:
+                if request.htmx: return htmx_redirect(HttpResponse(status=403), reverse("cover:error403", kwargs={'msg':err_msg}))
+                return redirect("cover:error403", msg=err_msg) 
+            # add target entry to kwargs
+            kwargs['target_entry'] = target_entry
+            return func(*args, **kwargs)
+        return core_func
+    return inner_func
+                
 
 def require_groups(*args, **kwargs):
     """
@@ -15,12 +46,12 @@ def require_groups(*args, **kwargs):
     def inner_func(func):
         # validate args and kwargs
         gr = args[0] if len(args) > 0 else kwargs.setdefault("groups", None)
-        error_msg = kwargs.setdefault("error_msg", None)
+        err_msg = kwargs.setdefault("error_msg", None)
         def core_func(*args, **kwargs):
+            nonlocal err_msg    # grab err_msg variable defined on upper function to be used on this function
             if gr:
                 request, *_ = args
-                if error_msg is None: err_msg = f"Only user in groups {gr} are allowed to access this page." 
-                else: err_msg = error_msg
+                if err_msg is None: err_msg = f"Only user in groups {gr} are allowed to access this page." 
                 for g in gr:
                     if exist:=request.user.groups.filter(name=g).exists(): 
                         if not exist: break 

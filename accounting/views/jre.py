@@ -12,7 +12,7 @@ from ..html.table import JRETable
 from ..myforms.jre import JRECreateSingleForm, JRECreateForm, JREUpdateForm
 from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin, not_implemented_yet
-from cover.decorators import htmx_only, have_company_and_approved, require_groups
+from cover.decorators import htmx_only, have_company_and_approved, require_groups, on_open_acc_period
 from cover import data
 
 
@@ -120,12 +120,10 @@ class JREListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
 @login_required
 @have_company_and_approved
 @require_groups(groups=("accounting_staff",), error_msg="You are not allowed to perform journal deletion")
-def jre_delete(request, slug):
-    target_entry = get_object_or_404(JRE, slug=slug)
+@on_open_acc_period(klass=JRE, field="date")
+def jre_delete(request, slug, *args, **kwargs):
+    target_entry = kwargs["target_entry"]
     pair_entry = get_object_or_404(JRE, pair=target_entry)
-    # check if transaction still on open accounting period
-    # closed accounting period journals can not be edited or deleted
-    # on_open_accounting_period(request, transaction) 
 
     ctx = {}
     ctx['object'] = target_entry
@@ -138,10 +136,6 @@ def jre_delete(request, slug):
         pair_entry.delete()
         target_entry.delete()
         return redirect("accounting:jre_list")
-
-
-def on_open_accounting_period(request, transaction):
-    return not_implemented_yet(request)    
 
 
 @login_required
