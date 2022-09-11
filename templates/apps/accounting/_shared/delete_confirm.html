@@ -34,7 +34,7 @@
             data-bs-target="#modalConfirmation"
             hx-target="#dataTableContent"
             hx-swap="innerHTML"
-            hx-post="{% url 'accounting:jre_delete' object.slug %}"
+            hx-post="{{delete_url}}"
             ><i class="fa fa-check me-1" aria-hidden="true"></i>Yes</button>
     </div>
 </div>

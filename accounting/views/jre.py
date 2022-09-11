@@ -128,6 +128,7 @@ def jre_delete(request, slug, *args, **kwargs):
     ctx = {}
     ctx['object'] = target_entry
     ctx['pair'] = pair_entry
+    ctx['delete_url'] = target_entry.get_delete_url()
 
     if request.method == "GET":
         ctx['question'] = f"Are you sure to delete both {target_entry.slug} and {pair_entry.slug} journal?"

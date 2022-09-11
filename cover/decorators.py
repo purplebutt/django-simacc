@@ -1,6 +1,7 @@
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.http import HttpResponse
 from cover.utils import htmx_redirect
+from datetime import datetime
 
 
 def on_open_acc_period(*args, **kwargs):
@@ -24,7 +25,10 @@ def on_open_acc_period(*args, **kwargs):
             request, *_ = args
             company = request.user.profile.company
             journal_date = getattr(target_entry, field)
-            closed_period = company.get_closed_period().date()
+            closed_period = company.get_closed_period()
+            # convert datetime (if any) to date
+            journal_date = journal_date.date() if isinstance(journal_date, datetime) else journal_date
+            closed_period = closed_period.date() if isinstance(closed_period, datetime) else closed_period
             if journal_date <= closed_period:
                 if request.htmx: return htmx_redirect(HttpResponse(status=403), reverse("cover:error403", kwargs={'msg':err_msg}))
                 return redirect("cover:error403", msg=err_msg) 
@@ -78,6 +82,9 @@ def have_company(func, *args, **kwargs):
 
 
 def have_company_and_approved(func, *args, **kwargs):
+    """
+        Return error page 403 if current logged user dont have any company or have company but not approved yet.
+    """
     def inner_func(*args, **kwargs):
         request, *_ = args
         user_profile = request.user.profile
@@ -89,16 +96,6 @@ def have_company_and_approved(func, *args, **kwargs):
             err_msg = 'You currently not registered to any company. This request required you to have a company.'
         if request.htmx: return htmx_redirect(HttpResponse(status=403), reverse("cover:error403", kwargs={'msg':err_msg}))
         return redirect("cover:error403", msg=err_msg) 
-    return inner_func
-
-
-def htmx_only_bak(func, *args, **kwargs):
-    def inner_func(*args, **kwargs):
-        request, *_ = args
-        if not request.htmx:
-            err_msg = 'Can only be requested from htmx.'
-            return redirect("cover:error403", msg=err_msg)
-        return func(*args, **kwargs)
     return inner_func
 
 

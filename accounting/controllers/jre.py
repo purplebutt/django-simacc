@@ -40,7 +40,7 @@ class JRE(AccModelBase):
     # database fields
     date = models.DateField(default=timezone.now, validators=[date_validator])
     number = models.PositiveBigIntegerField()
-    batch = models.ForeignKey(JRB, verbose_name='batch', on_delete=models.CASCADE, limit_choices_to={'is_active':True}, related_name='journals', related_query_name='journal')
+    batch = models.ForeignKey(JRB, verbose_name='batch', on_delete=models.RESTRICT, limit_choices_to={'is_active':True}, related_name='journals', related_query_name='journal')
     ref = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
     group = models.CharField(verbose_name="type",max_length=1, choices=_type)

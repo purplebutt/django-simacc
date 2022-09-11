@@ -51,6 +51,7 @@ urlpatterns = [
     path("jrb_add/", jrb_view.JRBCreateView.as_view(), name="jrb_add"),
     path("jrb_detail/<slug:slug>/", jrb_view.JRBDetailView.as_view(), name="jrb_detail"),
     path("jrb_update/<slug:slug>/", jrb_view.JRBUpdateView.as_view(), name="jrb_update"),
+    path("jrb_delete/<slug:slug>/", jrb_view.jrb_delete, name="jrb_delete"),
     path("jrb_list/", jrb_view.JRBListView.as_view(), name="jrb_list"),
     path("jrb_search/", jrb_view.search, name="jrb_search"),
 

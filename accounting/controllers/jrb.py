@@ -2,8 +2,9 @@ from django.db import models
 from django.db.models import Case, When, Sum, Count, F
 from django.template.defaultfilters import slugify
 from django.core.exceptions import ValidationError
-from .base import AccModelBase
 from django.contrib.auth.models import User
+from django.urls import reverse
+from .base import AccModelBase
 
 
 class JRBManager(models.Manager):
@@ -54,6 +55,9 @@ class JRB(AccModelBase):
         self.number = self.number.lower()
         self.group = self.group.upper()
         super(type(self), self).save(*args, **kwargs)
+
+    def get_delete_url(self):
+        return reverse(f"accounting:{type(self).__name__.lower()}_delete", kwargs={'slug':self.slug})
 
     def get_tablerow_style(self):
         x = type(self).objects.filter(pk=self.pk).first().balance

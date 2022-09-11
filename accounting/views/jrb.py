@@ -6,12 +6,14 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib import messages
 from django.contrib.auth.models import Group, User
 from django.db.models import Q, F
+from django.db.models.deletion import RestrictedError
 from django.urls.base import reverse_lazy
 from ..models import JRB
 from ..html.table import JRBTable
 from ..myforms.jrb import JRBCreateForm, JRBUpdateForm
 from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin
+from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin, htmx_redirect
+from cover.decorators import htmx_only, have_company_and_approved, require_groups, on_open_acc_period, htmx_only
 from cover import data
 
 
@@ -96,15 +98,32 @@ class JRBListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
 
 
 @login_required
-def search(request):
-    # checks user permission
-    # return Response Error 403 if user dont have permission
-    if not f_test_func(request):
-        if request.htmx:
-            err_msg = f"You are not authorized to view or modify data."
-            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
-        return redirect("cover:error403", msg=err_msg)
+@have_company_and_approved
+@require_groups(groups=("accounting_staff",), error_msg="You are not allowed to perform batch deletion")
+@htmx_only()
+def jrb_delete(request, slug, *args, **kwargs):
+    target_entry = get_object_or_404(JRB, slug=slug)
 
+    ctx = {}
+    ctx['object'] = target_entry
+    ctx['delete_url'] = target_entry.get_delete_url()
+
+    if request.method == "GET":
+        ctx['question'] = f"Are you sure to delete {target_entry.slug} batch?"
+        return render(request, template_name=DP/'delete_confirm.html', context=ctx)
+    else:
+        try:
+            target_entry.delete()
+        except RestrictedError as err:
+            err_msg = "Can not delete Journal Batch due to relationship restriction with Journal Entry"
+            return htmx_redirect(HttpResponse(status=403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
+        return redirect("accounting:jrb_list")
+
+
+@login_required
+@have_company_and_approved
+@htmx_only()
+def search(request):
     model = JRB
     table = JRBTable
     page_title = PAGE_TITLE
