@@ -2,8 +2,39 @@
 {% load core_tags %}
 
 
-<div id="sidebar_menu" class="nav flex-column rounded user-select-none d-print-none" {{attrs}}>
-    <h5 id="page_title" class="p-2 fw-700 text-end">{{page_title}}</h5>
+<div id="sidebar_menu" class="nav flex-column rounded user-select-none" {{attrs}}>
+    <button id="btnSideMenuHide" class="btn btn-close ms-auto" title="hide sidebar menu"></button>
+    <script type="text/javascript">
+        var showHideSideBarMenu = function(e) {
+            const sbmenu = document.querySelector("div#sideBarMenu");
+            const sbcontent = document.querySelector("div#sideBarContent");
+            const sbshowbtn = document.querySelector("div#btnSideMenuShow");
+            if (e.target.id == 'btnSideMenuHide') {
+                sbmenu.classList.remove("col-lg-2");
+                sbcontent.classList.remove("col-lg-10");
+                sbmenu.classList.remove("col-md-3");
+                sbcontent.classList.remove("col-md-9");
+                sbmenu.classList.add("d-none");
+                sbshowbtn.classList.remove("d-none");
+            }
+            else {
+                sbmenu.classList.add("col-lg-2");
+                sbcontent.classList.add("col-lg-10");
+                sbmenu.classList.add("col-md-3");
+                sbcontent.classList.add("col-md-9");
+                sbmenu.classList.remove("d-none");
+                sbshowbtn.classList.add("d-none");
+            }
+            sbshowbtn.addEventListener('click', showHideSideBarMenu);
+        } 
+        var btnsmhide = document.querySelector("button#btnSideMenuHide");
+        btnsmhide.addEventListener('click', showHideSideBarMenu);
+    </script>
+    {% if side_menu_group|is_eq:'reports' %}
+        <h5 id="page_title" class="p-2 fw-700 text-start">Report</h5>
+    {% else %}
+        <h5 id="page_title" class="p-2 fw-700 text-end">{{page_title}}</h5>
+    {% endif %}
 
     <div class="d-flex p-2 justify-content-end align-items-center gap-2 border border-2">
         <button class="btn btn-outline-primary px-2 py-1" 
@@ -28,18 +59,44 @@
         <input class="form-control rounded-0 " type="search" 
             name="search_key" placeholder="Search" aria-label="Search"
             hx-get="{{search_url}}"
+            hx-include="input[name=period_from],input[name=period_to]"
             hx-target="div#dataTableContent"
             hx-trigger="keyup changed delay:500ms"
             {% comment %} hx-push-url="true" {% endcomment %}
             hx-swap="innerHTML"/>
         <button class="btn btn-outline-primary rounded-0 border-0 border-top border-end border-bottom"
             hx-get="{{search_url}}"
+            hx-include="input[name=period_from],input[name=period_to]"
             hx-target="div#dataTableContent"
             {% comment %} hx-push-url="true" {% endcomment %}
             hx-swap="innerHTML"
             hx-include="input[name=search_key]">
             <i class="fa fa-magnifying-glass"></i></button>
     </form>
+
+    {% if side_menu_group|is_eq:"reports" %}
+        <form id="reportPeriod" class="border bg-danger bg-opacity-10 p-2 mt-1 mb-2">
+            <div class="mb-2 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="my-0 fw-bold">Reporting Period</h6>
+                <button type="button" class="btn btn-outline-secondary btn-sm ms-auto"
+                    hx-get="{{request.path}}"
+                    hx-target="div#dataTableContent"
+                    hx-swap="innerHTML"
+                    hx-include="input[name=period_from],input[name=period_to]"
+                    >Set period</button>
+            </div>
+            <div id="periodFormInput" class="row">
+                <div class="col-12 mb-1">
+                    <input class="form-control form-control-sm" {% if reporting_period %}value={{reporting_period.0}}{% endif %} 
+                        title="start date" type=date name="period_from">
+                </div>
+                <div class="col-12">
+                    <input class="form-control form-control-sm" {% if reporting_period %}value={{reporting_period.1}}{% endif %} 
+                        title="end date" type=date name="period_to">
+                </div>
+            </div>
+        </form>
+    {% endif %}
 
     {% for k in side_menu.items %}
         {% include 'apps/_comps/collapse_menu.html' with name=k.0 items=k.1 %}

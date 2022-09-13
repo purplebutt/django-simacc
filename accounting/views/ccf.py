@@ -10,8 +10,9 @@ from django.urls.base import reverse_lazy
 from ..models import CCF
 from ..html.table import CCFTable
 from ..myforms.ccf import CCFCreateForm, CCFUpdateForm
-from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin
+from cover.decorators import htmx_only, have_company_and_approved
 from cover import data
 
 
@@ -19,7 +20,7 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Chart Of Cash Flow"
 
 
-class CCFCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
+class CCFCreateView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.CreateView):
     model = CCF
     page_title = PAGE_TITLE
     htmx_template = DP / 'create.html'
@@ -34,7 +35,7 @@ class CCFCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     # get = f_get
 
 
-class CCFDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
+class CCFDetailView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.DetailView):
     model = CCF
     page_title = PAGE_TITLE
     htmx_template = DP / 'detail.html'
@@ -43,7 +44,7 @@ class CCFDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     test_func = f_test_func
 
 
-class CCFUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
+class CCFUpdateView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.UpdateView):
     model = CCF
     page_title = PAGE_TITLE
     htmx_template = DP / 'update.html'
@@ -54,10 +55,9 @@ class CCFUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     test_func = f_test_func
-    # post = f_post
 
 
-class CCFListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
+class CCFListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.ListView):
     model = CCF
     table = CCFTable
     table_fields = ('number', 'name', 'flow', 'activity', 'is_active')
@@ -71,8 +71,6 @@ class CCFListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
     page_title = PAGE_TITLE
     test_func = f_test_func
     get_context_data = f_get_list_context_data
-    # get_context_data = f_get_context_data
-    # get = f_get
 
     @classmethod
     def get_table_filters(cls):
@@ -97,28 +95,21 @@ class CCFListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
 
 
 @login_required
+@have_company_and_approved
+@htmx_only()
 def search(request):
-    # checks user permission
-    # return Response Error 403 if user dont have permission
-    if not f_test_func(request):
-        if request.htmx:
-            err_msg = f"You are not authorized to view or modify data."
-            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
-        return redirect("cover:error403", msg=err_msg)
-
     model = CCF
     table = CCFTable
     page_title = PAGE_TITLE 
+    template_name = DP/"list_search.html"
     table_fields = ('number', 'name', 'flow', 'activity', 'is_active')
     header_text = ('Code', 'Flow Name', 'In/Out', 'Activity', 'Active')
     table_filters = CCFListView.get_table_filters()
-    template_name = DP/"list_search.html"
 
     search_key = request.GET.get('search_key') or ""
-    if not search_key.isnumeric():
-        filter_q = Q(name__icontains=search_key)
-    else:
-        filter_q = Q(number__contains=search_key)
+
+    if not search_key.isnumeric(): filter_q = Q(name__icontains=search_key)
+    else: filter_q = Q(number__contains=search_key)
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
                         table_fields=table_fields, header_text=header_text, template_name=template_name, page_title=page_title)

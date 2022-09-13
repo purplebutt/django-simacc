@@ -10,8 +10,9 @@ from django.db.models import Q, F
 from ..models import COH
 from ..myforms.coh import COHCreateForm, COHUpdateForm
 from ..html.table import COHTable
-from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_standard_context, f_search
 from cover.utils import htmx_refresh, DEFPATH, paginate, HtmxRedirectorMixin, AllowedGroupsMixin
+from cover.decorators import htmx_only, have_company_and_approved
 from cover import data
 
 
@@ -19,23 +20,20 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Account Header"
 
 
-class COHCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
+class COHCreateView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.CreateView):
     model = COH
     page_title = PAGE_TITLE
     htmx_template = DP / 'create.html'
     htmx_only = True 
-    # htmx_redirector_msg = f'Bad Request - Can not create new COH this way!'
     form_class = COHCreateForm
     success_url = reverse_lazy("accounting:coh_list")
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     test_func = f_test_func
-    # post = f_post
-    # get = f_get
 
 
-class COHDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
+class COHDetailView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.DetailView):
     model = COH
     page_title = PAGE_TITLE
     htmx_template = DP / 'detail.html'
@@ -45,7 +43,7 @@ class COHDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     test_func = f_test_func
 
 
-class COHUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
+class COHUpdateView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.UpdateView):
     model = COH
     page_title = PAGE_TITLE
     htmx_template = DP / 'update.html'
@@ -56,10 +54,9 @@ class COHUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     test_func = f_test_func
-    # post = f_post
 
 
-class COHListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
+class COHListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.ListView):
     model = COH
     table = COHTable
     table_fields = ('number', 'name', 'report', 'group')
@@ -73,8 +70,6 @@ class COHListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
     page_title = PAGE_TITLE
     test_func = f_test_func
     get_context_data = f_get_list_context_data
-    # get_context_data = f_get_context_data
-    # get = f_get
 
     @classmethod
     def get_table_filters(cls):
@@ -93,28 +88,21 @@ class COHListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
 
 
 @login_required
+@have_company_and_approved
+@htmx_only()
 def search(request):
-    # checks user permission
-    # return Response Error 403 if user dont have permission
-    if not f_test_func(request):
-        if request.htmx:
-            err_msg = f"You are not authorized to view or modify data."
-            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
-        return redirect("cover:error403", msg=err_msg)
-
     model = COH
     table = COHTable
     page_title = PAGE_TITLE
+    template_name = DP/"list_search.html"
     table_fields = ('number', 'name', 'report', 'group')
     header_text = ('Code', 'Header Name', 'Report', 'Account Group')
     table_filters = COHListView.get_table_filters()
-    template_name = DP/"list_search.html"
 
     search_key = request.GET.get('search_key') or ""
-    if search_key.isnumeric():
-        filter_q = Q(number__contains=search_key)
-    else:
-        filter_q = Q(name__icontains=search_key)
+
+    if search_key.isnumeric(): filter_q = Q(number__contains=search_key)
+    else: filter_q = Q(name__icontains=search_key)
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
                         table_fields=table_fields, header_text=header_text, template_name=template_name, page_title=page_title)

@@ -4,6 +4,7 @@ from django.db.models import Case, When, Sum, Count, F, Q
 from .base import AccModelBase, ActiveManager
 from django.contrib.auth.models import User
 from .coh import COH
+from datetime import date
 
 
 class COATBManager(models.Manager):
@@ -77,3 +78,30 @@ class COA(AccModelBase):
     def get_with_number(cls, sep:str=" "):
         result = map(lambda i: str(i[0])+sep+i[1], cls.actives.values_list('number', 'name'))
         return result
+
+    @classmethod
+    def get_tb_at(cls, period_from:date, period_to:date):
+        result = cls.objects.annotate(
+            previous=Sum(Case(
+                When(Q(journal__group='d')&Q(journal__date__lt=period_from), then=F('journal__amount')),
+                When(Q(journal__group='c')&Q(journal__date__lt=period_from), then=F('journal__amount')*-1),
+                default=0,
+            )),
+            debit=Sum(Case(
+                When(Q(journal__group='d')&Q(journal__date__gte=period_from)&Q(journal__date__lte=period_to), then=F('journal__amount')), default=0,
+            )),
+            credit=Sum(Case(
+                When(Q(journal__group='c')&Q(journal__date__gte=period_from)&Q(journal__date__lte=period_to), then=F('journal__amount')), default=0,
+            )),
+            balance=Sum(Case(
+                When(Q(journal__group='d')&Q(journal__date__lte=period_to), then=F('journal__amount')),
+                When(Q(journal__group='c')&Q(journal__date__lte=period_to), then=F('journal__amount')*-1),
+                default=0,
+            )),
+            entries=Count('journal')
+        )
+        # return result.filter(Q(balance__gt=0)).order_by('number')
+        return result.exclude(Q(balance=0)&Q(previous=0)&Q(debit=0)&Q(credit=0)).order_by('number')
+        # return result.filter(
+        #     (Q(balance!=0)&Q(previous!=0)&Q(debit!=0)&Q(credit!=0))
+        # ).order_by('number')

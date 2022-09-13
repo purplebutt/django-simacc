@@ -189,6 +189,7 @@ class TBTable(base.Table):
         modal_target='UpdateModal',
         html_class='text-decoration-none'
     )
+    previous = base.TableRowCell(html_class="border text-end", val_type="money")
     debit = base.TableRowCell(html_class="border text-end", val_type="money")
     credit = base.TableRowCell(html_class="border text-end", val_type="money")
     balance = base.TableRowCell(html_class="border text-end", val_type="money")

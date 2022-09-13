@@ -2,6 +2,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from .base import AccModelBase
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 
 class BSG(AccModelBase):
@@ -31,3 +32,6 @@ class BSG(AccModelBase):
         self.slug = slugify(self.name)
         self.group = self.group.upper()
         super(type(self), self).save(*args, **kwargs)
+
+    def get_delete_url(self):
+        return reverse(f"accounting:{type(self).__name__.lower()}_delete", kwargs={'slug':self.slug})

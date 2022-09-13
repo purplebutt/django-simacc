@@ -91,6 +91,12 @@ class Company(AccModelBase):
             self.config = dict()
         super(type(self), self).save()
 
+
+    def get_time_zone(self):
+        tz = self.config.get('time_zone')
+        if isinstance(tz, list): tz=tz.pop()
+        return tz
+
     def get_closed_period(self):
         dt = self.config.get('closed_period')
         if isinstance(dt, list): dt=dt.pop()

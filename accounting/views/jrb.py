@@ -11,9 +11,9 @@ from django.urls.base import reverse_lazy
 from ..models import JRB
 from ..html.table import JRBTable
 from ..myforms.jrb import JRBCreateForm, JRBUpdateForm
-from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin, htmx_redirect
-from cover.decorators import htmx_only, have_company_and_approved, require_groups, on_open_acc_period, htmx_only
+from cover.decorators import htmx_only, have_company_and_approved, require_groups, htmx_only
 from cover import data
 
 
@@ -21,7 +21,7 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Journal Batch"
 
 
-class JRBCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
+class JRBCreateView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.CreateView):
     model = JRB
     page_title = PAGE_TITLE
     htmx_template = DP / 'create.html'
@@ -32,11 +32,9 @@ class JRBCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     test_func = f_test_func
-    # post = f_post
-    # get = f_get
 
 
-class JRBDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
+class JRBDetailView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.DetailView):
     model = JRB
     page_title = PAGE_TITLE
     htmx_template = DP / 'detail.html'
@@ -46,7 +44,7 @@ class JRBDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     test_func = f_test_func
 
 
-class JRBUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
+class JRBUpdateView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.UpdateView):
     model = JRB
     page_title = PAGE_TITLE
     htmx_template = DP / 'update.html'
@@ -57,10 +55,9 @@ class JRBUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     test_func = f_test_func
-    # post = f_post
 
 
-class JRBListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
+class JRBListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.ListView):
     model = JRB
     table = JRBTable
     table_fields = ('created', 'number', 'description', 'group', 'is_active', 'balance', 'entries')
@@ -74,8 +71,6 @@ class JRBListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
     page_title = PAGE_TITLE
     test_func = f_test_func
     get_context_data = f_get_list_context_data
-    # get_context_data = f_get_context_data
-    # get = f_get
 
 
     @classmethod
@@ -127,17 +122,15 @@ def search(request):
     model = JRB
     table = JRBTable
     page_title = PAGE_TITLE
+    template_name = DP/"list_search.html"
     table_fields = ('created', 'number', 'description', 'group', 'is_active')
     header_text = ('Date', 'Batch Code', 'Description', 'Type', 'Active')
     table_filters = JRBListView.get_table_filters()
-    template_name = DP/"list_search.html"
 
     search_key = request.GET.get('search_key') or ""
 
-    if search_key.isnumeric():
-        filter_q = Q(created__contains=search_key)
-    else:
-        filter_q = Q(description__icontains=search_key)|Q(number__icontains=search_key)
+    if search_key.isnumeric(): filter_q = Q(created__contains=search_key)
+    else: filter_q = Q(description__icontains=search_key)|Q(number__icontains=search_key)
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
                         table_fields=table_fields, header_text=header_text, template_name=template_name, page_title=page_title)

@@ -29,8 +29,9 @@ def f_test_func(self):
         return user.is_authenticated and is_valid_employee
     else: return False
 
+
 #@ deprecated
-def f_get(self, *args, **kwargs):
+def f_get_bak(self, *args, **kwargs):
     # checks if user have permission to update or modify data
     htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
     if f_user_ingroup(self):
@@ -42,7 +43,7 @@ def f_get(self, *args, **kwargs):
         else: return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
 
 #@ deprecated
-def f_post(self, *args, **kwargs):
+def f_post_bak(self, *args, **kwargs):
     # checks if user have permission to update or modify data
     err_info = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
     if not f_user_ingroup(self):
@@ -147,11 +148,11 @@ def f_get_list_context_data(self, *args, **kwargs):
     context = f_standard_context(self, context)     # combined with standard context
     context.setdefault("search_url", type(self).model.get_search_url())
     context[type(self).context_object_name] = paginate(page, context[type(self).context_object_name], paginateBy=per_page)
-    context[type(self).table_object_name] = type(self).table(context[type(self).context_object_name], type(self).table_fields, 
+    context[type(self).table_object_name] = type(self).table(context[type(self).context_object_name], self.table_fields, 
         table_name=type(self).model.__name__.lower(),
         htmx_target=f"div#dataTableContent",
-        header_text=type(self).table_header, 
-        filter_data = type(self).get_table_filters() if hasattr(type(self), 'get_table_filters') else None,
+        header_text=self.table_header, 
+        filter_data = self.get_table_filters() if hasattr(self, 'get_table_filters') else None,
         ignore_query=("follow_sort",),
         request=self.request)
     return context
@@ -159,6 +160,10 @@ def f_get_list_context_data(self, *args, **kwargs):
 
 def f_get_context_data(self, *args, **kwargs):
     context = super(type(self), self).get_context_data(*args, **kwargs)
+    #@ deprecated
+    #@ is_user_allowed context is no longer need, since we use mixin and decorators to 
+    #@ validate user. The update view template must be fix, no need to check if is_user_allowed
+    #@ that's why f_user_ingroup() function (see line 15) is no longer needed
     context["is_user_allowed"] = f_user_ingroup(self)
     # general data
     context = f_standard_context(self, context, include_sidebar=False)

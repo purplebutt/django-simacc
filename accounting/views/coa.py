@@ -10,8 +10,9 @@ from django.urls.base import reverse_lazy
 from ..models import COA, COH
 from ..html.table import COATable
 from ..myforms.coa import COACreateForm, COAUpdateForm
-from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate, htmx_redirect, HtmxRedirectorMixin, AllowedGroupsMixin
+from cover.decorators import htmx_only, have_company_and_approved
 from cover import data
 
 
@@ -19,7 +20,7 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Chart Of Account"
 
 
-class COACreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
+class COACreateView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.CreateView):
     model = COA
     page_title = PAGE_TITLE
     htmx_template = DP / 'create.html'
@@ -34,7 +35,7 @@ class COACreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     # get = f_get
 
 
-class COADetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
+class COADetailView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.DetailView):
     model = COA
     page_title = PAGE_TITLE
     htmx_template = DP / 'detail.html'
@@ -43,7 +44,7 @@ class COADetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     test_func = f_test_func
 
 
-class COAUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
+class COAUpdateView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.UpdateView):
     model = COA
     page_title = PAGE_TITLE
     htmx_template = DP / 'update.html'
@@ -54,10 +55,9 @@ class COAUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     test_func = f_test_func
-    # post = f_post
 
 
-class COAListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
+class COAListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.ListView):
     model = COA
     table = COATable
     table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'is_active')
@@ -71,8 +71,6 @@ class COAListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
     htmx_template = DP / 'list.html'
     test_func = f_test_func
     get_context_data = f_get_list_context_data
-    # get_context_data = f_get_context_data
-    # get = f_get
 
     @classmethod
     def get_table_filters(cls):
@@ -100,29 +98,21 @@ class COAListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
 
 
 @login_required
+@have_company_and_approved
+@htmx_only()
 def search(request):
-    # checks user permission
-    # return Response Error 403 if user dont have permission
-    if not f_test_func(request):
-        err_msg = f"You are not authorized to view or modify data."
-        if request.htmx:
-            return htmx_redirect(HttpResponse(403), reverse_lazy("cover:error403", kwargs={'msg':err_msg}))
-        return redirect("cover:error403", msg=err_msg)
-
     model = COA
     table = COATable
     page_title = PAGE_TITLE
+    template_name = DP/"list_search.html"
     table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'is_active')
     header_text = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Active')
     table_filters = COAListView.get_table_filters()
-    template_name = DP/"list_search.html"
 
     search_key = request.GET.get('search_key') or ""
 
-    if not search_key.isnumeric():
-        filter_q = Q(name__icontains=search_key)
-    else:
-        filter_q = Q(number__contains=search_key)
+    if not search_key.isnumeric(): filter_q = Q(name__icontains=search_key)
+    else: filter_q = Q(number__contains=search_key)
 
     response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, 
                         table_fields=table_fields, header_text=header_text, template_name=template_name, page_title=page_title)

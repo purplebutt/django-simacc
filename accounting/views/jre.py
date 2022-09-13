@@ -5,14 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib import messages
 from django.contrib.auth.models import Group, User
-from django.db.models import Q, F
+from django.db.models import Q, F, Count
 from django.urls.base import reverse_lazy
 from ..models import JRE, JRB, COA, BSG, CCF
 from ..html.table import JRETable
 from ..myforms.jre import JRECreateSingleForm, JRECreateForm, JREUpdateForm
-from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_post, f_get, f_standard_context, f_search
-from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, HtmxRedirectorMixin, not_implemented_yet
-from cover.decorators import htmx_only, have_company_and_approved, require_groups, on_open_acc_period
+from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_standard_context, f_search
+from cover.utils import DEFPATH, paginate, AllowedGroupsMixin, ProtectClosedPeriodMixin, HtmxRedirectorMixin, AllowedTodayMixin, not_implemented_yet
+from cover.decorators import htmx_only, have_company_and_approved, require_groups, protect_closed_period
 from cover import data
 
 
@@ -20,22 +20,21 @@ DP = DEFPATH('apps/accounting/_shared')
 PAGE_TITLE = "Journal Entry"
 
 
-class JRECreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
+class JRECreateView(UserPassesTestMixin, AllowedGroupsMixin, AllowedTodayMixin, HtmxRedirectorMixin, generic.CreateView):
     model = JRE
     page_title = PAGE_TITLE
     htmx_template = DP / 'create.html'
     htmx_only = True
+    errmsg_allowed_today = dict(title="Error", head="Invalid date", msg="Can not add journals entry with date > today.")
     form_class = JRECreateForm
     success_url = reverse_lazy(f"accounting:{model.__name__.lower()}_list")
     allowed_groups = ('accounting_staff',)
     form_valid = f_form_valid
     get_context_data = f_get_context_data
     test_func = f_test_func
-    # post = f_post
-    # get = f_get
 
 
-class JRECreateSingle(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.CreateView):
+class JRECreateSingle(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.CreateView):
     model = JRE
     page_title = PAGE_TITLE
     htmx_template = DP / 'create_single.html'
@@ -48,7 +47,7 @@ class JRECreateSingle(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMix
     test_func = f_test_func
 
 
-class JREDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.DetailView):
+class JREDetailView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.DetailView):
     model = JRE
     page_title = PAGE_TITLE
     template_name = DP / 'detail.html'
@@ -58,7 +57,7 @@ class JREDetailView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     test_func = f_test_func
 
 
-class JREUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
+class JREUpdateView(UserPassesTestMixin, AllowedGroupsMixin, ProtectClosedPeriodMixin, HtmxRedirectorMixin, generic.UpdateView):
     model = JRE
     page_title = PAGE_TITLE
     htmx_template = DP / 'update.html'
@@ -71,7 +70,7 @@ class JREUpdateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin
     test_func = f_test_func
 
 
-class JREListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.ListView):
+class JREListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.ListView):
     model = JRE
     table = JRETable
     table_fields = ('date', 'number', 'batch', 'ref', 'description', 'amount', 'group', 'account', 'segment', 'cashflow')
@@ -88,11 +87,14 @@ class JREListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
 
     @classmethod
     def get_table_filters(cls):
+        coa = COA.objects.annotate(entries=(Count('journal'))).filter(entries__gt=0)
+        seg = BSG.objects.annotate(entries=(Count('journal'))).filter(entries__gt=0)
+        ccf = CCF.objects.annotate(entries=(Count('journal'))).filter(entries__gt=0)
         return {
             'group': cls.model._type,
-            'account': sorted(set(map(lambda i: i.name, COA.actives.all()))),
-            'segment': sorted(set(map(lambda i: i.name, BSG.actives.all()))),
-            'cashflow': sorted(set(map(lambda i: i.name, CCF.actives.all()))),
+            'account': sorted(set(map(lambda i: i.name, coa))),
+            'segment': sorted(set(map(lambda i: i.name, seg))),
+            'cashflow': sorted(set(map(lambda i: i.name, ccf))),
             'is_active': [("true", "Yes"), ("false", "No")]
         }
 
@@ -120,7 +122,7 @@ class JREListView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, 
 @login_required
 @have_company_and_approved
 @require_groups(groups=("accounting_staff",), error_msg="You are not allowed to perform journal deletion")
-@on_open_acc_period(klass=JRE, field="date")
+@protect_closed_period(klass=JRE, field="date")
 def jre_delete(request, slug, *args, **kwargs):
     target_entry = kwargs["target_entry"]
     pair_entry = get_object_or_404(JRE, pair=target_entry)
@@ -129,6 +131,7 @@ def jre_delete(request, slug, *args, **kwargs):
     ctx['object'] = target_entry
     ctx['pair'] = pair_entry
     ctx['delete_url'] = target_entry.get_delete_url()
+    ctx['more_info'] = True     # makes template shows more info
 
     if request.method == "GET":
         ctx['question'] = f"Are you sure to delete both {target_entry.slug} and {pair_entry.slug} journal?"

@@ -44,6 +44,7 @@ urlpatterns = [
     path("bsg_add/", bsg_view.BSGCreateView.as_view(), name="bsg_add"),
     path("bsg_detail/<slug:slug>/", bsg_view.BSGDetailView.as_view(), name="bsg_detail"),
     path("bsg_update/<slug:slug>/", bsg_view.BSGUpdateView.as_view(), name="bsg_update"),
+    path("bsg_delete/<slug:slug>/", bsg_view.bsg_delete, name="bsg_delete"),
     path("bsg_list/", bsg_view.BSGListView.as_view(), name="bsg_list"),
     path("bsg_search/", bsg_view.search, name="bsg_search"),
 

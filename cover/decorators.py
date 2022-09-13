@@ -4,7 +4,7 @@ from cover.utils import htmx_redirect
 from datetime import datetime
 
 
-def on_open_acc_period(*args, **kwargs):
+def protect_closed_period(*args, **kwargs):
     """
         Checks if current transaction date is on open accounting period, if yes allow the operations otherwise return error 
         required keyword args:

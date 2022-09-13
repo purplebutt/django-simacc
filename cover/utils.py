@@ -1,7 +1,9 @@
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.urls import reverse
 from django.http.response import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.utils.timezone import datetime
 
 
 # urls
@@ -46,7 +48,87 @@ def url_query_add(url:str, **kwargs):
     return base
 
 
+
 # mixins
+def _show_mixin_err(self, htmx_err:dict):
+    if self.request.htmx:
+        if "modal" in self.request.htmx_target.lower():
+            return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
+        else:
+            return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
+    return redirect('cover:error403', msg=htmx_err['msg'])
+
+
+class AllowedTodayMixin:
+    """
+        Allow only data with date <= today, today will be calculated at server time (utc-0) with offset to user.company.config.time_zone
+
+        OPTIONAL SUBCLASS ATTRIBUTES:
+        >> errmsg_allowed_today:dict -> {'title':'Error Title', 'head':'Error Head', 'msg','Error Message'}
+    """
+    def dispatch(self, request, *args, **kwargs):
+        user = self.request.user
+        if self.request.method == "POST":
+            today = timezone.now().date()
+            obj_date = self.request.POST.get("date")
+            obj_date = datetime.fromisoformat(obj_date).date()
+            if obj_date > today: 
+                htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"Invalid date, date should <= today."}
+                if hasattr(type(self), "errmsg_allowed_today"): htmx_err = type(self).errmsg_allowed_today
+                return _show_mixin_err(self, htmx_err)
+        return super().dispatch(request, *args, **kwargs)
+
+
+class AllowedOpenPeriodMixin:
+    """
+        Allow only data with date on open accounting period, otherwise return error
+
+        OPTIONAL SUBCLASS ATTRIBUTES:
+        >> errmsg_allowed_open_period:dict -> {'title':'Error Title', 'head':'Error Head', 'msg','Error Message'}
+    """
+    def dispatch(self, request, *args, **kwargs):
+        user = self.request.user
+        if self.request.method == "POST":
+            op_start = user.profile.company.get_current_period_start()
+            op_end = user.profile.company.get_current_period_end()
+            obj_date = self.request.POST.get("date")
+            obj_date = obj_date.date() if isinstance(obj_date, "datetime") else obj_date
+            if not (obj_date >= op_start and obj_date <= op_end): 
+                htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"Invalid date. Date should on current open accounting period."}
+                if hasattr(type(self), "errmsg_allowed_open_period"): htmx_err = type(self).errmsg_allowed_open_period
+                return _show_mixin_err(self, htmx_err)
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ProtectClosedPeriodMixin:
+    """
+        Protect data of being deleted or modify when data.date (or data.created if data doesn't have date attribute)
+        is <= closed period (closed period is read from user.profile.company.get_closed_period())
+
+        REQUIRED SUBCLASS ATTRIBUTES (child/subclass should implement this):
+        >> model > model to be used (model should have 'date' or 'created' attribute)
+
+        OPTIONAL SUBCLASS ATTRIBUTES:
+        >> errmsg_protect_closed:dict -> {'title':'Error Title', 'head':'Error Head', 'msg','Error Message'}
+    """
+    def dispatch(self, request, *args, **kwargs):
+        if 'slug' in kwargs: obj = type(self).model.objects.get(slug=kwargs.get('slug'))
+        elif 'pk' in kwargs: obj = type(self).model.objects.get(pk=kwargs.get('pk'))
+        else: obj = type(self).model.objects.get(id=kwargs.get('id'))
+
+        if hasattr(obj, "date"): obj_date = obj.date
+        else: obj_date = obj.created.date()
+
+        closed_period = self.request.user.profile.company.get_closed_period().date()
+
+        if obj_date <= closed_period:
+            # Data already on closed period
+            htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"Accounting period already closed. Can not modify this record."}
+            if hasattr(type(self), "errmsg_protect_closed_period"): htmx_err = type(self).errmsg_protect_closed_period
+            return _show_mixin_err(self, htmx_err)
+        return super().dispatch(request, *args, **kwargs)
+
+
 class HtmxRedirectorMixin:
     """
         Redirect view to use htmx_template instead of template_name if request comes from htmx
@@ -93,11 +175,11 @@ class AllowedGroupsMixin:
         If current logged user have all the permission then user passed, otherwise return error 403
         This mixin do a verification .
 
-        OPTIONAL INFERIOR/CHILD CLASS ATTRIBUTES:
-        >> groups_permission_error:dict -> {'title':'Error Title', 'head':'Error Head', 'msg','Error Message'}
-
         REQUIRED INFERIOR/CHILD CLASS ATTRIBUTES (child class should implement this!):
         >> allowed_groups:tuple|list|set -> iterator contains groups to be allowed
+
+        OPTIONAL INFERIOR/CHILD CLASS ATTRIBUTES:
+        >> errmsg_allowed_groups:dict -> {'title':'Error Title', 'head':'Error Head', 'msg':'Error Message'}
     """
 
     def dispatch(self, request, *args, **kwargs):
@@ -105,13 +187,8 @@ class AllowedGroupsMixin:
             if ingroup:= self.request.user.groups.filter(name=group).exists(): break
         if not ingroup:
             htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data."}
-            if hasattr(type(self), 'groups_permission_error'): htmx_err = type(self).groups_permission_error
-            if self.request.htmx:
-                if "modal" in self.request.htmx_target.lower():
-                    return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
-                else:
-                    return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
-            return redirect('cover:error403', msg=htmx_err['msg'])
+            if hasattr(type(self), 'errmsg_allowed_groups'): htmx_err = type(self).errmsg_allowed_groups
+            return _show_mixin_err(self, htmx_err)
         return super().dispatch(request, *args, **kwargs)
         # return super().get(request, *args, **kwargs)
 
@@ -145,32 +222,34 @@ class AllowedGroupsMixin:
 
 
 class NoCompanyMixin:
+    """
+        Return error if current logged user already have company
+
+        OPTIONAL INFERIOR/CHILD CLASS ATTRIBUTES:
+        >> errmsg_no_company:dict -> {'title':'Error Title', 'head':'Error Head', 'msg':'Error Message'}
+    """
     def dispatch(self, request, *args, **kwargs):
         htmx_err = {"title":"Forbidden", "head":"Forbidden"}
         if comp:=self.request.user.profile.company:
-            htmx_err["msg"] = f"You already have a company ({comp}). This request can only be perform when you have no company."
-            if self.request.htmx:
-                if "modal" in self.request.htmx_target.lower():
-                    return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
-                else:
-                    return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
-            return redirect('cover:error403', msg=htmx_err["msg"])
+            htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You already have a company, this request require you to have no company."}
+            if hasattr(type(self), 'errmsg_no_company'): htmx_err = type(self).errmsg_no_company
+            return _show_mixin_err(self, htmx_err)
         return super().dispatch(request, *args, **kwargs)
 
 
 class HaveCompanyMixin:
+    """
+        Return error page if current logged user doesn't have company
+
+        OPTIONAL INFERIOR/CHILD CLASS ATTRIBUTES:
+        >> errmsg_no_company:dict -> {'title':'Error Title', 'head':'Error Head', 'msg':'Error Message'}
+    """
     def dispatch(self, request, *args, **kwargs):
-        if self.request.user.profile.company:
-            return super().dispatch(request, *args, **kwargs)
-        else:
-            htmx_err = {"title":"Forbidden", "head":"Forbidden"}
-            htmx_err["msg"] = f"You dont have company yet. This request can only be perform if you have a company."
-            if self.request.htmx:
-                if "modal" in self.request.htmx_target.lower():
-                    return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
-                else:
-                    return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
-        return redirect('cover:error403', msg=htmx_err["msg"])
+        if not self.request.user.profile.company:
+            htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have company yet, this request require you to have a company."}
+            if hasattr(type(self), 'errmsg_have_company'): htmx_err = type(self).errmsg_have_company
+            return _show_mixin_err(self, htmx_err)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class HaveAndMyCompanyMixin:
@@ -189,12 +268,7 @@ class HaveAndMyCompanyMixin:
             if my_comp != view_obj: 
                 htmx_err["msg"] = f"Your company is {my_comp}, but you are trying to access {view_obj} which is not yours."
             else: return super().dispatch(request, *args, **kwargs)
-        if self.request.htmx:
-            if "modal" in self.request.htmx_target.lower():
-                return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
-            else:
-                return htmx_redirect(HttpResponse(status=403), reverse('cover:error403', kwargs={'msg':htmx_err["msg"]}))
-        return redirect('cover:error403', msg=htmx_err["msg"])
+        return _show_mixin_err(self, htmx_err)
 
 
 # htmx response header

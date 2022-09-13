@@ -38,9 +38,10 @@ class ConfigEditForm(forms.Form):
     closed_period = forms.DateField(help_text="Accounting period will be close to this date", label="Close period", required=False)
     current_period_start = forms.DateField(label="Current period start date", required=False)
     current_period_end = forms.DateField(label="Current period end date", required=False)
+    time_zone = forms.ChoiceField(choices=[(8, "Indonesia/Jakarta"), (0, "Germany/Berlin")], required=True)
 
     class Meta:
-        fields = ('closed_period', 'current_period')
+        fields = ('closed_period', 'current_period', 'time_zone')
 
 
 class UserEditGroupForm(forms.ModelForm):

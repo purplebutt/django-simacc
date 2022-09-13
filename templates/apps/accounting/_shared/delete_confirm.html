@@ -13,28 +13,30 @@
             <button class="btn btn-close" data-bs-dismiss="alert"></button>
         </div>
 
-        <a class="text-secondary fw-bold" type="button" href="#journalMoreInfo" data-bs-toggle="collapse"
-            aria-expanded="false" aria-controls="journalMoreInfo"> More Info</a>
-        <div id="journalMoreInfo" class="collapse">
-            Batch Number: <b>{{object.batch}}</b><br>
-            {% if object.group|is_eq:"d" %}
-                Debited Account : <b>{{object.account}}</b><br>
-                Credited Account : <b>{{pair.account}}</b><br>
-            {% else %}
-                Debited Account : <b>{{pair.account}}</b><br>
-                Credited Account : <b>{{object.account}}</b><br>
-            {% endif %}
-            Amount: <b>{{object.amount|intcomma}}</b>
-        </div>
+        {% if more_info %}
+            <a class="text-secondary fw-bold" type="button" href="#journalMoreInfo" data-bs-toggle="collapse"
+                aria-expanded="false" aria-controls="journalMoreInfo"> More Info</a>
+            <div id="journalMoreInfo" class="collapse">
+                Batch Number: <b>{{object.batch}}</b><br>
+                {% if object.group|is_eq:"d" %}
+                    Debited Account : <b>{{object.account}}</b><br>
+                    Credited Account : <b>{{pair.account}}</b><br>
+                {% else %}
+                    Debited Account : <b>{{pair.account}}</b><br>
+                    Credited Account : <b>{{object.account}}</b><br>
+                {% endif %}
+                Amount: <b>{{object.amount|intcomma}}</b>
+            </div>
+        {% endif %}
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" 
-            data-bs-target="#modalConfirmation"><i class="fa fa-x me-1" aria-hidden="true"></i>No</button>
-        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
+    <div class="modal-footer d-flex justify-content-around align-items-center">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" 
+            data-bs-target="#modalConfirmation"><i class="fa fa-arrow-circle-left me-1" aria-hidden="true"></i>No</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
             data-bs-target="#modalConfirmation"
             hx-target="#dataTableContent"
             hx-swap="innerHTML"
             hx-post="{{delete_url}}"
-            ><i class="fa fa-check me-1" aria-hidden="true"></i>Yes</button>
+            ><i class="fa fa-trash me-1" aria-hidden="true"></i>Yes</button>
     </div>
 </div>

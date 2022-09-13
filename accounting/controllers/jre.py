@@ -22,13 +22,6 @@ class JRE(AccModelBase):
                 f"Max value: 99,999,999,999,999"
             ) 
 
-    def date_validator(value):
-        today = timezone.now().date()
-        if value > today:
-            raise ValidationError(
-                f"Invalid value: {value} should be a date <= today"
-            )
-
     # class fields
     _img_path = 'images/jre/'
     _img_def_path = 'images/default/jre.png'
@@ -38,7 +31,7 @@ class JRE(AccModelBase):
     ]
 
     # database fields
-    date = models.DateField(default=timezone.now, validators=[date_validator])
+    date = models.DateField(default=timezone.now)
     number = models.PositiveBigIntegerField()
     batch = models.ForeignKey(JRB, verbose_name='batch', on_delete=models.RESTRICT, limit_choices_to={'is_active':True}, related_name='journals', related_query_name='journal')
     ref = models.CharField(max_length=50)
@@ -46,9 +39,9 @@ class JRE(AccModelBase):
     group = models.CharField(verbose_name="type",max_length=1, choices=_type)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
     amount = models.PositiveBigIntegerField(validators=[amount_validator])
-    account = models.ForeignKey(COA, on_delete=models.CASCADE, limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
+    account = models.ForeignKey(COA, on_delete=models.RESTRICT, limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
     segment = models.ForeignKey(BSG, on_delete=models.RESTRICT, null=True, limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
-    cashflow = models.ForeignKey(CCF, verbose_name="cash flow", null=True, on_delete=models.CASCADE, 
+    cashflow = models.ForeignKey(CCF, verbose_name="cash flow", null=True, on_delete=models.RESTRICT, 
         limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
     notes = models.TextField(blank=True)
     pair = models.OneToOneField('JRE', default=None, null=True, on_delete=models.CASCADE)

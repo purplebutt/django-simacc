@@ -2,6 +2,9 @@
 {% load core_filters %}
 
 
+{% if side_menu_group|is_eq:'reports' %}
+    <span class="fs-5 fw-bold"> {{page_title|upper}}</span> <cite class="ms-2">For period ended {% now "DATE_FORMAT" %}</cite>
+{% endif %}
 <table id="{{model_name}}-table" class="table table-data table-hover">
     {{table_obj}}
 </table>
