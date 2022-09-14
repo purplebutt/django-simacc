@@ -103,6 +103,8 @@ class JRECreateSingleForm(forms.ModelForm):
         model = JRE
         fields = ('date', 'batch', 'ref', '_form_info', 'description', 'group', 'amount', 'account', 'segment', 'cashflow', 'notes')
 
+
+#! journal double entry
 class JREUpdateForm(forms.ModelForm):
     clean = jre_clean
     form_type = 'double:update'   # mark this form as update form
@@ -118,6 +120,7 @@ class JREUpdateForm(forms.ModelForm):
     account = forms.CharField()     # use datalist
     segment = forms.ModelChoiceField(BSG.actives, required=False)
     cashflow = forms.CharField(required=False)  # use datalist
+    pdf = forms.FileField(widget=forms.FileInput(), required=False)
     notes = forms.Textarea()
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
@@ -140,10 +143,9 @@ class JREUpdateForm(forms.ModelForm):
 
     class Meta:
         model = JRE
-        fields = ('number', 'pair', 'date', 'batch', 'ref', 'description', 'group', 'amount', 'account', 'segment', 'cashflow', 'notes')
+        fields = ('number', 'pair', 'date', 'batch', 'ref', 'description', 'group', 'amount', 'account', 'segment', 'cashflow', 'pdf', 'notes')
 
 
-#! journal double entry
 class COAPair:
     __debit:COA=None
     __credit:COA=None
@@ -280,6 +282,7 @@ class JRECreateForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'border border-info border-3 create-amt'}))
     segment = forms.ModelChoiceField(BSG.actives, required=False)
     cashflow = forms.CharField(required=False)    # use datalist
+    pdf = forms.FileField(widget=forms.FileInput(), required=False)
     notes = forms.CharField(widget=forms.Textarea, required=False)
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
@@ -300,4 +303,4 @@ class JRECreateForm(forms.ModelForm):
 
     class Meta:
         model = JRE
-        fields = ('date', 'batch', 'ref', 'description', 'account', 'account2', 'amount', 'segment', 'cashflow', 'notes')
+        fields = ('date', 'batch', 'ref', 'description', 'account', 'account2', 'amount', 'segment', 'cashflow', 'pdf', 'notes')

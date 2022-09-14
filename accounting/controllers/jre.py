@@ -25,6 +25,8 @@ class JRE(AccModelBase):
     # class fields
     _img_path = 'images/jre/'
     _img_def_path = 'images/default/jre.png'
+    _pdf_path = 'documents/pdf/jre/'
+    _pdf_def_path = 'documents/pdf/default/not_available.pdf'
     _type = [
         ('d', 'DEBIT'),
         ('c', 'CREDIT'),
@@ -43,6 +45,7 @@ class JRE(AccModelBase):
     segment = models.ForeignKey(BSG, on_delete=models.RESTRICT, null=True, limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
     cashflow = models.ForeignKey(CCF, verbose_name="cash flow", null=True, on_delete=models.RESTRICT, 
         limit_choices_to={'is_active': True}, related_name='journals', related_query_name='journal')
+    pdf = models.FileField(upload_to=_pdf_path, default=_pdf_def_path)
     notes = models.TextField(blank=True)
     pair = models.OneToOneField('JRE', default=None, null=True, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='jre_authors', related_query_name='jre_author')
@@ -142,6 +145,10 @@ class JRE(AccModelBase):
         else:
             raise ValidationError(f"No valid account found for {pair}")
         return (self.number, pair_instance.number)
+
+    def has_pdf(self):
+        pdf_name = self.pdf.path.split("/").pop()
+        return len(pdf_name)>0 and pdf_name!='not_available.pdf'
 
     def get_delete_url(self):
         return reverse(f"accounting:{type(self).__name__.lower()}_delete", kwargs={'slug':self.slug})

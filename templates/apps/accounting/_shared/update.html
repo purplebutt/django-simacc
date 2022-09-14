@@ -19,6 +19,9 @@
         {% if is_user_allowed %}
             <h6 class="text-center user-select-none text-primary fw-bold mb-4">Fill in to update {{page_title|title}}</h6>
         {% endif %}
+        {% if object.has_pdf %}
+            <a class="mb-2 text-decoration-none text-underline text-secondary fw-bold" href="{{object.pdf.url}}">See pdf document</a>
+        {% endif %}
         <form class="needs-validation form-update row g-2">
             {% csrf_token %}
             {% if is_user_allowed %}
@@ -42,6 +45,7 @@
                     <button type="button" class="btn btn-primary btn-submit" title="Save" disabled
                         hx-swap="innerHTML"
                         hx-post="{{object.get_update_url}}"
+                        hx-encoding="multipart/form-data"
                         hx-target="#UpdateModalContent">
                         <i class="fa fa-floppy-disk" aria-hidden="true"></i></button>
                 </div>
