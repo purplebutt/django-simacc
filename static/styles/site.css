@@ -363,12 +363,12 @@ section#profile img.profile-left-img {
     max-width: 300px;
   }
 }
-a.sidebar-collapse-btn > svg {
+a.sidebar-collapse-btn > svg, button.sidebar-collapse-btn > svg {
   transition: all 0.3s ease;
   transform: rotate(90deg);
 }
 
-a.sidebar-collapse-btn.collapsed > svg {
+a.sidebar-collapse-btn.collapsed > svg, button.sidebar-collapse-btn.collapsed {
   transition: all 0.3s ease;
   transform: rotate(0deg);
 }

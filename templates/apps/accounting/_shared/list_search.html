@@ -2,6 +2,13 @@
 {% load core_filters %}
 
 
+{% if side_menu_group|is_eq:'reports' %}
+    {% if reporting_period %}
+        <span class="fs-5 fw-bold"> {{page_title|upper}}</span> <cite class="ms-2">For period {{reporting_period.0}} to {{reporting_period.1}}</cite>
+    {% else %}
+        <span class="fs-5 fw-bold"> {{page_title|upper}}</span> <cite class="ms-2">For period ended {% now "DATE_FORMAT" %}</cite>
+    {% endif %}
+{% endif %}
 <table id="{{model_name}}-table" class="table table-data table-hover">
     {{table_obj}}
 </table>

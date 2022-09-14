@@ -3,7 +3,7 @@ from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
 from django.views import View
 from django.views.generic import CreateView, UpdateView, ListView
-from django.db.models import F
+from django.db.models import QuerySet, F
 from ..models import COA, JRE
 from cover.utils import htmx_refresh, htmx_trigger, paginate
 from cover import data
@@ -251,23 +251,29 @@ def f_search(request, **kwargs):
     page = request.GET.get('page') or 1
     per_page = request.GET.get('per_page') or 10
 
-    if hasattr(model, kwargs.setdefault('querymanager', 'objects')):
-        # dynamically get queryset attribute from model
-        # the queryset name come from kwargs['querymanager']
-        # because model is a class (not instance), then we need to
-        # call __getattribute__ from model super class, in this case the type() class
-        context = {obj_name: type.__getattribute__(model, kwargs.get('querymanager')).all()}
+
+    if isinstance(kwargs.setdefault("querymanager", "objects"), QuerySet):
+        context = {obj_name: kwargs['querymanager']}
     else:
-        context = {obj_name: model.objects.all()}
+        if hasattr(model, kwargs.setdefault('querymanager', 'objects')):
+            # dynamically get queryset attribute from model
+            # the queryset name come from kwargs['querymanager']
+            # because model is a class (not instance), then we need to
+            # call __getattribute__ from model super class, in this case the type() class
+            context = {obj_name: getattr(model, kwargs.get("querymanager")).all()}
+        else:
+            context = {obj_name: model.objects.all()}
 
     context.setdefault(model_name, model.__name__.lower())
     context["page_title"] = page_title
     context['search_url'] = request.get_full_path()
+    context['side_menu_group'] = kwargs.get("side_menu_group")
     context["side_menu"] = {
         'reports': data.sidebar("report"),
         'master': data.sidebar("master"),
         'transactions': data.sidebar("trans")
     }
+    context['reporting_period'] = kwargs.get("reporting_period")
     # context[model_name] = model.__name__.lower()
     context[obj_name] = context[obj_name].filter(filter_q)
     context[obj_name] = paginate(page, context[obj_name], paginateBy=per_page)

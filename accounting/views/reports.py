@@ -79,20 +79,39 @@ class TBListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, g
 @have_company_and_approved
 @htmx_only()
 def tb_search(request):
-    model = COA
-    table = TBTable
-    page_title = PAGE_TITLE
-    template_name = DP/"list_search.html"
-    querymanager = 'trialbalance'
-    table_fields = ('number', 'name', 'normal', 'is_cashflow', 'header', 'debit', 'credit', 'balance', 'is_active')
-    header_text = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Debit', 'Credit', 'Balance', 'Active')
-    table_filters = TBListView.get_table_filters()
+    kwargs = {}
+    kwargs['model'] = COA
+    kwargs['table'] = TBTable
+    kwargs['page_title'] = PAGE_TITLE
+    kwargs['template_name'] = DP/"list_search.html"
+    kwargs['querymanager'] = 'trialbalance'
+    # kwargs['table_fields'] = ('number', 'name', 'normal', 'is_cashflow', 'header', 'debit', 'credit', 'balance', 'is_active')
+    # kwargs['table_header'] = ('Code', 'Account Name', 'NB', 'CF', 'Header', 'Debit', 'Credit', 'Balance', 'Active')
+    kwargs['table_fields'] = TBListView.table_fields 
+    kwargs['header_text'] = TBListView.table_header 
+    kwargs['table_filters'] = TBListView.get_table_filters()
+    kwargs['side_menu_group'] = "reports"  # mark this search as report search
 
     search_key = request.GET.get('search_key') or ""
+    start_date = request.GET.get('period_from')
+    end_date = request.GET.get('period_to')
 
-    if not search_key.isnumeric(): filter_q = Q(name__icontains=search_key)
-    else: filter_q = Q(number__contains=search_key)
+    if start_date and end_date:
+        # set queryset
+        kwargs['querymanager'] = kwargs['model'].get_tb_at(date.fromisoformat(start_date), date.fromisoformat(end_date)).all()
+        kwargs["reporting_period"] = (start_date, end_date)    # add reporting period to context, so it can be consume on view template
+        # set table fields and table header text
+    else:
+        field_diff = ('previous',)
+        header_diff = ('Previous',)
+        # using filter to remove non report fields from type(self).table_fields and type(self).table_header
+        kwargs['table_fields'] = tuple(filter(lambda i: i not in field_diff, kwargs['table_fields']))
+        kwargs['table_header'] = tuple(filter(lambda i: i not in header_diff, kwargs['table_header']))
 
-    response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, table_fields=table_fields, 
-        header_text=header_text, template_name=template_name, page_title=page_title, querymanager=querymanager)
+    if not search_key.isnumeric(): kwargs['filter_q'] = Q(name__icontains=search_key)
+    else: kwargs['filter_q'] = Q(number__contains=search_key)
+
+    # response = f_search(request, model=model, filter_q=filter_q, table=table, table_filters=table_filters, table_fields=table_fields, 
+    #     header_text=header_text, template_name=template_name, page_title=page_title, querymanager=querymanager)
+    response = f_search(request, **kwargs)
     return response

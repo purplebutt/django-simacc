@@ -1,9 +1,10 @@
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from django.utils.timezone import datetime
+from django.utils.timezone import datetime, timedelta
 
 
 # urls
@@ -62,21 +63,44 @@ def _show_mixin_err(self, htmx_err:dict):
 class AllowedTodayMixin:
     """
         Allow only data with date <= today, today will be calculated at server time (utc-0) with offset to user.company.config.time_zone
+        this mixin will read date fields on the object. If object didn't have date fields or the date fields is not contains date/datetime data format
+        then this mixin will fail and return error. Only use this mixin if you have date field on your model that using date/datetime format
 
         OPTIONAL SUBCLASS ATTRIBUTES:
         >> errmsg_allowed_today:dict -> {'title':'Error Title', 'head':'Error Head', 'msg','Error Message'}
     """
-    def dispatch(self, request, *args, **kwargs):
-        user = self.request.user
-        if self.request.method == "POST":
-            today = timezone.now().date()
-            obj_date = self.request.POST.get("date")
+
+    def post(self, request, *args, **kwargs):
+        obj_date = self.request.POST.get("date")
+        if len(obj_date) > 0:
+            user = self.request.user
+            tz = user.profile.company.config.setdefault("time_zone", [0])[0]
             obj_date = datetime.fromisoformat(obj_date).date()
+            today = timezone.now() + timedelta(hours=int(tz))   # convert server datetime to client datetime
+            today = today.date()
             if obj_date > today: 
-                htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"Invalid date, date should <= today."}
-                if hasattr(type(self), "errmsg_allowed_today"): htmx_err = type(self).errmsg_allowed_today
-                return _show_mixin_err(self, htmx_err)
-        return super().dispatch(request, *args, **kwargs)
+                form = self.form_class(self.request.POST)
+                # super().form_invalid() didn't create the self.object instance
+                # and required self.object instance to work properly
+                self.object = type(self).model()
+                form.add_error('date', f"Requires value < {today}")
+                return super().form_invalid(form, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     if self.request.method == "POST":
+    #         obj_date = self.request.POST.get("date")
+    #         if len(obj_date) > 0:
+    #             user = self.request.user
+    #             tz = user.profile.company.config.setdefault("time_zone", [0])[0]
+    #             obj_date = datetime.fromisoformat(obj_date).date()
+    #             today = timezone.now() + timedelta(hours=int(tz))   # convert server datetime to client datetime
+    #             today = today.date()
+    #             if obj_date > today: 
+    #                 htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"Invalid date, date should <= today."}
+    #                 if hasattr(type(self), "errmsg_allowed_today"): htmx_err = type(self).errmsg_allowed_today
+    #                 return _show_mixin_err(self, htmx_err)
+    #     return super().dispatch(request, *args, **kwargs)
 
 
 class AllowedOpenPeriodMixin:
