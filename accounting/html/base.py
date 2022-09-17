@@ -125,11 +125,24 @@ class Table:
         else:
             head = TableHead(self).html_tag()
         body = "<tbody>"
+        # if cumulative balance
+        if self.cumulative_balance:
+            body += "<tr>"
+            for f in self.fields:
+                if hasattr(self, f): 
+                    attr = getattr(self, f)
+                    if not isinstance(attr, TableRowHeader):
+                        body += f"<td class='{attr.kwargs.get('html_class')}'></td>"
+                    else:
+                        body += f"<th class='{attr.kwargs.get('html_class')}'></th>"
+            body += "</tr>"
         for i in self.model:
             body += f"<tr class='{i.get_tablerow_style()}'>"
             for f in self.fields:
-                if f in self.__attributes__:
-                    body += self.__getattribute__(f).html_tag(i, f)
+                # if f in self.__attributes__:
+                if hasattr(self, f):
+                    # body += self.__getattribute__(f).html_tag(i, f)
+                    body += getattr(self, f).html_tag(i, f)
                 else:
                     body += TableRowCell().html_tag(i, f)
             body += "</tr>"

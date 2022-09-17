@@ -55,25 +55,33 @@
             hx-get="{{add_url}}"
             title="Add new" ><i class="fa fa-plus" aria-hidden="true"></i></button>
     </div>
+    test {{cumulative_balance}}
     <form class="d-flex p-0 my-2 my-lg-0">
         <input class="form-control rounded-0 " type="search" 
             name="search_key" placeholder="Search" aria-label="Search"
             hx-get="{{search_url}}"
-            hx-include="input[name=period_from],input[name=period_to]"
+            {% if cumulative_balance %}
+                hx-include="input[name=period_from],input[name=period_to],input[name=account]"
+            {% elif side_menu_group|is_eq:"reports" %}
+                hx-include="input[name=period_from],input[name=period_to]"
+            {% endif %}
             hx-target="div#dataTableContent"
             hx-trigger="keyup changed delay:500ms"
             {% comment %} hx-push-url="true" {% endcomment %}
             hx-swap="innerHTML"/>
         <button class="btn btn-outline-primary rounded-0 border-0 border-top border-end border-bottom"
             hx-get="{{search_url}}"
-            hx-include="input[name=period_from],input[name=period_to]"
+            {% if cumulative_balance %}
+                hx-include="input[name=period_from],input[name=period_to],input[name=account]"
+            {% elif side_menu_group|is_eq:"reports" %}
+                hx-include="input[name=period_from],input[name=period_to]"
+            {% endif %}
             hx-target="div#dataTableContent"
             {% comment %} hx-push-url="true" {% endcomment %}
             hx-swap="innerHTML"
             hx-include="input[name=search_key]">
             <i class="fa fa-magnifying-glass"></i></button>
     </form>
-
     {% if side_menu_group|is_eq:"reports" %}
         <form id="reportPeriod" class="border bg-danger bg-opacity-10 p-2 mt-1 mb-2">
             <div class="mb-2 d-flex flex-row align-items-center justify-content-between">
@@ -82,10 +90,28 @@
                     hx-get="{{request.path}}"
                     hx-target="div#dataTableContent"
                     hx-swap="innerHTML"
-                    hx-include="input[name=period_from],input[name=period_to]"
-                    >Set period</button>
+                    {% if model_name|is_eq:'gnl' %}
+                        hx-include="input[name=period_from],input[name=period_to],input[name=account]"
+                        >Get Ledger</button>
+                    {% else %}
+                        hx-include="input[name=period_from],input[name=period_to]"
+                        >Set period</button>
+                    {% endif %}
             </div>
             <div id="periodFormInput" class="row">
+                {% if model_name|is_eq:'gnl' %}
+                    <div class="col-12 mb-1">
+                        <input class="form-control form-control-sm" title="select account" 
+                            {% if account %}value={{account}}{% endif %}
+                            type="text" list="sb_account_listdata" name="account">
+                    </div>
+                    <datalist id="sb_account_listdata" 
+                        hx-swap="innerHTML" 
+                        hx-target="datalist#sb_account_listdata" 
+                        hx-trigger="load once"
+                        hx-get="{% url 'accounting:utils_datalist' 'COA' %}">
+                    </datalist>
+                {% endif %}
                 <div class="col-12 mb-1">
                     <input class="form-control form-control-sm" {% if reporting_period %}value={{reporting_period.0}}{% endif %} 
                         title="start date" type=date name="period_from">

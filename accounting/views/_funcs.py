@@ -150,6 +150,7 @@ def f_get_list_context_data(self, *args, **kwargs):
     context[type(self).context_object_name] = paginate(page, context[type(self).context_object_name], paginateBy=per_page)
     context[type(self).table_object_name] = type(self).table(context[type(self).context_object_name], self.table_fields, 
         table_name=type(self).model.__name__.lower(),
+        cumulative_balance=context.setdefault("cumulative_balance", False),
         htmx_target=f"div#dataTableContent",
         header_text=self.table_header, 
         filter_data = self.get_table_filters() if hasattr(self, 'get_table_filters') else None,
@@ -243,7 +244,7 @@ def f_search(request, **kwargs):
     page_title = kwargs["page_title"]
     table = kwargs["table"]
     table_fields = kwargs["table_fields"]
-    table_filters = kwargs["table_filters"]
+    table_filters = kwargs.setdefault("table_filters", None)
     header_text = kwargs["header_text"]
     template_name = kwargs["template_name"]
     filter_q = kwargs["filter_q"]
@@ -268,6 +269,7 @@ def f_search(request, **kwargs):
     context["page_title"] = page_title
     context['search_url'] = request.get_full_path()
     context['side_menu_group'] = kwargs.get("side_menu_group")
+    context['cumulative_balance'] = kwargs.setdefault("cumulative_balance", False)
     context["side_menu"] = {
         'reports': data.sidebar("report"),
         'master': data.sidebar("master"),
@@ -280,6 +282,7 @@ def f_search(request, **kwargs):
     context[tbl_name] = table(context[obj_name], table_fields, 
         table_name=model.__name__.lower(),
         # htmx_target=f"div#{model.__name__.lower()}Content",
+        cumulative_balance=kwargs.setdefault("cumulative_balance", False),
         htmx_target=f"div#dataTableContent",
         header_text=header_text, 
         filter_data=table_filters,

@@ -200,3 +200,27 @@ class TBTable(base.Table):
         head_css_class = {'_default_css_class': 'text-warning text-center border'}
         self.table_header = base.TableHead(self, html_class=head_css_class, thead_class="bg-secondary", 
             filter_data=kwargs.get('filter_data'), ignore_query=kwargs.get('ignore_query'), list_url=type(self).list_url)
+
+
+class GNLTable(base.Table):
+    model_name = 'gnl'
+    list_url = reverse_lazy("accounting:report_gnl")
+    date = base.TableRowHeader(html_class="border")
+    batch = base.TableRowLink(
+        hx_target='UpdateModalContent',
+        modal_target='UpdateModal',
+        html_class='text-decoration-none'
+    )
+    ref = base.TableRowCell()
+    description = base.TableRowCell()
+    pair_account = base.TableRowCell()
+    debit = base.TableRowCell(html_class="border text-end", val_type="money")
+    credit = base.TableRowCell(html_class="border text-end", val_type="money")
+    balance = base.TableRowCell(html_class="border text-end", val_type="money")
+
+    def __init__(self, model, fields, **kwargs):
+        super(type(self), self).__init__(model, fields, **kwargs)
+        # custom table header (can only be add on __init__ method because it's need self/instance)
+        head_css_class = {'_default_css_class': 'text-warning text-center border'}
+        self.table_header = base.TableHead(self, html_class=head_css_class, thead_class="bg-secondary", 
+            filter_data=kwargs.get('filter_data'), ignore_query=kwargs.get('ignore_query'), list_url=type(self).list_url)

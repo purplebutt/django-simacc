@@ -56,5 +56,6 @@ def widget_disabled(widget):
 
 @register.filter
 def widget_debugger(widget):
-    print(f'\033[33m>>>>>>>>>>>>>>>>>>>>>>>>>>>  {dir(widget)}\033[0m')
+    print(f'\033[33m>>>>>>>>>>>>>>>>>>>>>>>>>>>  {dir(widget.field)}\033[0m')
+    print(f'\033[33m>>>>>>>>>>>>>>>>>>>>>>>>>>>  {widget.field.widget.attrs}\033[0m')
     return widget

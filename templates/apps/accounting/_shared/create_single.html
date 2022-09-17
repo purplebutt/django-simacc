@@ -19,7 +19,7 @@
             <form class="needs-validation form-create row g-2">
                 {% csrf_token %}
                 {% if is_user_allowed %}
-                    {% form_float_cbleft form %}
+                    {% form_float_cbleft form show_file_label=True %}
                     <div class="modal-footer">
                         <button class="btn btn-secondary btn-reset me-auto" type="reset" value="Reset" disabled 
                             title="Reset" tabindex=-1><i class="fa fa-refresh" aria-hidden="true"></i></button>

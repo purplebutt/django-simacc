@@ -25,7 +25,7 @@
         <form class="needs-validation form-update row g-2">
             {% csrf_token %}
             {% if is_user_allowed %}
-                {% form_float_cbleft form %}
+                {% form_float_cbleft form show_file_label=True %}
                 <div class="modal-footer">
                     {% if object.get_delete_url %}
                         <button type="button" class="btn btn-danger me-auto" data-bs-toggle="modal" data-bs-target="div#DeleteModal" title="Delete this entry" tabindex=-1

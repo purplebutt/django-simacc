@@ -68,4 +68,7 @@ urlpatterns = [
     #! Trial Balance
     path("report/trial_balance/", rep_view.TBListView.as_view(), name="report_tb"),
     path("report/trial_balance/search/", rep_view.tb_search, name="report_tb_search"),
+    
+    path("report/general_ledger/", rep_view.GNLListView.as_view(), name="report_gnl"),
+    path("report/general_ledger/search/", rep_view.gnl_search, name="report_gnl_search"),
 ]

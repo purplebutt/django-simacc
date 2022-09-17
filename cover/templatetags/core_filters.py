@@ -50,3 +50,11 @@ def getvalbyfield(obj, field:str):
 @register.filter
 def toset(iterable):
     return set(iterable)
+
+@register.filter
+def to_media_url(url):
+    return '/media/' + str(url)
+
+@register.filter
+def get_file_name(value):
+    return str(value).split("/")[-1:].pop()

@@ -1,10 +1,11 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.db.models import Case, When, Sum, Count, F, Q
-from .base import AccModelBase, ActiveManager
+from .base import AccModelBase, ActiveManager, ModelManager
 from django.contrib.auth.models import User
-from .coh import COH
-from datetime import date
+from ..models import COH
+from datetime import date, timedelta
+from django.utils import timezone
 
 
 class COATBManager(models.Manager):
@@ -44,7 +45,7 @@ class COA(AccModelBase):
     author = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='coa_authors', related_query_name='coa_author')
     edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='coa_editors', related_query_name='coa_editor')
 
-    objects = ActiveManager()
+    objects = ModelManager()
     trialbalance = COATBManager()
 
     class Meta:

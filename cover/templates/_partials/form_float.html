@@ -35,11 +35,12 @@
     {% endif %}
 {% elif f|is_field_file %} 
     <div class="form-file mt-{{space}} {{f|widget_col_width}}">
+        {% if f.value %}<div>Current: <a href="{{f.value|to_media_url}}">{{f.value|get_file_name}}</a></div>{% endif %}
         {% if show_file_label %} {{f.label_tag}} {% endif %}
         {% if f.errors %}
             {% render_field f class+="form-control is-invalid" placeholder=f.name %}
         {% else %}
-            {% render_field f class+="form-control" placeholder=f.name %}
+            {% render_field f class+="form-control" value=f.value placeholder=f.name %}
         {% endif %}
         {{f.errors}}
     </div>

@@ -4,7 +4,8 @@
 
 {% if side_menu_group|is_eq:'reports' %}
     {% if reporting_period %}
-        <span class="fs-5 fw-bold"> {{page_title|upper}}</span> <cite class="ms-2">For period {{reporting_period.0}} to {{reporting_period.1}}</cite>
+        <span class="fs-5 fw-bold"> {{page_title|upper}} {% if account %} &nbsp;- {{account}}{% endif %}</span> 
+            <cite class="ms-2">For period {{reporting_period.0}} to {{reporting_period.1}}</cite>
     {% else %}
         <span class="fs-5 fw-bold"> {{page_title|upper}}</span> <cite class="ms-2">For period ended {% now "DATE_FORMAT" %}</cite>
     {% endif %}
@@ -12,6 +13,85 @@
 
 <table id="{{model_name}}-table" class="table table-data table-hover">
     {{table_obj}}
+    {% if cumulative_balance %}
+        {{beginning_balance|json_script:'begbal'}}
+        {{num_rows|json_script:'numrows'}}
+        <script type="text/javascript">
+            var appendBalance = function() {
+                const tr = document.querySelectorAll("tbody tr");
+                const numRows = document.querySelector('script#numrows').textContent;
+                let beginningBalance = document.querySelector('script#begbal');
+                if (beginningBalance !== null) {
+                    beginningBalance = beginningBalance.textContent;
+                }
+                else {
+                    beginningBalance = 0;
+                }
+
+                function removeComma(string) {
+                    var newString = new String("");
+                    for (let index = 0; index < string.length; index++) {
+                        const val = string.charAt(index);
+                        if (val == ",") { 
+                            newString = newString.concat("");
+                        }
+                        else {
+                            newString = newString.concat(val);
+                        };
+                    }
+                    return newString;
+                }
+
+                function reverse(string) {
+                    var newString = new String('');
+                    for (let index = string.length; index > -1; index--) {
+                        newString = newString.concat(string.charAt(index));
+                    }
+                    return newString;
+                }
+
+                function addComma(string) {
+                    string = reverse(string);
+                    var newString = new String('');
+                    counter = 1;
+                    for (let index = 0; index < string.length; index++) {
+                        newString = newString.concat(string.charAt(index));
+                        if ((counter == 3)&&((index+1)<string.length)) { 
+                            newString = newString.concat(','); 
+                            counter = 0;    //reset counter
+                        }
+                        counter++;
+                    }
+                    newString = reverse(newString);
+                    return newString;
+                }
+
+                is_first_loop = true;
+                if (numRows > 0) {
+                    tr.forEach(e => {
+                        var lc = e.lastChild;
+                        if (!is_first_loop){
+                            var prev_row = e.previousSibling;
+                            var prev_amount = parseInt(removeComma(e.previousSibling.lastChild.innerHTML));
+                            var n1 = parseInt(removeComma(lc.previousSibling.previousSibling.innerHTML));
+                            var n2 = parseInt(removeComma(lc.previousSibling.innerHTML));
+                            result = (prev_amount+n1-n2).toString() ;
+                            lc.innerHTML = addComma(result);
+                        }
+                        else {
+                            e.firstChild.innerHTML = e.nextSibling.firstChild.innerHTML;
+                            e.firstChild.nextSibling.nextSibling.nextSibling.innerHTML = "Beginning balance";
+                            result = beginningBalance;
+                            lc.innerHTML = addComma(result);
+                        }
+
+                        if (is_first_loop) { is_first_loop=false }
+                    });
+                }
+            }
+            appendBalance();
+        </script>
+    {% endif %}
 </table>
 
 <footer id="{{model_name}}_paginator" class="paginator py-2 mt-3">

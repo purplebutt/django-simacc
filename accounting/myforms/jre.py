@@ -82,6 +82,7 @@ class JRECreateSingleForm(forms.ModelForm):
     account = forms.CharField()     # use datalist
     segment = forms.ModelChoiceField(BSG.actives, required=False)
     cashflow = forms.CharField(required=False)    # use datalist
+    pdf = forms.FileField(widget=forms.FileInput(attrs={'model':JRE}), required=False, label="Select PDF document")
     notes = forms.Textarea()
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
@@ -101,7 +102,7 @@ class JRECreateSingleForm(forms.ModelForm):
 
     class Meta:
         model = JRE
-        fields = ('date', 'batch', 'ref', '_form_info', 'description', 'group', 'amount', 'account', 'segment', 'cashflow', 'notes')
+        fields = ('date', 'batch', 'ref', '_form_info', 'description', 'group', 'amount', 'account', 'segment', 'cashflow', 'pdf', 'notes')
 
 
 #! journal double entry
@@ -120,7 +121,7 @@ class JREUpdateForm(forms.ModelForm):
     account = forms.CharField()     # use datalist
     segment = forms.ModelChoiceField(BSG.actives, required=False)
     cashflow = forms.CharField(required=False)  # use datalist
-    pdf = forms.FileField(widget=forms.FileInput(), required=False)
+    pdf = forms.FileField(widget=forms.FileInput(attrs={'model': 'jre'}), required=False, label="Change PDF document (old document will be deleted)")
     notes = forms.Textarea()
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
@@ -282,7 +283,7 @@ class JRECreateForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'border border-info border-3 create-amt'}))
     segment = forms.ModelChoiceField(BSG.actives, required=False)
     cashflow = forms.CharField(required=False)    # use datalist
-    pdf = forms.FileField(widget=forms.FileInput(), required=False)
+    pdf = forms.FileField(widget=forms.FileInput(), required=False, label="Select PDF document")
     notes = forms.CharField(widget=forms.Textarea, required=False)
     no_password = True  # prevent password hide/show javascript to load (form without password field)
 
