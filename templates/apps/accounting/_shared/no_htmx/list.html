@@ -15,7 +15,7 @@
             {% htmx_paginator 'div#dataTableContent' objects request %}
         </footer>
         {% with "div#dataTableContent" as htmx_target %}
-            {% include 'apps/accounting/_comps/table_refresher.html' with ref_id='table-refresher' htmx_swap='innerHTML' %}
+            {% include 'apps/accounting/_comps/table_refresher.html' with ref_id='data-refresher' htmx_swap='innerHTML' %}
         {% endwith %}
     </div>
 {% endblock acc_sidebar_content %}

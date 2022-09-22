@@ -8,12 +8,14 @@ class COHTable(base.Table):
     number = base.TableRowLink(
         hx_target='UpdateModalContent',
         modal_target='UpdateModal',
-        html_class='text-decoration-none fw-bold'
+        html_class='border text-center',
+        link_class='text-decoration-none fw-bold text-primary',
     )
     name = base.TableRowLink(
         hx_target='DetailModalContent',
         modal_target='DetailModal',
-        html_class='text-decoration-none fw-bold text-secondary',
+        html_class='border',
+        link_class='text-decoration-none fw-bold text-primary',
         detail_link=True
     )
     report = base.TableRowCell(
@@ -37,17 +39,19 @@ class COATable(base.Table):
     number = base.TableRowLink(
         hx_target='UpdateModalContent',
         modal_target='UpdateModal',
-        html_class='text-decoration-none fw-bold text-primary'
+        html_class='border text-center',
+        link_class='text-decoration-none fw-bold text-primary',
     )
     name = base.TableRowLink(
         hx_target='DetailModalContent',
         modal_target='DetailModal',
-        html_class='text-decoration-none fw-bold text-secondary',
+        html_class='border',
+        link_class='text-decoration-none fw-bold text-primary',
         detail_link=True
     )
-    normal = base.TableRowCell(mask=COA._normal_balance, html_class="border")
-    is_active = base.TableRowCell(html_class="border", mask=[(True, "Yes"), (False, "No")])
-    is_cashflow = base.TableRowCell(html_class="border", mask=[(True, "Yes"), (False, "No")])
+    normal = base.TableRowCell(mask=COA._normal_balance, html_class="border text-center")
+    is_active = base.TableRowCell(html_class="border text-center", mask=[(True, "Yes"), (False, "No")])
+    is_cashflow = base.TableRowCell(html_class="border text-center", mask=[(True, "Yes"), (False, "No")])
     debit = base.TableRowCell(html_class="border text-end", val_type="money")
     credit = base.TableRowCell(html_class="border text-end", val_type="money")
     balance = base.TableRowCell(html_class="border text-end", val_type="money")
@@ -65,12 +69,14 @@ class CCFTable(base.Table):
     number = base.TableRowLink(
         hx_target='UpdateModalContent',
         modal_target='UpdateModal',
-        html_class='text-decoration-none fw-bold'
+        html_class='border text-center',
+        link_class='text-decoration-none fw-bold text-primary',
     )
     name = base.TableRowLink(
         hx_target='DetailModalContent',
         modal_target='DetailModal',
-        html_class='text-decoration-none fw-bold text-secondary',
+        html_class='border',
+        link_class='text-decoration-none fw-bold text-primary',
         detail_link=True
     )
     flow = base.TableRowCell(mask=CCF._flow, html_class="border")
@@ -90,12 +96,14 @@ class BSGTable(base.Table):
     number = base.TableRowLink(
         hx_target='UpdateModalContent',
         modal_target='UpdateModal',
-        html_class='text-decoration-none fw-bold'
+        html_class='border text-center',
+        link_class='text-decoration-none fw-bold text-primary',
     )
     name = base.TableRowLink(
         hx_target='DetailModalContent',
         modal_target='DetailModal',
-        html_class='text-decoration-none fw-bold text-secondary',
+        html_class='border',
+        link_class='text-decoration-none fw-bold text-primary',
         detail_link=True
     )
     group = base.TableRowHeader(html_class="border")
@@ -114,12 +122,14 @@ class JRBTable(base.Table):
     number = base.TableRowLink(
         hx_target='UpdateModalContent',
         modal_target='UpdateModal',
-        html_class='text-decoration-none fw-bold'
+        html_class='border',
+        link_class='text-decoration-none text-primary fw-bold'
     )
     description = base.TableRowLink(
         hx_target='DetailModalContent',
         modal_target='DetailModal',
-        html_class='text-decoration-none fw-bold text-secondary',
+        html_class='border',
+        link_class='text-decoration-none fw-bold text-primary',
         detail_link=True
     )
     created = base.TableRowCell(html_class="border", val_type="date")
@@ -142,12 +152,14 @@ class JRETable(base.Table):
     number = base.TableRowLink(
         hx_target='UpdateModalContent',
         modal_target='UpdateModal',
-        html_class='text-decoration-none fw-bold'
+        html_class='border',
+        link_class='text-decoration-none fw-bold text-primary',
     )
     batch = base.TableRowLink(
         hx_target='DetailModalContent',
         modal_target='DetailModal',
-        html_class='text-decoration-none fw-bold text-secondary d-none d-lg-table-cell',
+        html_class='border d-none d-lg-table-cell',
+        link_class='text-decoration-none fw-bold text-primary',
         detail_link=True
     )
     # batch = base.TableRowCell(html_class="border d-none d-lg-table-cell", css_style="font-size:small")
@@ -187,7 +199,8 @@ class TBTable(base.Table):
     name = base.TableRowLink(
         hx_target='UpdateModalContent',
         modal_target='UpdateModal',
-        html_class='text-decoration-none'
+        html_class='border',
+        link_class='text-decoration-none fw-bold text-primary',
     )
     previous = base.TableRowCell(html_class="border text-end", val_type="money")
     debit = base.TableRowCell(html_class="border text-end", val_type="money")
@@ -209,7 +222,8 @@ class GNLTable(base.Table):
     batch = base.TableRowLink(
         hx_target='UpdateModalContent',
         modal_target='UpdateModal',
-        html_class='text-decoration-none'
+        html_class='border',
+        link_class='text-decoration-none fw-bold text-primary',
     )
     ref = base.TableRowCell()
     description = base.TableRowCell()

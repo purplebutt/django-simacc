@@ -64,6 +64,13 @@ ul.dropdown-menu {
     }
 }
 
+ul.errorlist {
+    margin-bottom: 0px;
+    li {
+        line-height: 15px;
+    }
+}
+
 
 //make bootstrap floatform radio button appear inline
 fieldset.bs_radio_field {

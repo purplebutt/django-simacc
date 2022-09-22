@@ -43,7 +43,7 @@ class TableRowLink:
         url_link = model.get_detail_url() if self.kwargs.get('detail_link') else model.get_update_url()
         return f"""<td class='{self.kwargs.get('html_class')}'>
             <a 
-                class='{self.kwargs.get('html_class')}'
+                class='{self.kwargs.get('link_class')}'
                 type='button'
                 data-bs-toggle='modal'
                 data-bs-target='#{self.kwargs.get('modal_target')}'

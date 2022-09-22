@@ -10,15 +10,6 @@ from cover import data
 
 
 # functions for class compositions
-
-#@ deprecated - function (like search function) problably still need this
-def f_user_ingroup(self):
-    ingroup = False
-    for group in type(self).allowed_groups:
-        if ingroup:= self.request.user.groups.filter(name=group).exists(): break
-    return ingroup
-
-
 def f_test_func(self):
     if isinstance(self, View): user = self.request.user     # if t_test_func is calling by views.generic
     else: user = self.user      # if t_test_func is not called by views.generic
@@ -28,31 +19,6 @@ def f_test_func(self):
         is_valid_employee = have_company and is_approved
         return user.is_authenticated and is_valid_employee
     else: return False
-
-
-#@ deprecated
-def f_get_bak(self, *args, **kwargs):
-    # checks if user have permission to update or modify data
-    htmx_err = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
-    if f_user_ingroup(self):
-        if isinstance(self, ListView):
-            if self.request.htmx: self.template_name = type(self).htmx_template   # change to htmx template
-        return super(type(self), self).get(self.request, *args, **kwargs)
-    else:
-        if not self.request.htmx: return redirect('cover:error403', msg=htmx_err['msg'])
-        else: return render(self.request, template_name="errors/htmx_modal_err.html", context=htmx_err)
-
-#@ deprecated
-def f_post_bak(self, *args, **kwargs):
-    # checks if user have permission to update or modify data
-    err_info = {"title":"Forbidden", "head":"Forbidden", "msg":"You dont have permission to access or modify data"}
-    if not f_user_ingroup(self):
-        if self.request.htmx:
-            return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
-        else:
-            return HttpResponseForbidden(err_info["msg"])
-    else:
-        return super(type(self), self).post(self.request, *args, **kwargs)
 
 
 def f_form_valid(self, form):
@@ -161,67 +127,8 @@ def f_get_list_context_data(self, *args, **kwargs):
 
 def f_get_context_data(self, *args, **kwargs):
     context = super(type(self), self).get_context_data(*args, **kwargs)
-    #@ deprecated
-    #@ is_user_allowed context is no longer need, since we use mixin and decorators to 
-    #@ validate user. The update view template must be fix, no need to check if is_user_allowed
-    #@ that's why f_user_ingroup() function (see line 15) is no longer needed
-    context["is_user_allowed"] = f_user_ingroup(self)
-    # general data
     context = f_standard_context(self, context, include_sidebar=False)
     return context
-
-
-#@ delete this backup code
-def f_get_context_data_bak(self, *args, **kwargs):
-    if isinstance(self, ListView):
-        page = self.request.GET.get('page') or 1
-        per_page = self.request.GET.get('per_page') or 10
-
-        if hasattr(self, "filter_context_data"):
-            context = self.filter_context_data(**self.kwargs)
-        else:
-            context = super(type(self), self).get_context_data(*args, **kwargs)
-
-        # sort queryset data
-        if sortby:=self.request.GET.get("sortby"):
-            sort_mode = self.request.session.get(f"{type(self).__name__}_sortmode") or "desc"
-            if self.request.GET.get("follow_sort"):
-                if sort_mode == "asc":
-                    context[type(self).context_object_name] = context[type(self).context_object_name].order_by(F(sortby).desc())
-                else:
-                    context[type(self).context_object_name] = context[type(self).context_object_name].order_by(F(sortby).asc())
-            else:
-                context[type(self).context_object_name] = context[type(self).context_object_name].order_by(F(sortby).__getattribute__(sort_mode)())
-                # update _sortmode session only if request not perform by paginator
-                if sort_mode == "asc":
-                    self.request.session[f"{type(self).__name__}_sortmode"] = "desc"
-                else:
-                    self.request.session[f"{type(self).__name__}_sortmode"] = "asc"
-
-        context = f_standard_context(self, context)
-
-        # context["search_url"] = type(self).model.get_search_url()
-        context.setdefault("search_url", type(self).model.get_search_url())
-
-        context[type(self).context_object_name] = paginate(page, context[type(self).context_object_name], paginateBy=per_page)
-        context[type(self).table_object_name] = type(self).table(context[type(self).context_object_name], type(self).table_fields, 
-            table_name=type(self).model.__name__.lower(),
-            htmx_target=f"div#dataTableContent",
-            header_text=type(self).table_header, 
-            filter_data = type(self).get_table_filters() if hasattr(type(self), 'get_table_filters') else None,
-            ignore_query=("follow_sort",),
-            request=self.request)
-        return context
-    else:
-        context = super(type(self), self).get_context_data(*args, **kwargs)
-        context["is_user_allowed"] = f_user_ingroup(self)
-        # general data
-        # context["model_name"] = type(self).model.__name__.lower()
-        context.setdefault("model_name", type(self).model.__name__.lower())
-        context["page_title"] = type(self).page_title
-        context["add_url"] = type(self).model.get_add_url()
-        if hasattr(type(self).model, 'get_add_single_url'): context["add_single_url"] = type(self).model.get_add_single_url()
-        return context
 
 
 def f_search(request, **kwargs):

@@ -1,0 +1,20 @@
+{{request.htmx_message|json_script:'msg_update'}}
+<script type="text/javascript">
+    var htmxCloseModal = ()=> {
+        let target = document.querySelector('button.btn-close[data-bs-dismiss="modal"]');
+        target.click();
+
+        // show toast message
+        let toastTemplate = document.querySelector('div#toastInfo');
+        let toastBody = document.querySelector('div#toastInfo>div.toast-body');
+        let msg = document.querySelector('script#msg_update').textContent;
+        if (msg.length > 0) {
+            msg = msg.substring(1, msg.length-1);
+            toastBody.innerText = msg;
+            new bootstrap.Toast(toastTemplate).show();
+        }
+    }
+    var refresher = document.querySelector("a#data-refresher");
+    refresher.click()
+    htmxCloseModal();
+</script>

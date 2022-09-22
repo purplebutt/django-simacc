@@ -230,6 +230,13 @@ ul.dropdown-menu {
   background-color: #2a90c4;
 }
 
+ul.errorlist {
+  margin-bottom: 0px;
+}
+ul.errorlist li {
+  line-height: 15px;
+}
+
 fieldset.bs_radio_field div.form-radio div {
   display: inline;
   margin-right: 1em;
