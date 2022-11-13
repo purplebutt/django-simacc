@@ -162,7 +162,6 @@ class JRETable(base.Table):
         link_class='text-decoration-none fw-bold text-primary',
         detail_link=True
     )
-    # batch = base.TableRowCell(html_class="border d-none d-lg-table-cell", css_style="font-size:small")
     ref = base.TableRowCell(html_class="border d-none d-lg-table-cell")
     description = base.TableRowCell(html_class="border d-none d-lg-table-cell", css_style="font-size:small")
     group = base.TableRowCell(html_class="border", mask=JRE._type)

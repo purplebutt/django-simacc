@@ -4,7 +4,10 @@
         <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body py-1">
-        <p>{{object.author}}</p>
+        <p class="mt-2">Author: <b>{{object.author}}</b></br>
+        Created: <b>{{object.created}}</b></br>
+        Last modified: <b>{{object.modified}}</b></br>
+        Modified by: <b>{{object.edited_by}}</b></p>
     </div>
     <div class="modal-footer py-1">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Close">Ok</button>

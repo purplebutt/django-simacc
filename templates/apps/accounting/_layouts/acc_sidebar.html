@@ -12,7 +12,7 @@
     {% include 'account/_partials/mod_wrapper.html' with modal_id="updatePictureModal" modal_content_id="updatePictureModalContent" %}
 
     {% include '_comps/_partials/mod_wrapper_lg.html' with static=1 modal_id="AddModal" modal_content_id="AddModalContent" %}
-    {% include '_comps/_partials/mod_wrapper_lg.html' with static=1 modal_id="DetailModal" modal_content_id="DetailModalContent" %}
+    {% include '_comps/_partials/mod_wrapper.html' with static=1 modal_id="DetailModal" modal_content_id="DetailModalContent" %}
     {% include '_comps/_partials/mod_wrapper_lg.html' with static=1 modal_id="UpdateModal" modal_content_id="UpdateModalContent" %}
     {% include '_comps/_partials/mod_center_wrapper.html' with static=1 modal_id="DeleteModal" modal_content_id="DeleteModalContent" %}
     {% include '_comps/toast_info.html' %}
@@ -22,9 +22,6 @@
                 <div id="sideBarMenu" class="col-md-3 col-lg-2 px-1 d-print-none">
                     <div class="position-sticky" style="top: 3.9rem">
                       {% include "apps/_partials/sidebar.html" %}
-                    </div>
-                    <div class="fixed-bottom p-2">
-                        <a class="fs-6 fw-bolder text-decoration-none" href="{% url 'company:my_company' %}">{{user.profile.company|title}}</a>
                     </div>
                 </div>
                 <div id="sideBarContent" class="col-md-9 col-lg-10 ps-1">

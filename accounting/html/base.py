@@ -33,6 +33,10 @@ class TableRowCell:
                 v = v.split()[0]
             elif tp == "money":
                 v = "{:,}".format(int(v))
+                if v[0] == "-":
+                    v = v.replace("-", "(")
+                    v =  v + ")"
+                    return f"<td class='{self.kwargs.get('html_class')} text-danger' style='{self.kwargs.get('css_style')}'>{v}</td>"
             return f"<td class='{self.kwargs.get('html_class')}' style='{self.kwargs.get('css_style')}'>{v}</td>"
 
 class TableRowLink:
@@ -71,6 +75,7 @@ class TableHead:
             head_css_class = self.kwargs.get('html_class').get(i) or self.kwargs.get('html_class').get('_default_css_class')
             if 'filter_data' in self.kwargs and self.kwargs.get('filter_data') and i in self.kwargs.get('filter_data').keys():
                 head += f"""<th scope='col' class="{head_css_class}">
+                    <div class="d-flex align-items-center justify-content-center">
                     <a style='color:inherit' class='text-decoration-none' type='button'
                         hx-swap='innerHTML'
                         hx-target='{self.target.htmx_target}'
@@ -105,6 +110,7 @@ class TableHead:
                             hx-target='{self.target.htmx_target}'
                             hx-get='{utils.url_query_add(self.kwargs.get("list_url"), **utils._extract_url_query(self.target.request.get_full_path(), self.kwargs.get("ignore_query"), sortby=i))}'
                             >{t.upper()}</a>
+                        </div>
                         </th>"""
         head += "</thead>"
         return head

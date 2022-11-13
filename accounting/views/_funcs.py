@@ -92,7 +92,7 @@ def f_standard_context(self, context, include_sidebar=True):
 
 def f_get_list_context_data(self, *args, **kwargs):
     page = self.request.GET.get('page') or 1
-    per_page = self.request.GET.get('per_page') or 10
+    per_page = self.request.GET.get('per_page') or 16
 
     if hasattr(self, "filter_context_data"): context = self.filter_context_data(**self.kwargs)
     else: context = super(type(self), self).get_context_data(*args, **kwargs)

@@ -122,7 +122,7 @@ class ConfigCreateView(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMi
             return redirect('company:my_company')
 
 
-class EmployeeEditGroup(HtmxRedirectorMixin, generic.UpdateView):
+class EmployeeEditGroup(AllowedGroupsMixin, HtmxRedirectorMixin, UserPassesTestMixin, generic.UpdateView):
     model = User
     form_class = UserEditGroupForm
     template_name = DP / 'edit_group.html'

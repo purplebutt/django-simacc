@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.models import Group, User
 from django.db.models import Q, F
 from django.urls.base import reverse_lazy
-from ..models import COA, COH, JRE
+from ..models import COA, COH, JRE, CCF
 from ..controllers.reports import generate_ledger
 from ..html.table import TBTable, GNLTable
 from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_standard_context, f_search
@@ -18,6 +18,64 @@ from cover import data
 
 
 DP = DEFPATH('apps/accounting/_shared')
+
+
+# class CFLListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.ListView):
+#     model = JRE
+#     table = CFLTable
+#     table_fields = ('date', 'batch', 'ref', 'description', 'account', 'debit', 'credit', 'balance')
+#     table_header = ('Date', 'Batch', 'Ref', 'Description', 'Account', 'Debit', 'Credit', 'Balance')
+#     allowed_groups = ('accounting_viewer',)
+#     context_object_name = 'objects'
+#     table_object_name = 'table_obj'
+#     side_menu_group = 'reports'
+#     template_name = DP / 'no_htmx/list.html'
+#     htmx_template = DP / 'list.html'
+#     page_title = "Cash Flow Ledger"
+#     test_func = f_test_func
+#     get_context_data = f_get_list_context_data
+
+#     def filter_context_data(self, **kwargs):
+#         context = {}
+#         context["search_url"] = reverse_lazy("accounting:report_gnl_search")
+#         context["model_name"] = 'cfl'    # model_name should be lowercase
+#         # allows the view template to render javascript for calculating and render cumulative balance
+#         # for more info, see the javascript attached at apps/accounting/_shared/list.html
+#         context["cumulative_balance"] = True    
+#         start_date = self.request.GET.get('period_from')
+#         end_date = self.request.GET.get('period_to')
+#         acc_num_and_name = self.request.GET.get('account')
+#         # cash_flow = self.request.GET.get('cash_flow')
+#         if start_date and end_date:
+#             if not acc_num_and_name: account = CCF()     # create an empty account
+#             else: 
+#                 account = COA.objects.get(number=acc_num_and_name.split("|")[0])
+#                 context["account"] = acc_num_and_name
+#             qs, bb = generate_ledger(account, date.fromisoformat(start_date), date.fromisoformat(end_date))
+#             context["num_rows"] = qs.count()
+#             context[type(self).context_object_name] = qs.all()
+#             context["beginning_balance"] = bb
+#             context["reporting_period"] = (start_date, end_date)    # add reporting period to context, so it can be consume on view template
+#         else:
+#             # different fields between original fields and report fields
+#             field_diff = ('previous',)
+#             header_diff = ('Previous',)
+#             # using filter to remove non report fields from type(self).table_fields and type(self).table_header
+#             self.table_fields = tuple(filter(lambda i: i not in field_diff, type(self).table_fields))
+#             self.table_header = tuple(filter(lambda i: i not in header_diff, type(self).table_header))
+#             acc = COA() # create a new empty coa
+#             context[type(self).context_object_name] = generate_ledger(acc)[0]
+#         if len(self.request.GET) > 0:
+#             for k, v in self.request.GET.items():
+#                 if k == "header":
+#                     header_id = COH.objects.get(name__iexact=v)
+#                     context[type(self).context_object_name] = context[type(self).context_object_name].filter(**{k:header_id})
+#                 elif k == "normal":
+#                     context[type(self).context_object_name] = context[type(self).context_object_name].filter(**{k:v[:1].lower()})
+#                 elif k == "is_active" or k == "is_cashflow":
+#                     x = True if v == "true" else False
+#                     context[type(self).context_object_name] = context[type(self).context_object_name].filter(**{k:x})
+#         return context
 
 
 class GNLListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.ListView):
