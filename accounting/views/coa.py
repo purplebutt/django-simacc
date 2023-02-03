@@ -82,7 +82,6 @@ class COAListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, 
         }
 
     def filter_context_data(self, **kwargs):
-        from time import sleep
         context = super().get_context_data(**kwargs)
         if len(self.request.GET) > 0:
             for k, v in self.request.GET.items():

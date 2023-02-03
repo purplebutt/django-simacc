@@ -56,6 +56,6 @@ def generate_cfledger(cash_flow, period_from:date=None, period_to:date=None):
     if beginning_balance['amount2__sum'] is None: beginning_balance = 0
     else: beginning_balance = beginning_balance['amount2__sum']
 
-    if account.normal == 'd':
+    if cash_flow.flow == 'i':
         return result.order_by('date', '-debit'), beginning_balance
     return result.order_by('date', '-credit'), beginning_balance

@@ -89,7 +89,7 @@
                     hx-get="{{request.path}}"
                     hx-target="div#dataTableContent"
                     hx-swap="innerHTML"
-                    {% if model_name|is_eq:'gnl' %}
+                    {% if model_name|is_eq:'gnl' or model_name|is_eq:'cfl' %}
                         hx-include="input[name=period_from],input[name=period_to],input[name=account]"
                         >Get Ledger</button>
                     {% else %}
@@ -109,6 +109,18 @@
                         hx-target="datalist#sb_account_listdata" 
                         hx-trigger="load once"
                         hx-get="{% url 'accounting:utils_datalist' 'COA' %}">
+                    </datalist>
+                {% elif model_name|is_eq:'cfl' %}
+                    <div class="col-12 mb-1">
+                        <input class="form-control form-control-sm" title="select account" 
+                            {% if account %}value={{account}}{% endif %}
+                            type="text" list="sb_account_listdata" name="account">
+                    </div>
+                    <datalist id="sb_account_listdata" 
+                        hx-swap="innerHTML" 
+                        hx-target="datalist#sb_account_listdata" 
+                        hx-trigger="load once"
+                        hx-get="{% url 'accounting:utils_datalist' 'CCF' %}">
                     </datalist>
                 {% endif %}
                 <div class="col-12 mb-1">

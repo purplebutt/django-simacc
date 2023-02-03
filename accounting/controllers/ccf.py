@@ -34,6 +34,12 @@ class CCF(AccModelBase):
         verbose_name = "CCF"
         verbose_name_plural = "CCF"
 
+    # class methods
+    @classmethod
+    def get_with_number(cls, sep:str=" "):
+        result = map(lambda i: str(i[0])+sep+i[1], cls.actives.values_list('number', 'name'))
+        return result
+
     # instance methods
     def __str__(self):
         return self.name
