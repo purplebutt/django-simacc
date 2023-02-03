@@ -140,8 +140,8 @@ def f_search(request, **kwargs):
         if request.user.groups.filter(name=group).exists(): 
             ingroup = True; break
     if not ingroup:
-        if not self.request.htmx: return redirect('cover:error403', msg=err_info['msg'])
-        else: return render(self.request, template_name="errors/htmx_modal_err.html", context=err_info)
+        if request.htmx: return redirect('cover:error403', msg=err_info['msg'])
+        else: return render(request, template_name="errors/htmx_modal_err.html", context=err_info)
 
     obj_name = "objects" 
     tbl_name = "table_obj"

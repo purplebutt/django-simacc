@@ -10,7 +10,7 @@ from django.db.models import Q, F
 from django.urls.base import reverse_lazy
 from ..models import COA, COH, JRE, CCF
 from ..controllers.reports import generate_ledger, generate_cfledger
-from ..html.table import TBTable, GNLTable, CCFTable
+from ..html.table import TBTable, GNLTable, CFLTable
 from ._funcs import f_form_valid, f_test_func, f_get_list_context_data, f_get_context_data, f_standard_context, f_search
 from cover.utils import DEFPATH, paginate, HtmxRedirectorMixin, AllowedGroupsMixin
 from cover.decorators import htmx_only, have_company_and_approved
@@ -22,9 +22,9 @@ DP = DEFPATH('apps/accounting/_shared')
 
 class CFLListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.ListView):
     model = JRE
-    table = CCFTable
-    table_fields = ('date', 'batch', 'ref', 'description', 'account', 'debit', 'credit', 'balance')
-    table_header = ('Date', 'Batch', 'Ref', 'Description', 'Account', 'Debit', 'Credit', 'Balance')
+    table = CFLTable
+    table_fields = ('date', 'batch', 'ref', 'description', 'debit', 'credit', 'balance')
+    table_header = ('Date', 'Batch', 'Ref', 'Description', 'Debit', 'Credit', 'Balance')
     allowed_groups = ('accounting_viewer',)
     context_object_name = 'objects'
     table_object_name = 'table_obj'
@@ -58,12 +58,12 @@ class CFLListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, 
             context["reporting_period"] = (start_date, end_date)    # add reporting period to context, so it can be consume on view template
         else:
             # different fields between original fields and report fields
-            field_diff = ('previous',)
-            header_diff = ('Previous',)
-            # using filter to remove non report fields from type(self).table_fields and type(self).table_header
-            self.table_fields = tuple(filter(lambda i: i not in field_diff, type(self).table_fields))
-            self.table_header = tuple(filter(lambda i: i not in header_diff, type(self).table_header))
-            account = CCF() # create a new empty coa
+            # field_diff = ('previous',)
+            # header_diff = ('Previous',)
+            # # using filter to remove non report fields from type(self).table_fields and type(self).table_header
+            # self.table_fields = tuple(filter(lambda i: i not in field_diff, type(self).table_fields))
+            # self.table_header = tuple(filter(lambda i: i not in header_diff, type(self).table_header))
+            account = CCF() # create a new empty account
             context[type(self).context_object_name] = generate_cfledger(account)[0]
         if len(self.request.GET) > 0:
             for k, v in self.request.GET.items():
@@ -115,11 +115,11 @@ class GNLListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, 
             context["reporting_period"] = (start_date, end_date)    # add reporting period to context, so it can be consume on view template
         else:
             # different fields between original fields and report fields
-            field_diff = ('previous',)
-            header_diff = ('Previous',)
-            # using filter to remove non report fields from type(self).table_fields and type(self).table_header
-            self.table_fields = tuple(filter(lambda i: i not in field_diff, type(self).table_fields))
-            self.table_header = tuple(filter(lambda i: i not in header_diff, type(self).table_header))
+            # field_diff = ('previous',)
+            # header_diff = ('Previous',)
+            # # using filter to remove non report fields from type(self).table_fields and type(self).table_header
+            # self.table_fields = tuple(filter(lambda i: i not in field_diff, type(self).table_fields))
+            # self.table_header = tuple(filter(lambda i: i not in header_diff, type(self).table_header))
             acc = COA() # create a new empty coa
             context[type(self).context_object_name] = generate_ledger(acc)[0]
         if len(self.request.GET) > 0:
