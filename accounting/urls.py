@@ -69,9 +69,15 @@ urlpatterns = [
     path("report/trial_balance/", rep_view.TBListView.as_view(), name="report_tb"),
     path("report/trial_balance/search/", rep_view.tb_search, name="report_tb_search"),
     
+    #! Ledger
     path("report/general_ledger/", rep_view.GNLListView.as_view(), name="report_gnl"),
     path("report/general_ledger/search/", rep_view.gnl_search, name="report_gnl_search"),
 
+    #! CF Ledger
     path("report/cf_ledger/", rep_view.CFLListView.as_view(), name="report_cfl"),
     path("report/cf_ledger/search/", rep_view.cfl_search, name="report_cfl_search"),
+
+    #! Income Statement 
+    path("report/income_statement/", rep_view.ISListView.as_view(), name="report_is"),
+    path("report/income_statement/search/", rep_view.tb_search, name="report_is_search"),
 ]

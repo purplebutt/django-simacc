@@ -214,6 +214,29 @@ class TBTable(base.Table):
             filter_data=kwargs.get('filter_data'), ignore_query=kwargs.get('ignore_query'), list_url=type(self).list_url)
 
 
+class ISTable(base.Table):
+    model_name = 'is'
+    list_url = reverse_lazy("accounting:report_is")
+    number = base.TableRowHeader(html_class="border")
+    normal = base.TableRowCell(mask=COA._normal_balance, html_class="border")
+    is_active = base.TableRowCell(html_class="border", mask=[(True, "Yes"), (False, "No")])
+    name = base.TableRowLink(
+        hx_target='UpdateModalContent',
+        modal_target='UpdateModal',
+        html_class='border',
+        link_class='text-decoration-none fw-bold text-primary',
+    )
+    entries = base.TableRowCell(html_class="border text-end", val_type="money")
+    balance = base.TableRowCell(html_class="border text-end", val_type="money")
+
+    def __init__(self, model, fields, **kwargs):
+        super(type(self), self).__init__(model, fields, **kwargs)
+        # custom table header (can only be add on __init__ method because it's need self/instance)
+        head_css_class = {'_default_css_class': 'text-warning text-center border'}
+        self.table_header = base.TableHead(self, html_class=head_css_class, thead_class="bg-secondary", 
+            filter_data=kwargs.get('filter_data'), ignore_query=kwargs.get('ignore_query'), list_url=type(self).list_url)
+
+
 class GNLTable(base.Table):
     model_name = 'gnl'
     list_url = reverse_lazy("accounting:report_gnl")

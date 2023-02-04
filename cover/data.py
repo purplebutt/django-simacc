@@ -41,7 +41,7 @@ def sidebar(mode:str):
             { 'name': 'tb', 'url': reverse('accounting:report_tb'), 'verbose': 'trial balance'},
             { 'name': 'gnl', 'url': reverse('accounting:report_gnl'), 'verbose': 'general ledger'},
             { 'name': 'cfl', 'url': reverse('accounting:report_cfl'), 'verbose': 'cash flow ledger'},
-            { 'name': 'is', 'url': '#is', 'verbose': 'income statement'},
+            { 'name': 'is', 'url': reverse('accounting:report_is'), 'verbose': 'income statement'},
             { 'name': 'es', 'url': '#is', 'verbose': 'equity statement'},
             { 'name': 'bs', 'url': '#bs', 'verbose': 'balance sheet'},
             { 'name': 'cf', 'url': '#cf', 'verbose': 'cash flow'},

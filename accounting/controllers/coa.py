@@ -26,6 +26,18 @@ class COATBManager(models.Manager):
         )
         return result.filter(Q(balance__gt=0)|Q(balance__lt=0)).order_by('number')
 
+class COAISManager(models.Manager):
+    def get_queryset(self):
+        result = super(type(self), self).get_queryset().filter(header__report='pl', is_active=True).annotate(
+            balance=Sum(Case(
+                When(journal__group='d', then=F('journal__amount')*-1),
+                When(journal__group='c', then=F('journal__amount')),
+                default=0,
+            )),
+            entries=Count('journal')
+        )
+        return result.filter(Q(balance__gt=0)|Q(balance__lt=0)).order_by('number')
+
 
 class COA(AccModelBase):
     _img_path = 'images/accounting/coa/'
@@ -47,6 +59,7 @@ class COA(AccModelBase):
 
     objects = ModelManager()
     trialbalance = COATBManager()
+    incomestatement = COAISManager()
 
     class Meta:
         ordering = ('number',)
@@ -106,3 +119,17 @@ class COA(AccModelBase):
         # return result.filter(
         #     (Q(balance!=0)&Q(previous!=0)&Q(debit!=0)&Q(credit!=0))
         # ).order_by('number')
+
+    @classmethod
+    def get_is_at(cls, period_from:date, period_to:date):
+        result = cls.objects.filter(header__report="pl").annotate(
+            balance=Sum(
+                Case(
+                    When(Q(journal__group='d')&Q(journal__date__gte=period_from)&Q(journal__date__lte=period_to), then=F('journal__amount')*-1),
+                    When(Q(journal__group='c')&Q(journal__date__gte=period_from)&Q(journal__date__lte=period_to), then=F('journal__amount')),
+                    default=0,
+                )
+            ),
+            entries=Count('journal')
+        )
+        return result
