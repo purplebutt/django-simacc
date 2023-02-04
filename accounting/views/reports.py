@@ -37,7 +37,7 @@ class CFLListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, 
 
     def filter_context_data(self, **kwargs):
         context = {}
-        context["search_url"] = reverse_lazy("accounting:report_gnl_search")
+        context["search_url"] = reverse_lazy("accounting:report_cfl_search")
         context["model_name"] = 'cfl'    # model_name should be lowercase
         # allows the view template to render javascript for calculating and render cumulative balance
         # for more info, see the javascript attached at apps/accounting/_shared/list.html
@@ -76,6 +76,49 @@ class CFLListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, 
                     x = True if v == "true" else False
                     context[type(self).context_object_name] = context[type(self).context_object_name].filter(**{k:x})
         return context
+
+
+@login_required
+@have_company_and_approved
+@htmx_only()
+def cfl_search(request):
+    kwargs = {}
+    kwargs['model'] = JRE
+    kwargs['table'] = CFLTable
+    kwargs['page_title'] = "Cash Flow Ledger"
+    kwargs['template_name'] = DP/"list_search.html"
+    kwargs['table_fields'] = CFLListView.table_fields
+    kwargs['header_text'] = CFLListView.table_header 
+    # kwargs['table_filters'] = CFLListView.get_table_filters()
+    kwargs['side_menu_group'] = "reports"  # mark this search as report search
+    kwargs['cumulative_balance'] = True
+
+    search_key = request.GET.get('search_key') or ""
+    start_date = request.GET.get('period_from')
+    end_date = request.GET.get('period_to')
+    account = request.GET.get('account')
+
+    if start_date and end_date:
+        # set queryset
+        if not account: account = CCF()     # create an empty account
+        else: account = CCF.objects.get(number=account.split('|')[0])
+        qs, bb = generate_cfledger(account, date.fromisoformat(start_date), date.fromisoformat(end_date))
+        kwargs['querymanager'] = qs.all()
+        kwargs['beginning_balance'] = bb
+        kwargs["reporting_period"] = (start_date, end_date)    # add reporting period to context, so it can be consume on view template
+        # set table fields and table header text
+    else:
+        field_diff = ('previous',)
+        header_diff = ('Previous',)
+        # using filter to remove non report fields from type(self).table_fields and type(self).table_header
+        kwargs['table_fields'] = tuple(filter(lambda i: i not in field_diff, kwargs['table_fields']))
+        kwargs['header_text'] = tuple(filter(lambda i: i not in header_diff, kwargs['header_text']))
+
+    if not search_key.isnumeric(): 
+        kwargs['filter_q'] = Q(ref__icontains=search_key)|Q(description__icontains=search_key)
+
+    response = f_search(request, **kwargs)
+    return response
 
 
 class GNLListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, generic.ListView):

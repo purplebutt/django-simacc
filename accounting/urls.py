@@ -73,5 +73,5 @@ urlpatterns = [
     path("report/general_ledger/search/", rep_view.gnl_search, name="report_gnl_search"),
 
     path("report/cf_ledger/", rep_view.CFLListView.as_view(), name="report_cfl"),
-    path("report/cf_ledger/search/", rep_view.gnl_search, name="report_cfl_search"),
+    path("report/cf_ledger/search/", rep_view.cfl_search, name="report_cfl_search"),
 ]
