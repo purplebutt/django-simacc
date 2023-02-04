@@ -21,7 +21,7 @@ def jre_clean(self):
         if ccval.isnumeric() and int(ccval) > 0:
             self.cleaned_data['amount'] = ccval
         else:
-            self.add_error('amount', f"Invalid value: {value} should be a positive integer")
+            self.add_error('amount', f"Invalid value: {ccval} should be a positive integer")
     # custom validation for 'account'
     ccval = self.cleaned_data.get('account') 
     if ccval is not None:
@@ -38,19 +38,21 @@ def jre_clean(self):
                 self.cleaned_data['account'] = coa_instance
             else:
                 self.add_error('account', f"No account with name '{ccval}'") 
-    # custom validation for 'cashflow'
-    ccval = self.cleaned_data.get('cashflow') 
-    if ccval != None and ccval != '':
-        if CCF.actives.filter(name=ccval).exists():
-            self.cleaned_data['cashflow'] = CCF.actives.get(name=ccval)
-        else:
-            self.add_error('cashflow', f"No cash flow with name '{ccval}'") 
-        if coa_instance and not coa_instance.is_cashflow: 
-            self.add_error('cashflow', f"This field is no need, please provide a blank value.")
-    else:
-        self.cleaned_data['cashflow'] = None
-        if coa_instance and coa_instance.is_cashflow: 
-            self.add_error('cashflow', f"This field is required.")
+
+    # # custom validation for 'cashflow'
+    # ccval = self.cleaned_data.get('cashflow') 
+    # if ccval != None and ccval != '':
+    #     if CCF.actives.filter(name=ccval).exists():
+    #         self.cleaned_data['cashflow'] = CCF.actives.get(name=ccval)
+    #     else:
+    #         self.add_error('cashflow', f"No cash flow with name '{ccval}'") 
+    #     if coa_instance and not coa_instance.is_cashflow: 
+    #         self.add_error('cashflow', f"This field is no need, please provide a blank value.")
+    # else:
+    #     self.cleaned_data['cashflow'] = None
+    #     if coa_instance and coa_instance.is_cashflow: 
+    #         self.add_error('cashflow', f"This field is required.")
+
     # custom validation for 'busines seqment'
     ccval = self.cleaned_data.get('segment') 
     if ccval != None and ccval != '':
@@ -60,6 +62,21 @@ def jre_clean(self):
         self.cleaned_data['segment'] = None
         if coa_instance and coa_instance.report() == 'PROFIT & LOSS': 
             self.add_error('segment', f"This field is required.")
+    # custom validation for 'cash flow'
+    cashflow = self.cleaned_data.get('cashflow') 
+    if cashflow != None and cashflow != "":
+        if "|" in cashflow and cashflow[:1].isnumeric():
+            number, name = cashflow.split("|")
+            if CCF.actives.filter(Q(name=name)&Q(number=number)).exists():
+                self.cleaned_data['cashflow'] = CCF.actives.get(number=float(number))
+            else:
+                self.add_error('cashflow', f"No cash flow with number & name '{cashflow}'") 
+        else:
+            if CCF.actives.filter(name=cashflow).exists():
+                self.cleaned_data['cashflow'] = CCF.actives.get(name=cashflow)
+            else:
+                self.add_error('cashflow', f"No cash flow with name '{cashflow}'") 
+
 
 class JRECreateSingleForm(forms.ModelForm):
     clean = jre_clean
@@ -214,7 +231,7 @@ def jre_double_entry_clean(self):
         if ccval.isnumeric() and int(ccval) > 0:
             self.cleaned_data['amount'] = ccval
         else:
-            self.add_error('amount', f"Invalid value: {value} should be a positive integer")
+            self.add_error('amount', f"Invalid value: {ccval} should be a positive integer")
     # custom validation for 'account debited'
     ccval = self.cleaned_data.get('account') 
     if ccval != None and ccval != "":
@@ -247,19 +264,21 @@ def jre_double_entry_clean(self):
                 self.cleaned_data['account2'] = coa_instance.get_credit()
             else:
                 self.add_error('account2', f"No account with name '{ccval}'") 
-    # custom validation for 'cashflow'
-    ccval = self.cleaned_data.get('cashflow') 
-    if ccval != None and ccval != '':
-        if CCF.actives.filter(name=ccval).exists():
-            self.cleaned_data['cashflow'] = CCF.actives.get(name=ccval)
-        else:
-            self.add_error('cashflow', f"No cash flow with name '{ccval}'") 
-        if not coa_instance.is_cashflow(): 
-            self.add_error('cashflow', f"This field is no need, please provide a blank value.")
-    else:
-        self.cleaned_data['cashflow'] = None
-        if coa_instance.is_cashflow(): 
-            self.add_error('cashflow', f"This field is required.")
+
+    # # custom validation for 'cashflow'
+    # ccval = self.cleaned_data.get('cashflow') 
+    # if ccval != None and ccval != '':
+    #     if CCF.actives.filter(name=ccval).exists():
+    #         self.cleaned_data['cashflow'] = CCF.actives.get(name=ccval)
+    #     else:
+    #         self.add_error('cashflow', f"No cash flow with name '{ccval}'") 
+    #     if not coa_instance.is_cashflow(): 
+    #         self.add_error('cashflow', f"This field is no need, please provide a blank value.")
+    # else:
+    #     self.cleaned_data['cashflow'] = None
+    #     if coa_instance.is_cashflow(): 
+    #         self.add_error('cashflow', f"This field is required.")
+
     # custom validation for 'busines seqment'
     ccval = self.cleaned_data.get('segment') 
     if ccval != None and ccval != '':
@@ -269,6 +288,20 @@ def jre_double_entry_clean(self):
         self.cleaned_data['segment'] = None
         if coa_instance.is_profit_and_loss(): 
             self.add_error('segment', f"This field is required.")
+    # custom validation for 'cash flow'
+    cashflow = self.cleaned_data.get('cashflow') 
+    if cashflow != None and cashflow != "":
+        if "|" in cashflow and cashflow[:1].isnumeric():
+            number, name = cashflow.split("|")
+            if CCF.actives.filter(Q(name=name)&Q(number=number)).exists():
+                self.cleaned_data['cashflow'] = CCF.actives.get(number=float(number))
+            else:
+                self.add_error('cashflow', f"No cash flow with number & name '{cashflow}'") 
+        else:
+            if CCF.actives.filter(name=cashflow).exists():
+                self.cleaned_data['cashflow'] = CCF.actives.get(name=cashflow)
+            else:
+                self.add_error('cashflow', f"No cash flow with name '{cashflow}'") 
 
 class JRECreateForm(forms.ModelForm):
     clean = jre_double_entry_clean

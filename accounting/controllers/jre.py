@@ -58,7 +58,6 @@ class JRE(AccModelBase):
 
     # instance methods
     def __str__(self):
-        batch = JRB.objects.get(number=self.batch)
         return str(self.number)
 
     def set_opp_group(self, pair)->None:
@@ -143,7 +142,7 @@ class JRE(AccModelBase):
             pair_instance.save()
             self.save()
         else:
-            raise ValidationError(f"No valid account found for {pair}")
+            raise ValidationError(f"No valid account found for {self.pair}")
         return (self.number, pair_instance.number)
 
     def has_pdf(self):
