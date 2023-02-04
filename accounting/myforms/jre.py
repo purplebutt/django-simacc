@@ -76,6 +76,10 @@ def jre_clean(self):
                 self.cleaned_data['cashflow'] = CCF.actives.get(name=cashflow)
             else:
                 self.add_error('cashflow', f"No cash flow with name '{cashflow}'") 
+    else:
+        self.cleaned_data['cashflow'] = None
+        if coa_instance and coa_instance.is_cashflow:
+            self.add_error('cashflow', f"This field is required.")
 
 
 class JRECreateSingleForm(forms.ModelForm):
@@ -302,6 +306,11 @@ def jre_double_entry_clean(self):
                 self.cleaned_data['cashflow'] = CCF.actives.get(name=cashflow)
             else:
                 self.add_error('cashflow', f"No cash flow with name '{cashflow}'") 
+    else:
+        self.cleaned_data['cashflow'] = None
+        if coa_instance and coa_instance.is_cashflow:
+            self.add_error('cashflow', f"This field is required.")
+
 
 class JRECreateForm(forms.ModelForm):
     clean = jre_double_entry_clean
