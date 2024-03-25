@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'cover.middleware.HTMXMiddleware',
@@ -83,15 +84,15 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'sqlite3': {
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'simaccdb.sqlite3',
     },
-    'default': {
+    'postgres': {
         'ENGINE': 'django.db.backends.postgresql',
         'HOST': 'localhost',
         'USER': 'postgres',
-        'NAME': 'simacc2db',
+        'NAME': 'simaccdb',
         'PORT': '5432' 
     }
 }
@@ -161,7 +162,7 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 1     # required by allauth to work
 
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SESSION_REMEMBER = None

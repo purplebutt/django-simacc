@@ -32,8 +32,8 @@ class Company(AccModelBase):
     desc = models.TextField(blank=True)
     config = models.JSONField(default=dict)
     image = models.ImageField(upload_to=_img_path, default=_img_def_path)
-    author = models.OneToOneField(User, on_delete=models.RESTRICT, related_name='comp_author', related_query_name='comp_author')
-    edited_by = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='comp_editors', related_query_name='comp_editor')
+    author = models.OneToOneField(User, on_delete=models.CASCADE, related_name='comp_author', related_query_name='comp_author')
+    edited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comp_editors', related_query_name='comp_editor')
 
     class Meta:
         verbose_name = "Company"
@@ -66,9 +66,8 @@ class Company(AccModelBase):
             self.sync_user_profile(stat=True, level=5)
             self.author.profile.save()  # make persistent on database
             # create config for the company
-            config = Config()
-            config.company = self
-            config.save()
+            ##self.config.company = self
+            ##self.config.save()
         else:
             super(type(self), self).save(*args, **kwargs)
 

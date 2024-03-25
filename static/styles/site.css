@@ -44,17 +44,7 @@ body {
 }
 
 img.img-animate {
-  -webkit-animation: waveAnim 2s linear infinite alternate;
-          animation: waveAnim 2s linear infinite alternate;
-}
-
-@-webkit-keyframes waveAnim {
-  0% {
-    transform: translate(0, 0) rotate(0);
-  }
-  100% {
-    transform: translate(3px, 5px) rotate(2deg);
-  }
+  animation: waveAnim 2s linear infinite alternate;
 }
 
 @keyframes waveAnim {
@@ -65,28 +55,12 @@ img.img-animate {
     transform: translate(3px, 5px) rotate(2deg);
   }
 }
-@-webkit-keyframes rotate90deg {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(90deg);
-  }
-}
 @keyframes rotate90deg {
   0% {
     transform: rotate(0deg);
   }
   100% {
     transform: rotate(90deg);
-  }
-}
-@-webkit-keyframes rotate90deg_back {
-  0% {
-    transform: rotate(90deg);
-  }
-  100% {
-    transform: rotate(0deg);
   }
 }
 @keyframes rotate90deg_back {
@@ -108,7 +82,6 @@ section h1 {
 section div.banner {
   -webkit-user-select: none;
      -moz-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 section div.banner img {
@@ -348,17 +321,13 @@ section#welcome div.container button.collapse-btn {
   color: var(--white);
 }
 section#welcome div.container button.collapse-btn svg {
-  -webkit-animation: rotate90deg 0.2s;
-          animation: rotate90deg 0.2s;
+  animation: rotate90deg 0.2s;
   animation-direction: reverse;
-  -webkit-animation-fill-mode: forwards;
-          animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
 }
 section#welcome div.container button.collapse-btn svg.rotate {
-  -webkit-animation: rotate90deg 0.2s;
-          animation: rotate90deg 0.2s;
-  -webkit-animation-fill-mode: forwards;
-          animation-fill-mode: forwards;
+  animation: rotate90deg 0.2s;
+  animation-fill-mode: forwards;
 }
 
 section#profile img.profile-left-img {
@@ -458,7 +427,6 @@ footer a.to-top {
   background-image: var(--gradient-2);
   padding: 6px 10px;
   border-radius: 50%;
-  width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
   display: none;

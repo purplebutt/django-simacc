@@ -38,7 +38,7 @@ class COHDetailView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin
     page_title = PAGE_TITLE
     htmx_template = DP / 'detail.html'
     htmx_only = True
-    allowed_groups = ('accounting_viewer',)
+    allowed_groups = ('accounting_viewer','accounting_staff')
     get_context_data = f_get_context_data
     test_func = f_test_func
 
@@ -61,7 +61,7 @@ class COHListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, 
     table = COHTable
     table_fields = ('number', 'name', 'report', 'group')
     table_header = ('Code', 'Header Name', 'Report', 'Account Group')
-    allowed_groups = ('accounting_viewer',)
+    allowed_groups = ('accounting_viewer','accounting_staff')
     context_object_name = 'objects'
     table_object_name = 'table_obj'
     side_menu_group = 'master'

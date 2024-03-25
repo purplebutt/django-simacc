@@ -31,7 +31,7 @@ class MyCompany(HaveCompanyMixin, HtmxRedirectorMixin, UserPassesTestMixin, gene
     def get_object(self): return self.request.user.profile.company
 
 
-class CompanyCreateView(NoCompanyMixin, UserPassesTestMixin, generic.CreateView):
+class CompanyCreateView(NoCompanyMixin, AllowedGroupsMixin, UserPassesTestMixin, generic.CreateView):
     model = Company
     form_class = CompanyEditForm
     template_name = DP / 'create.html'

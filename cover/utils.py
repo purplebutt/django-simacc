@@ -194,7 +194,7 @@ class HtmxRedirectorMixin:
 
 
 class AllowedGroupsMixin:
-    """ 
+    """
         Checks if current logged user groups contains all groups defined in 'allowed_groups' field
         If current logged user have all the permission then user passed, otherwise return error 403
         This mixin do a verification .
@@ -205,7 +205,6 @@ class AllowedGroupsMixin:
         OPTIONAL INFERIOR/CHILD CLASS ATTRIBUTES:
         >> errmsg_allowed_groups:dict -> {'title':'Error Title', 'head':'Error Head', 'msg':'Error Message'}
     """
-
     def dispatch(self, request, *args, **kwargs):
         for group in type(self).allowed_groups:
             if ingroup:= self.request.user.groups.filter(name=group).exists(): break

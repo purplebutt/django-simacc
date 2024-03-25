@@ -40,7 +40,7 @@ class COADetailView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin
     page_title = PAGE_TITLE
     htmx_template = DP / 'detail.html'
     htmx_only = True
-    allowed_groups = ('accounting_viewer',)
+    allowed_groups = ('accounting_viewer','accounting_staff')
     test_func = f_test_func
 
 
@@ -66,7 +66,7 @@ class COAListView(UserPassesTestMixin, AllowedGroupsMixin, HtmxRedirectorMixin, 
     table_object_name = 'table_obj'
     side_menu_group = 'master'
     page_title = PAGE_TITLE
-    allowed_groups = ('accounting_viewer',)
+    allowed_groups = ('accounting_viewer','accounting_staff')
     template_name = DP / 'no_htmx/list.html'
     htmx_template = DP / 'list.html'
     test_func = f_test_func
